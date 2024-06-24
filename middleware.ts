@@ -1,12 +1,14 @@
 
 import { getToken } from 'next-auth/jwt';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(req:any) {
+export async function middleware(req:NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  console.log("entrando al middlware")
+  
 
   const { pathname } = req.nextUrl;
+  console.log("pathname: ", pathname)
+  console.log("hay token: ", token)
 
   if (token && pathname === '/login') {
     return NextResponse.redirect(new URL('/', req.url));
