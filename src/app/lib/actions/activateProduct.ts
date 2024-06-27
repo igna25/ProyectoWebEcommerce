@@ -15,6 +15,7 @@ export async function activateProduct(formData: FormData) {
     const productsRepository = new ProductsRepository()
     try{
         const {updatedRows} =await productsRepository.changeProductActiveStatus(id,true)
+        await revalidatePath('/admin/inactivos')
         
         if(updatedRows == 0){
             return {
