@@ -24,14 +24,14 @@ export default async function getAllBuysPaginated({
     const salesRepository = new SalesRepository();
     let totalPages = 5;
 
-    const { sales, total } = await salesRepository.getAllSalesPaginated(currentPage, ITEMS_PER_PAGE);
+    const { sales, total } = await salesRepository.getAllSalesPaginatedWithUserId(currentPage, ITEMS_PER_PAGE, session?.user.id );
+
     totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     const filteredSales = sales.filter(sale => sale.userid === session?.user.id);
 
     return (
         <Fragment>
             <div className="container mx-auto px-4">
-                <SearchBar />
                 {sales.length === 0 ? (
                     <div className="h-screen flex items-center justify-center bg-gray-100">
                         <div className="text-center text-gray-700">

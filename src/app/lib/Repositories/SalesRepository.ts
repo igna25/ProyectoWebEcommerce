@@ -74,6 +74,35 @@ class SalesRepository {
         throw new Error('Failed to fetch sales.');
     }
   }
+
+
+  async getAllSalesPaginatedWithUserId(
+    page: number,
+    pageSize: number,
+    userId: string = ""
+  ): Promise<{sales:Sale[], total:number}> {
+    try {
+        const offset = (page - 1) * pageSize;
+        const query = await sql<Sale>
+        `SELECT * FROM sales
+        WHERE userid= ${userId}
+        ORDER BY creationDate
+        LIMIT ${pageSize} OFFSET ${offset}`;
+
+        const totalQuery = await sql<{ count: number }>`
+            SELECT COUNT(*) as count FROM sales WHERE userid= ${userId}`;
+        const total = totalQuery.rows[0].count;
+        
+        return {
+            sales:query.rows,
+            total
+        }
+    } catch (error) {
+        console.error('Failed to fetch sales:', error);
+        throw new Error('Failed to fetch sales.');
+    }
+  }
+
   async getRecentSales(limit: number = 3): Promise<Sale[]> {
     try {
       const query = await sql<Sale>`

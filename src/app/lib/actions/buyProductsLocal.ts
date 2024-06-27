@@ -61,29 +61,25 @@ export async function buyProductsLocal(cartProducts: (OrderItem & Product)[]): P
                     unit_price: parseFloat(orderItem.productprice + "")
                 }
             })
-            console.log(items)
-            // ACA USAR PROCESS PAYMENT Y NO LO DE ABAJO
-            // const preference = await (new Preference(client)).create(
-            //     {
-            //         body: {
-            //             items,
-            //             back_urls: {
-            //                 success: "https://proyecto-web-vercel.vercel.app/",
-            //                 pending: "https://proyecto-web-vercel.vercel.app/",
-            //                 failure: "https://proyecto-web-vercel.vercel.app/"
-            //             },
-            //             auto_return: 'approved',
-            //             metadata: {
-            //                 cartid: cart.id,
-            //             }
-            //         },
-            //     })
-            //ESTO NO ^^
+            const preference = await (new Preference(client)).create(
+                 {
+                     body: {
+                         items,
+                         back_urls: {
+                             success: "https://proyecto-web-vercel.vercel.app/",
+                             failure: "https://proyecto-web-vercel.vercel.app/"
+                         },
+                         metadata: {
+                             cartid: cartId,
+                         }
+                     },
+                 })
+            
             if (await processPayment(cartId, "payimentID")) {
                 revalidatePath('/')
                 return {
                     success: true,
-                    redirectUrl: "/",//preference.sandbox_init_point // ACA PONER STRING VACIO
+                    redirectUrl: preference.sandbox_init_point 
                 };
 
             } else {               
