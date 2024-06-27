@@ -176,6 +176,37 @@ class ProductsRepository {
     }
   }
 
+  async getRecentlyAddedProducts(): Promise<Product[]> {
+    try {
+      const query = await sql<Product>`
+        SELECT * FROM products
+        ORDER BY publicationdate DESC
+        LIMIT 3
+      `;
+      return query.rows;
+    } catch (error) {
+      console.error('Failed to fetch recently added products:', error);
+      throw new Error('Failed to fetch recently added products.');
+    }
+  }
+
+  async getTopSellingProducts(): Promise<Product[]> {
+    try {
+      const query = await sql<Product>`
+        SELECT p.*, SUM(so.quantity) as total_sold
+        FROM products p
+        JOIN sales_orders so ON p.id = so.productID
+        GROUP BY p.id
+        ORDER BY total_sold DESC
+        LIMIT 3
+      `;
+      return query.rows;
+    } catch (error) {
+      console.error('Failed to fetch top selling products:', error);
+      throw new Error('Failed to fetch top selling products.');
+    }
+  }
+
 }
 
 export default ProductsRepository;
