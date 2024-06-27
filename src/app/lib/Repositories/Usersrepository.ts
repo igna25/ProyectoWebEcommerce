@@ -2,6 +2,7 @@ import { QueryResult } from '@vercel/postgres';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../Entities/User';
 import { sql } from '@vercel/postgres';
+import bcrypt from 'bcrypt';
 
 class UsersRepository {
     async getUserById(userId: string): Promise<User | undefined> {
@@ -13,6 +14,22 @@ class UsersRepository {
         throw new Error(`Failed to fetch user with ID ${userId}.`);
       }
     }
+
+    async registerUser(email: string, username: string, password: string): Promise<boolean> {
+      try {
+        const hashedPassword = await bcrypt.hash(password, 10); 
+        const query = await sql`
+          INSERT INTO users (email, username, password)
+          VALUES (${email}, ${username}, ${hashedPassword})
+        `;
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to register user:', error);
+        throw new Error('Failed to register user.');
+      }
+    }
+  
   
     async createUser(name: string, role: string, email: string, password: string): Promise<string> {
       try {

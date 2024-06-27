@@ -1,6 +1,9 @@
 import clsx from 'clsx'
+import { registerUser} from '../lib/actions/registerUser';
 
 export default function RegisterForm() {
+
+
   return (
     <div className="w-full max-w-md px-4">
       <form className="space-y-6 rounded-xl bg-white p-6 sm:p-10">

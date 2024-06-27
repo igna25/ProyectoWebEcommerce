@@ -48,7 +48,7 @@ class SalesRepository {
         const offset = (page - 1) * pageSize;
         const query = await sql<Sale>
         `SELECT * FROM sales
-        ORDER BY creationDate
+        ORDER BY creationDate DESC
         LIMIT ${pageSize} OFFSET ${offset}`;
 
         const totalQuery = await sql<{ count: number }>`

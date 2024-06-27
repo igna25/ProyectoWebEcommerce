@@ -61,18 +61,18 @@ export default async function AdminPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {lowStockProducts.length > 0 ? (
                 lowStockProducts.map(product => (
-                  <div key={product.id} className="bg-gray-100 rounded-lg p-4">
+                  <div key={product.id} className="bg-red-100 rounded-lg p-4">
                     <p className="text-lg font-semibold">{product.productname}</p>
                     <p className="text-sm text-gray-600">Stock: {product.stock}</p>
-                    <Link href={`/admin/activos/${product.id}`}>
-                      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">Ir a Producto</button>
-                    </Link>
                   </div>
                 ))
               ) : (
                 <p className="text-gray-500">Todos los productos están al día</p>
               )}
             </div>
+            <Link href={`/admin/activos}`}>
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">Ir a Productos</button>
+            </Link>
           </div>
 
         </div>
