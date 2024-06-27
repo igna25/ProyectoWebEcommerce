@@ -9,8 +9,6 @@ export async function POST(
     try {
         const body:any= await req.json()
         console.log(body)
-        const {cartid} = body.metadata
-        console.log(cartid)
         const payment = await new Payment(client).get({id:body.data.id})
         console.log(payment)
 
