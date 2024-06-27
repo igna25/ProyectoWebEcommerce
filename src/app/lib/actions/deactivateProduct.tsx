@@ -9,7 +9,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
   })
   
-
+export const revalidate = true
 export async function deactivateProduct(formData: FormData) {
     const id = String(formData.get('id'))
     const imageId = String(formData.get('imageId'))
