@@ -74,7 +74,6 @@ export async function createProduct(formData: FormData) {
     };
 
   } catch (error) {
-    console.log(error);
     return {
       success: false,
       msg: "Error creating product"

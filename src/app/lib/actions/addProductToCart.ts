@@ -25,14 +25,11 @@ export async function addProductToCart(product: Product, userID: string) {
                 cartId = await cartsRepository.createCart(userID, product.price, "abc");
                 await ordersRepository.createOrderItem(cartId, product.id, 1, product.price);
             } else {
-                console.log(cart.id, product.id)
                 const orderItem = await ordersRepository.getOrderByCartAndProductId(cart.id,product.id)
 
                 if(orderItem){
-                    console.log("acutalizando")
                     ordersRepository.updateOrderItem(orderItem.id, orderItem.quantity+1, orderItem.productprice)
                 }else{
-                    console.log("creando nuevo order item")
                     ordersRepository.createOrderItem(cart.id, product.id, 1, product.price);
                 }
                 const updatedCartTotal = parseFloat(cart.totalprice + "") + parseFloat(product.price + "");

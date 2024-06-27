@@ -8,12 +8,13 @@ export async function POST(
 ) {
     try {
         const body:any= await req.json()
-        const {cartid} = body.metadata
+        console.log(body)
+        /*const {cartid} = body.metadata
         const payment = await new Payment(client).get({id:body.data.id})
 
         const result = await processPayment(cartid, body.data.id)
 
-        return NextResponse.json({ msg:"Payment successfull" }, { status: 200 });
+        return NextResponse.json({ msg:"Payment successfull" }, { status: 200 });*/
     } 
     catch (err) {
         return NextResponse.json({ msg: "Error trying to fetch products" }, { status: 500 });

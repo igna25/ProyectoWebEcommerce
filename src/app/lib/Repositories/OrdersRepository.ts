@@ -49,8 +49,6 @@ class OrderItemsRepository {
     productPrice: number
   ): Promise<void> {
     try {
-      console.log(quantity)
-      console.log(orderItemId)
       await sql`
         UPDATE orderItems 
         SET quantity = ${quantity}, productPrice = ${productPrice} 

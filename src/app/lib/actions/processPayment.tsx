@@ -14,7 +14,6 @@ const usersRepository = new UsersRepository()
 
 export default async function processPayment(cartid:string, paymentId:string){
     try {
-        console.log("empezando el pago...")
         const cart = await cartsRepository.getCartById(cartid)
         const orderItems = await orderItemsRepository.getOrderItemsByCartId(cartid)
         let totalProducts = orderItems.reduce((accumulator, item) => accumulator + item.quantity, 0);
@@ -37,7 +36,6 @@ export default async function processPayment(cartid:string, paymentId:string){
             success: true
         };       
     } catch (error) {
-        console.log(error)
         return {
             success: false
         };   
