@@ -23,7 +23,6 @@ export async function deactivateProduct(formData: FormData) {
                 msg: "Product Id not fount"
             }
         }
-        revalidatePath('/admin/activos')
         return{
             success:true
         }
