@@ -13,8 +13,8 @@ export async function POST(
         const payment = await new Payment(client).get({id:body.data.id})
 
         const result = await processPayment(cartid, body.data.id)
-
-        return NextResponse.json({ msg:"Payment successfull" }, { status: 200 });*/
+*/
+        return NextResponse.json({ msg:"Payment successfull" }, { status: 200 });
     } 
     catch (err) {
         return NextResponse.json({ msg: "Error trying to fetch products" }, { status: 500 });
