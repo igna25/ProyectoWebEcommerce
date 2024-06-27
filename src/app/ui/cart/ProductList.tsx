@@ -6,14 +6,15 @@ import CartWrapper from './CartCard';
 import { Product } from '@/app/lib/Entities/Product';
 import { OrderItem } from '@/app/lib/Entities/Order';
 import { removeProduct, increaseQuantity, decreaseQuantity, clearCart } from './../../lib/actions/cartActions';
-import { LocalCart } from '@/app/lib/Entities/LocalCart';
 import { buyProducts } from '@/app/lib/actions/buyProducts';
+import { buyProductsLocal } from '@/app/lib/actions/buyProductsLocal';
 import { useRouter } from 'next/navigation';
+import { getCartProductsFromLocalStorage } from '@/app/lib/actions/getProductFromLocalStorage';
 
-export default function ProductList({ cartProducts, userId }: { cartProducts: (OrderItem & Product)[],userId:string |undefined }) {
+export default function ProductList({ cartProducts, userId }: { cartProducts: (OrderItem & Product)[], userId: string | undefined }) {
 
     const router = useRouter();
-    const isLogged= userId!=undefined
+    const isLogged = userId != undefined
 
     const [products, setProducts] = useState<(OrderItem & Product)[]>(cartProducts || []);
     const [cartId, setCartId] = useState<string>('');
@@ -24,13 +25,13 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
                 setCartId(cartProducts[0].cartid);
             }
         } else {
-            if (cartProducts.length > 0){
-                setCartId(cartProducts[0].cartid)
-            }
+            cartProducts = getCartProductsFromLocalStorage();
+            setProducts(cartProducts);
         }
-    }, [cartProducts]);
 
-    const handleRemoveProduct = async (orderitemid: string) => {
+    }, [cartProducts])
+
+    const handleRemoveProduct = async (orderitemid: string, productid:string) => {
         if (isLogged) {
             const handlerResult = await removeProduct(orderitemid, cartId);
             if (handlerResult.success) {
@@ -41,21 +42,20 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
         else {
             const cartString = localStorage.getItem('cart');
             if (cartString) {
-                const cart: LocalCart = JSON.parse(cartString);
-                const productToUpdate = cart.products.find((product) => product.productid !== orderitemid);
-                if (productToUpdate) {
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                }
+                const cart: (OrderItem & Product)[] = JSON.parse(cartString);
+                const updatedCart = cart.filter(item => item.productid !== productid);
+                localStorage.setItem('cart', JSON.stringify(updatedCart));
+                setProducts(updatedCart);
             }
         }
     };
 
-    const handleIncreaseQuantity = async (orderitemid: string) => {
+    const handleIncreaseQuantity = async (orderitemid: string, productid:string) => {
         if (isLogged) {
             const handlerResult = await increaseQuantity(orderitemid, cartId);
             if (handlerResult.success) {
                 const updatedProducts = products.map(product =>
-                    product.id === orderitemid ? { ...product, quantity: product.quantity + 1 } : product
+                    product.id == orderitemid ? { ...product, quantity: product.quantity + 1 } : product
                 );
                 setProducts(updatedProducts);
             }
@@ -63,22 +63,24 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
         else {
             const cartString = localStorage.getItem('cart');
             if (cartString) {
-                const cart: LocalCart = JSON.parse(cartString);
-                const productToUpdate = cart.products.find((product) => product.productid == orderitemid);
-                if (productToUpdate) {
-                    productToUpdate.quantity += 1;
+                const cart: (OrderItem & Product)[] = JSON.parse(cartString);
+                const existingProductIndex = cart.findIndex((item: (OrderItem & Product)) => item.productid === productid);
+                if (existingProductIndex !== -1) {
+                    cart[existingProductIndex].quantity++;
                     localStorage.setItem('cart', JSON.stringify(cart));
-                }
+                    setProducts(cart);
+                };
+
             }
         }
     };
 
-    const handleDecreaseQuantity = async (orderitemid: string) => {
+    const handleDecreaseQuantity = async (orderitemid: string, productid:string) => {
         if (isLogged) {
             const handlerResult = await decreaseQuantity(orderitemid, cartId);
             if (handlerResult.success) {
                 const updatedProducts = products.map(product =>
-                    product.id === orderitemid && product.quantity > 1 ? { ...product, quantity: product.quantity - 1 } : product
+                    product.id == orderitemid && product.quantity > 1 ? { ...product, quantity: product.quantity - 1 } : product
                 );
                 setProducts(updatedProducts);
             }
@@ -86,13 +88,14 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
         else {
             const cartString = localStorage.getItem('cart');
             if (cartString) {
-                const cart: LocalCart = JSON.parse(cartString);
-                const productToUpdate = cart.products.find((product) =>
-                    product.id === orderitemid && product.quantity > 1 ? { ...product, quantity: product.quantity - 1 } : product
-                );
-                if (productToUpdate) {
+                const cart: (OrderItem & Product)[] = JSON.parse(cartString);
+                const existingProductIndex = cart.findIndex((item: (OrderItem & Product)) => item.productid == productid && item.quantity > 1);
+                if (existingProductIndex !== -1) {
+                    cart[existingProductIndex].quantity--;
                     localStorage.setItem('cart', JSON.stringify(cart));
-                }
+                    setProducts(cart);
+                };
+
             }
         }
     };
@@ -107,7 +110,8 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
         else {
             const cartString = localStorage.getItem('cart');
             if (cartString) {
-                localStorage.clear
+                localStorage.removeItem('cart')
+                setProducts([]);
             }
         }
     };
@@ -118,27 +122,27 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
             const formData: FormData = new FormData()
 
             products.map((product: (OrderItem & Product)) => {
-                //userId recibido por parámetro desde page obteniendo el usuario especial??
-
                 //Campos orderItem
                 formData.append('orderId', product.id)
                 formData.append('cartId', product.cartid)
-                formData.append('date', product.dateadded.toISOString())
+                formData.append('date', product.dateadded.toString())
                 formData.append('quantity', String(product.quantity))
-                formData.append('totalPrice', String(product.price))
+                formData.append('orderItemPrice', String(product.productprice))
                 //Campos Product
                 formData.append('productId', product.productid)
                 formData.append('productName', product.productname)
                 formData.append('description', product.description)
                 formData.append('image', product.imageurl)
-                formData.append('productPrice', String(product.productprice))
-                formData.append('publicationDate', product.publicationdate.toISOString())
+                formData.append('productPrice', String(product.price))
+                formData.append('publicationDate', product.publicationdate.toString())
                 formData.append('productStock', String(product.stock))
+                formData.append('productActive', String(product.active))
 
             })
 
+            let result
             if (isLogged) {
-                const result = await buyProducts(userId)
+                result = await buyProducts(userId)
                 if (result.success && result.redirectUrl) {
                     router.push(result.redirectUrl);
                 } else {
@@ -147,13 +151,19 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
             }
             else {
                 //TODO agregar la compra local 
-                //result = await buyProductsLocal(formData);
-                
+               result = await buyProductsLocal(products);
+                if (result.success && result.redirectUrl) {
+                    //router.push(result.redirectUrl); 
+                    console.log("compra exitosa")
+                } else {
+                    console.error('Error during purchase:');
+                }
+
             }
 
         } catch (error) {
             console.error('Error al enviar datos:', error);
-        } 
+        }
     };
 
     return (
@@ -169,9 +179,9 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
                                             key={product.id}
                                             product={product}
                                             isLogged={isLogged}
-                                            onIncrease={() => handleIncreaseQuantity(product.id)}
-                                            onDecrease={() => handleDecreaseQuantity(product.id)}
-                                            onRemove={() => handleRemoveProduct(product.id)}
+                                            onIncrease={() => handleIncreaseQuantity(product.id, product.productid)}
+                                            onDecrease={() => handleDecreaseQuantity(product.id, product.productid)}
+                                            onRemove={() => handleRemoveProduct(product.id, product.productid)}
                                         />
                                     ))}
                                     <div className="flex-1 flex mt-4">
@@ -205,14 +215,16 @@ export default function ProductList({ cartProducts, userId }: { cartProducts: (O
                     </div>
                     <div className="flex justify-between mt-4 border-t pt-6">
                         <p className="text-xl font-bold">Total:</p>
-                        <p className="text-4xl">${products.reduce((acc, product) => acc + product.productprice * product.quantity, 0)}</p>
+                        <p className="text-4xl">${products.reduce((acc, product) => acc + product.productprice * product.quantity, 0).toFixed(2)}</p>
                     </div>
-                    <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 text-center"
-                        onClick={handleSubmit}
+                    {products.length > 0 && (
+                        <button
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 text-center"
+                            onClick={handleSubmit}
                         >
                             Comprar
-                    </button>
+                        </button>
+                    )}
                 </div>
             </div>
         </Fragment>

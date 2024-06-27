@@ -9,13 +9,18 @@ import CartButton from './dashboard/CartButton';
 import Image from "next/image";
 import HomeButton from './HomeButton';
 import SearchBar from './dashboard/SearchBar';
+import { Fragment } from 'react';
+import BuysRecordButton from './BuysRecordButton';
 
 
 const NavBar  = async ()=>{
   
   const session:Session|null = await getServerSession(authOptions)
   let AuthButton = (session)? 
-  <LogoutButton></LogoutButton>:
+  <Fragment>
+    <BuysRecordButton></BuysRecordButton>
+    <LogoutButton></LogoutButton> 
+  </Fragment>:
   <LoginButton></LoginButton>
   
 

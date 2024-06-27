@@ -1,5 +1,5 @@
 // lib/actions/getCartProductsFromLocalStorage.ts
-"use server"
+"use client"
 import { OrderItem } from "../Entities/Order";
 import { Product } from "../Entities/Product";
 

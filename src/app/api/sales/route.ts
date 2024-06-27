@@ -8,7 +8,7 @@ export async function GET(
         const salesRepository = new SalesRepository()
         const { searchParams } = new URL(req.url || "")
         const id = searchParams.get('id')
-        if(id!=null && id.length>0){
+        if(id!=null){
             const sale = await salesRepository.getSaleById(id)
             return NextResponse.json({ sale }, { status: 200 });
         }
@@ -22,4 +22,4 @@ export async function GET(
     }
 }
 
-export const revalidate = 60
+export const revalidate = 60

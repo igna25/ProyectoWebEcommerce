@@ -8,7 +8,7 @@ export async function GET(
         const producstRepository = new ProductsRepository()
         const { searchParams } = new URL(req.url || "")
         const id = searchParams.get('id')
-        if(id!=null && id.length>0){
+        if(id!=null){
             const product = await producstRepository.getProductById(id)
             return NextResponse.json({ product }, { status: 200 });
         }

@@ -1,6 +1,6 @@
 export interface Sale {
     id: string;
-    userID: string;
+    userid: string;
     username: string;
     totalprice: number;
     totalproducts: number;

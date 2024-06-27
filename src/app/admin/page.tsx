@@ -31,7 +31,7 @@ export default async function AdminPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <div className="bg-gray-100 rounded-lg p-4">
               <h3 className="text-xl font-semibold">Total Ganado</h3>
-              <p className="mt-2">${totalEarnings}</p>
+              <p className="mt-2">${totalEarnings.toFixed(2)}</p>
             </div>
 
             <div className="bg-gray-100 rounded-lg p-4">

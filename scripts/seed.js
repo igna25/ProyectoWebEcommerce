@@ -14,9 +14,78 @@ const carts = [
   { username: 'Bob Johnson', totalPrice: 0.00, mercadoPagoID: 'MP789012' }
 ];
 const products = [
-  { productName: 'Laptop', description: 'A high-performance laptop.', imageURL: 'https://fakeimg.pl/350x200/?text=Producto_1&font=lobster', imageKey: 'laptop123', price: 999.99, publicationDate: new Date(), stock: 50 },
-  { productName: 'Smartphone', description: 'Latest model smartphone.', imageURL: 'https://fakeimg.pl/350x200/?text=Producto_2&font=lobster', imageKey: 'smartphone123', price: 699.99, publicationDate: new Date(), stock: 100 },
-  { productName: 'Headphones', description: 'Noise-cancelling headphones.', imageURL: 'https://fakeimg.pl/350x200/?text=Producto_3&font=lobster', imageKey: 'headphones123', price: 199.99, publicationDate: new Date(), stock: 200 }
+  {
+    productName: 'Tetera de Metal',
+    description: 'Elegante tetera de metal con diseño clásico, marca TeaMaster, capacidad de 1.5 litros.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228690/proyecto_web/tetera_aw9onw.jpg',
+    imageKey: 'tetera123',
+    price: 29.99,
+    publicationDate: new Date('2023-03-15'),
+    stock: 75
+  },
+  {
+    productName: 'Tazas de Café de Vidrio',
+    description: 'Juego de 6 tazas de café de vidrio templado, marca CoffeeClear, capacidad de 250 ml cada una.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228688/proyecto_web/tazacafe_klegvn.png',
+    imageKey: 'tazacafe123',
+    price: 19.99,
+    publicationDate: new Date('2023-02-10'),
+    stock: 150
+  },
+  {
+    productName: 'Jarra de Vidrio',
+    description: 'Jarra de vidrio transparente de alta capacidad, marca PureGlass, capacidad de 2 litros.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228687/proyecto_web/jarra_z8xty8.jpg',
+    imageKey: 'jarra123',
+    price: 14.99,
+    publicationDate: new Date('2023-01-25'),
+    stock: 120
+  },
+  {
+    productName: 'Vaso de Vidrio',
+    description: 'Vaso de vidrio resistente para bebidas frías, marca ChillGlass, capacidad de 350 ml.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228685/proyecto_web/vaso_niukh0.jpg',
+    imageKey: 'vaso123',
+    price: 4.99,
+    publicationDate: new Date('2023-04-05'),
+    stock: 200
+  },
+  {
+    productName: 'Tupper de Plástico',
+    description: 'Tupper de plástico hermético para alimentos, marca FreshKeep, capacidad de 1 litro.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228683/proyecto_web/tupper_souqyc.jpg',
+    imageKey: 'tupper123',
+    price: 9.99,
+    publicationDate: new Date('2023-03-01'),
+    stock: 250
+  },
+  {
+    productName: 'Plato de Porcelana',
+    description: 'Plato de porcelana elegante para ocasiones especiales, marca FineDine, diámetro de 28 cm.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228681/proyecto_web/plato_hcvzur.jpg',
+    imageKey: 'plato123',
+    price: 12.99,
+    publicationDate: new Date('2023-02-20'),
+    stock: 80
+  },
+  {
+    productName: 'Especiero de Vidrio',
+    description: 'Especiero de vidrio con soporte de madera, marca SpiceSet, incluye 8 frascos.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228680/proyecto_web/especiero_agkwvg.png',
+    imageKey: 'especiero123',
+    price: 24.99,
+    publicationDate: new Date('2023-03-10'),
+    stock: 60
+  },
+  {
+    productName: 'Set de Tablas de Madera',
+    description: 'Set de 3 tablas de madera para cortar alimentos, marca WoodWorks, diferentes tamaños.',
+    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228678/proyecto_web/tablamadera_h3pkcb.jpg',
+    imageKey: 'tablas123',
+    price: 34.99,
+    publicationDate: new Date('2023-01-15'),
+    stock: 50
+  }
 ];
 
 async function seedUsers(client) {

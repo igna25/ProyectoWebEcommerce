@@ -12,7 +12,7 @@ const SaleDetail = ({ sale, orders }: SaleDetailProps) => {
     <div className="w-full rounded overflow-hidden shadow-lg bg-white m-4 p-6">
       <div className="flex justify-between items-center border-b pb-4 mb-4">
         <div>
-          <h2 className="font-bold text-2xl">Detalle de Venta</h2>
+          <h2 className="font-bold text-2xl">Detalle de Compra</h2>
           <p className="text-gray-600">Fecha: {new Date(sale.creationdate).toLocaleDateString()}</p>
           <p className="text-gray-600">Comprador: {sale.username}</p>
         </div>

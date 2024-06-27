@@ -10,7 +10,6 @@ import { addProductToLocalStorage } from '@/app/lib/actions/addProductToLocalSto
 
 
 function AddCartButton({ product, userID }: { product: Product, userID: string | undefined }) {
-
     let [isOpen, setIsOpen] = useState(false)
     const handleClick = () => {
         if (!userID) {

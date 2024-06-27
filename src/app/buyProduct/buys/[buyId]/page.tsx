@@ -10,17 +10,18 @@ export default async function SalePage({
   params,
 }: {
   params: {
-    saleId: string
+    buyId: string
   };
 }) {
+   noStore();
    
     const salesOrdersRepository = new SalesOrdersRepository();
     const salesRepository = new SalesRepository();
-    const sale = await salesRepository.getSaleById(params.saleId);
+    const sale = await salesRepository.getSaleById(params.buyId);
     let orders: SalesOrder[] = [];
 
     if (sale) {
-        orders = await salesOrdersRepository.getOrdersBySaleId(params.saleId);
+        orders = await salesOrdersRepository.getOrdersBySaleId(sale.id);
     } else{
         notFound();
     }

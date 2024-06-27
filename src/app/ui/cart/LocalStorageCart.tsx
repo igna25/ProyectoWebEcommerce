@@ -1,4 +1,3 @@
-// components/ClientCart.tsx
 "use client"
 import { OrderItem } from '@/app/lib/Entities/Order';
 import { Product } from '@/app/lib/Entities/Product';
@@ -15,7 +14,7 @@ export function ClientCart() {
       setCartProducts(JSON.parse(cartFromLocalStorage));
     }
   }, []);
-
+  
   return (
     <section className="w-full mb-2">
       <ProductList cartProducts={cartProducts} userId={undefined}></ProductList>

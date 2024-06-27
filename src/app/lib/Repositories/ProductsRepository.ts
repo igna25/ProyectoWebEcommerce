@@ -131,6 +131,29 @@ class ProductsRepository {
         SET active = ${active}
         WHERE id = ${productId}
       `;
+
+      if(!active){
+        const result2 = await sql`
+          DELETE FROM orderitems
+          WHERE productid = ${productId}
+        `;  
+      }
+      return {
+        updatedRows: result.rowCount
+      }
+    } catch (error) {
+      console.error(`Failed to change active status for product with ID ${productId}:`, error);
+      throw new Error(`Failed to change active status for product with ID ${productId}.`);
+    }
+  }
+
+  async updateStock(productId: string, newStock:number): Promise<{updatedRows:number}> {
+    try {
+      const result = await sql`
+        UPDATE products
+        SET stock = ${newStock}
+        WHERE id = ${productId}
+      `;
       return {
         updatedRows: result.rowCount
       }

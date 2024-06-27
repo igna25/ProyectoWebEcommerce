@@ -7,6 +7,7 @@ import Pagination from "@/app/ui/admin/Pagination";
 import { Fragment } from "react";
 import DeleteButton from "@/app/ui/admin/deleteButton";
 import Link from "next/link";
+import StockModal from "@/app/ui/admin/stockModal";
 
 export default async function LoginPage({
   searchParams,
@@ -51,11 +52,8 @@ export default async function LoginPage({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product}>
-                  <Link href={"/admin/activos/"+product.id}>
-                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-                    Modificar
-                  </button>
-                  </Link>
+                  
+                  <StockModal data={{ id: product.id, currentStock: product.stock }} />
                   <DeleteButton data={{id:product.id, imageId:product.imagekey}}/>
                 </ProductCard>
               ))}

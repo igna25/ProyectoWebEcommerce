@@ -23,13 +23,14 @@ const CartButton = () => {
           >
             <PopoverPanel
               anchor="bottom"
-              className="divide-y divide-white/5 rounded-xl bg-gray-400 text-sm/6 [--anchor-gap:var(--spacing-3)]"
+              className="divide-y divide-white rounded-xl bg-gray-400 text-sm text-white font-semibold [--anchor-gap:var(--spacing-3)]"
             >
               <div className="p-2">
-                <a className="block rounded-lg py-2 px-3 transition hover:bg-white/5" href="#">
-                  <p className="font-semibold text-white">Buy products</p>
+              <a className="block rounded-lg py-2 px-3 transition hover:bg-white/20" href="#">
+                  <Link href="/buyProduct">Ir a compra
+                  </Link>
                 </a>
-                <a className="block rounded-lg py-2 px-3 transition hover:bg-white/5" href="#">
+                <a className="block rounded-lg py-2 px-3 transition hover:bg-white/20" href="#">
                   <Link href="/cart">Carrito
                   </Link>
                 </a>

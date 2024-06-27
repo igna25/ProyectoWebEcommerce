@@ -8,7 +8,7 @@ export default function NotFound() {
       <h2 className="text-xl font-semibold">404 Not Found</h2>
       <p>No se pudo encontrar la compra solicitada.</p>
       <Link
-        href="/dashboard/invoices"
+        href="/buyProduct/buys"
         className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"
       >
         Volver
