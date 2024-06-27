@@ -3,6 +3,7 @@ import React, { Fragment, useState } from 'react';
 import Modal from 'react-modal'; 
 import { activateProduct } from '@/app/lib/actions/activateProduct';
 import { ToastContainer, toast } from 'react-toastify';
+import { revalidatePath } from 'next/cache';
 
 
 const ActivateButton = ({data}:{data:{id:string}}) => {
@@ -20,6 +21,7 @@ const ActivateButton = ({data}:{data:{id:string}}) => {
 
             const result = await activateProduct(form)
             if(result.success){
+                revalidatePath('/admin/inactivos')
                 console.log("eliminado correctamente")
             }
             else{

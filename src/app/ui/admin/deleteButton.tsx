@@ -2,6 +2,7 @@
 import React, { Fragment, useState } from 'react';
 import Modal from 'react-modal'; 
 import { deactivateProduct } from '@/app/lib/actions/deactivateProduct';
+import { revalidatePath } from 'next/cache';
 
 
 const DeleteButton = ({data}:{data:{id:string, imageId:string}}) => {
@@ -20,6 +21,7 @@ const DeleteButton = ({data}:{data:{id:string, imageId:string}}) => {
 
             const result = await deactivateProduct(form)
             if(result.success){
+                revalidatePath('/admin/activos')
                 console.log("todo bien")
             }
             else{
