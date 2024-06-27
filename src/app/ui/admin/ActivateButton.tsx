@@ -4,11 +4,13 @@ import Modal from 'react-modal';
 import { activateProduct } from '@/app/lib/actions/activateProduct';
 import { ToastContainer, toast } from 'react-toastify';
 import { revalidatePath } from 'next/cache';
-
+import Router from 'next/router';
+import { useRouter } from 'next/router';
 
 const ActivateButton = ({data}:{data:{id:string}}) => {
     const {id} = data
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const router = useRouter();
 
     const openModal = () => setModalIsOpen(true);
     const closeModal = () => setModalIsOpen(false);
@@ -21,7 +23,7 @@ const ActivateButton = ({data}:{data:{id:string}}) => {
 
             const result = await activateProduct(form)
             if(result.success){
-                revalidatePath('/admin/inactivos')
+                router.reload()
                 console.log("eliminado correctamente")
             }
             else{
