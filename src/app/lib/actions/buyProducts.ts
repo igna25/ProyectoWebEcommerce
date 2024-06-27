@@ -45,13 +45,12 @@ export async function buyProducts(userID: string): Promise<{ success: boolean, r
                     items,
                     back_urls: {
                         success: "https://proyecto-web-vercel.vercel.app/",
-                        pending:"https://proyecto-web-vercel.vercel.app/",
                         failure:"https://proyecto-web-vercel.vercel.app/"
                     },
-                    auto_return: 'approved',
                     metadata: {
                         cartid: cart.id,
-                    }
+                    },
+                    additional_info:cart.id
                 },
                 
             })

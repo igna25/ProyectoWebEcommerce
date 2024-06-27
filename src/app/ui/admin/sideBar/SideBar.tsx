@@ -8,25 +8,35 @@ import { usePathname } from 'next/navigation';
 import { SIDENAV_ITEMS } from './constants';
 import { SideNavItem } from './types';
 import { Icon } from '@iconify/react';
+import LogoutButton from '../../LogoutButton';
+import { Button } from '@headlessui/react';
 
 const SideNav = () => {
   return (
     <div className="md:w-60 bg-gray-900 text-white h-screen flex-1 fixed border-r border-gray-700 hidden md:flex">
-      <div className="flex flex-col space-y-6 w-full">
-        <Link
-          href="/"
-          className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 border-b border-gray-700 h-12 w-full"
-        >
-          <span className="h-7 w-7 bg-gray-800 rounded-lg" />
-          <span className="font-bold text-xl hidden md:flex">Logo</span>
-        </Link>
+      
 
-        <div className="flex flex-col space-y-2 md:px-6">
-          {SIDENAV_ITEMS.map((item, idx) => {
-            return <MenuItem key={idx} item={item} />;
-          })}
+      <div className="flex flex-col justify-between h-full">
+        <div className="flex flex-col space-y-6 w-full">
+          <Link
+            href="/"
+            className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 border-b border-gray-700 h-12 w-full"
+          >
+            <span className="h-7 w-7 bg-gray-800 rounded-lg" />
+            <span className="font-bold text-xl hidden md:flex">Logo</span>
+          </Link>
+
+          <div className="flex flex-col space-y-2 md:px-6">
+            {SIDENAV_ITEMS.map((item, idx) => {
+              return <MenuItem key={idx} item={item} />;
+            })}
+          </div>
+          <Button className="flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-gray-800">
+          <span className="font-semibold text-xl flex">Logout</span>
+          </Button>
+          
         </div>
-      </div>
+    </div>
     </div>
   );
 };
