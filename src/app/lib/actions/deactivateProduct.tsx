@@ -9,7 +9,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
   })
   
-export const revalidate = true
 export async function deactivateProduct(formData: FormData) {
     const id = String(formData.get('id'))
     const imageId = String(formData.get('imageId'))
@@ -23,7 +22,7 @@ export async function deactivateProduct(formData: FormData) {
                 msg: "Product Id not fount"
             }
         }
-        await revalidatePath('/admin/activos')
+        await revalidatePath('/admin/activos', 'layout')
         return{
             success:true
         }

@@ -9,13 +9,12 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
   })
   
-export const revalidate = true
 export async function activateProduct(formData: FormData) {
     const id = String(formData.get('id'))
     const productsRepository = new ProductsRepository()
     try{
         const {updatedRows} =await productsRepository.changeProductActiveStatus(id,true)
-        await revalidatePath('/admin/inactivos')
+        await revalidatePath('/admin/inactivos', 'page')
         
         if(updatedRows == 0){
             return {
