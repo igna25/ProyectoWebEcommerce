@@ -17,6 +17,7 @@ export async function POST(
         return NextResponse.json({ msg:"Payment successfull" }, { status: 200 });
     } 
     catch (err) {
+        console.log(err)
         return NextResponse.json({ msg: "Error trying to fetch products" }, { status: 500 });
     }
 }
