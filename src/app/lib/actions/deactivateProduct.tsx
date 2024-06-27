@@ -9,20 +9,21 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
   })
   
+
 export async function deactivateProduct(formData: FormData) {
     const id = String(formData.get('id'))
     const imageId = String(formData.get('imageId'))
     const productsRepository = new ProductsRepository()
     try{
         const {updatedRows} = await productsRepository.changeProductActiveStatus(id,false)
-
+    revalidatePath('/', 'layout')  
         if(updatedRows == 0){
             return {
                 success:false,
                 msg: "Product Id not fount"
             }
         }
-        await revalidatePath('/admin/activos', 'layout')
+        
         return{
             success:true
         }
