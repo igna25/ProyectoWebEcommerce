@@ -16,18 +16,13 @@ const ActivateButton = ({data}:{data:{id:string}}) => {
             const form = new FormData()
             form.append('id', id)
 
-            const result = await activateProduct(form)
-            if(result.success){
-                console.log("eliminado correctamente")
-            }
-            else{
-                console.log("algo paso")
-            }
+            activateProduct(form)
+            closeModal();
+
         }
         catch(error){
 
         }
-        closeModal();
     };
 
     return (
