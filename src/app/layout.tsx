@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import NavBar from "./ui/navBar";
+import RegisterSW from "./pwa/RegisterSW";
+import Providers from "./Providers";
 import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,7 +29,11 @@ export default async function RootLayout({
   return (
     <Fragment>
       <html lang="en">
-        <body className={inter.className}>{children}
+        <body className={inter.className}>
+          <Providers>
+            <RegisterSW />
+            {children}
+          </Providers>
         </body>
       </html>
     </Fragment>
