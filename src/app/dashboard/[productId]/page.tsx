@@ -1,44 +1,38 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/auth-config';
-import ProductsRepository from '@/app/lib/Repositories/ProductsRepository';
+"use client";
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import ProductDetails from '@/app/ui/dashboard/ProductDetails';
-import { getServerSession, Session } from 'next-auth';
-import { notFound } from 'next/navigation';
 
+export default function ProductDetailsPage() {
+  const params = useParams();
+  const productId = typeof params?.productId === 'string' ? params.productId : Array.isArray(params?.productId) ? params.productId[0] : '';
+  const { data: session } = useSession();
+  const [product, setProduct] = useState<any | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
-const ProductDetailsPage = async ({
-    params,
-  }: {
-    params: {
-      productId: string
-      userID: string
+  useEffect(() => {
+    const load = async () => {
+      if (!productId) return;
+      const res = await fetch(`/api/products/${productId}`);
+      if (!res.ok) { setNotFound(true); return; }
+      const json = await res.json();
+      setProduct(json.product || null);
     };
-  }) => {
-    
-    const session: Session | null = await getServerSession(authOptions);
-    const productsRepository = new ProductsRepository()
+    load();
+  }, [productId]);
 
-    const product = await productsRepository.getProductById(params.productId)
-    
-    if(!product) {
-      notFound();
-    }
-    
   return (
-    <div>
-
-      <div className="container mx-auto px-4">
-        {product? (
-            <ProductDetails product={product} userID={session?.user.id} />
-        ) : (
-            <div className="h-screen flex items-center justify-center bg-gray-100">
-                <div className="text-center text-gray-700">
-                    <p className="text-xl">Lo sentimos, parece que el producto no existe.</p>
-                </div>
-            </div>
-        )}
-    </div>
+    <div className="container mx-auto px-4">
+      {product ? (
+        <ProductDetails product={product} userID={session?.user?.id} />
+      ) : notFound ? (
+        <div className="h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center text-gray-700">
+            <p className="text-xl">Lo sentimos, parece que el producto no existe.</p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
-};
-
-export default ProductDetailsPage;
+}
