@@ -1,4 +1,4 @@
-import Image from "next/image";
+"use client";
 import Link from "next/link";
 import { Button } from "@headlessui/react";
 import { Product } from "@/app/lib/Entities/Product";

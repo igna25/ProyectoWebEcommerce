@@ -1,3 +1,4 @@
+"use client";
 import Image from 'next/image';
 import AddToCartButton from './AddToCartButton';
 import { Product } from '@/app/lib/Entities/Product';
