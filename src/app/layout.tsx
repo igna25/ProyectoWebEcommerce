@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import RegisterSW from "./pwa/RegisterSW";
 import Providers from "./Providers";
+import PersistUserId from "./pwa/PersistUserId";
 import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -32,6 +33,7 @@ export default async function RootLayout({
         <body className={inter.className}>
           <Providers>
             <RegisterSW />
+            <PersistUserId />
             {children}
           </Providers>
         </body>
