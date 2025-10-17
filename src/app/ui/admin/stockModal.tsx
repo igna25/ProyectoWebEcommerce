@@ -1,27 +1,31 @@
-'use client'
-import React, { Fragment, useState } from 'react';
-import Modal from 'react-modal';
-import { updateStock } from '@/app/lib/actions/updateStock';
+"use client";
+import React, { Fragment, useState } from "react";
+import Modal from "react-modal";
+import { updateStock } from "@/app/lib/actions/updateStock";
 
-const StockModal = ({ data }:{data:{id:string, currentStock:number}}) => {
+const StockModal = ({
+  data,
+}: {
+  data: { id: string; currentStock: number };
+}) => {
   const { id, currentStock } = data;
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [stock, setStock] = useState(currentStock || 0);
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => {
-      setModalIsOpen(false);
-      setStock(currentStock)
-  }
+    setModalIsOpen(false);
+    setStock(currentStock);
+  };
 
   const handleSubmit = async () => {
     try {
-       const result = await updateStock({ productId:id, newStock:stock });
-       if (result.success) {
-         console.log("Stock updated successfully");
-       } else {
-         console.log("Error updating stock");
-       }
+      const result = await updateStock({ productId: id, newStock: stock });
+      if (result.success) {
+        console.log("Stock updated successfully");
+      } else {
+        console.log("Error updating stock");
+      }
     } catch (error) {
       console.error("Error:", error);
     }

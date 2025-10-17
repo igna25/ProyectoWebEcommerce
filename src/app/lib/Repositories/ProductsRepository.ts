@@ -1,12 +1,12 @@
-import { sql } from '@vercel/postgres';
-import { Product } from '../Entities/Product';
-export const fetchCache = 'force-no-store';
-
+import { sql } from "@vercel/postgres";
+import { Product } from "../Entities/Product";
+export const fetchCache = "force-no-store";
 
 class ProductsRepository {
   async getProductById(productId: string): Promise<Product | undefined> {
     try {
-      const query = await sql<Product>`SELECT * FROM products WHERE id = ${productId}`;
+      const query =
+        await sql<Product>`SELECT * FROM products WHERE id = ${productId}`;
       return query.rows[0];
     } catch (error) {
       console.error(`Failed to fetch product with ID ${productId}:`, error);
@@ -14,17 +14,17 @@ class ProductsRepository {
     }
   }
 
-  async createProduct(data:{
-    productName: string, 
-    description: string, 
-    imageURL: string, 
-    imageKey: string, 
-    price: number, 
-    stock: number
-  }
-  ): Promise<number> {
+  async createProduct(data: {
+    productName: string;
+    description: string;
+    imageURL: string;
+    imageKey: string;
+    price: number;
+    stock: number;
+  }): Promise<number> {
     try {
-      const {productName, description, imageURL, price, imageKey, stock} = data
+      const { productName, description, imageURL, price, imageKey, stock } =
+        data;
       const query = await sql`
         INSERT INTO products (productName, description, imageURL, imageKey, price, stock) 
         VALUES (${productName}, ${description}, ${imageURL}, ${imageKey}, ${price}, ${stock}) 
@@ -32,22 +32,23 @@ class ProductsRepository {
       `;
       return query.rows[0].id;
     } catch (error) {
-      console.error('Failed to create product:', error);
-      throw new Error('Failed to create product.');
+      console.error("Failed to create product:", error);
+      throw new Error("Failed to create product.");
     }
   }
 
-  async updateProduct(product:Product): Promise<void> {
+  async updateProduct(product: Product): Promise<void> {
     try {
-      const {productname, description, imageurl, imagekey, price, stock, id} = product
+      const { productname, description, imageurl, imagekey, price, stock, id } =
+        product;
       await sql`
         UPDATE products 
         SET productName = ${productname}, description = ${description}, imageURL = ${imageurl}, imageKey = ${imagekey}, price = ${price}, stock = ${stock} 
         WHERE id = ${id}
       `;
     } catch (error) {
-      console.error('Failed to update product:', error);
-      throw new Error('Failed to update product.');
+      console.error("Failed to update product:", error);
+      throw new Error("Failed to update product.");
     }
   }
 
@@ -56,21 +57,20 @@ class ProductsRepository {
       const query = await sql<Product>`SELECT * FROM products`;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch products:', error);
-      throw new Error('Failed to fetch products.');
+      console.error("Failed to fetch products:", error);
+      throw new Error("Failed to fetch products.");
     }
   }
 
   async getAllProductsPaginated(
     page: number,
     pageSize: number,
-    active: boolean = true
-  ): Promise<{products:Product[], total:number}> {
+    active: boolean = true,
+  ): Promise<{ products: Product[]; total: number }> {
     try {
       const offset = (page - 1) * pageSize;
-  
-      const query = await sql<Product>
-        `SELECT * FROM products 
+
+      const query = await sql<Product>`SELECT * FROM products 
         WHERE active = ${active}
         ORDER BY productName
         LIMIT ${pageSize} OFFSET ${offset}`;
@@ -78,14 +78,14 @@ class ProductsRepository {
       const totalQuery = await sql<{ count: number }>`
       SELECT COUNT(*) as count FROM products WHERE active = ${active}`;
       const total = totalQuery.rows[0].count;
-      
+
       return {
-        products:query.rows,
-        total
-      }
+        products: query.rows,
+        total,
+      };
     } catch (error) {
-      console.error('Failed to fetch products:', error);
-      throw new Error('Failed to fetch products.');
+      console.error("Failed to fetch products:", error);
+      throw new Error("Failed to fetch products.");
     }
   }
 
@@ -93,22 +93,22 @@ class ProductsRepository {
     productName: string,
     page: number,
     pageSize: number,
-    active: boolean = true
-  ): Promise<{ products: Product[], total: number }> {
+    active: boolean = true,
+  ): Promise<{ products: Product[]; total: number }> {
     try {
       const offset = (page - 1) * pageSize;
-  
+
       const totalQuery = await sql<{ count: number }>`
         SELECT COUNT(*) as count 
         FROM products 
-        WHERE productName ILIKE ${'%' + productName + '%'} 
+        WHERE productName ILIKE ${"%" + productName + "%"} 
         AND active = ${active}
       `;
       const total = totalQuery.rows[0].count;
-  
+
       const query = await sql<Product>`
         SELECT * FROM products
-        WHERE productName ILIKE ${'%' + productName + '%'}
+        WHERE productName ILIKE ${"%" + productName + "%"}
         AND active = ${active}
         ORDER BY productName
         LIMIT ${pageSize} OFFSET ${offset}
@@ -118,13 +118,20 @@ class ProductsRepository {
         total: total,
       };
     } catch (error) {
-      console.error(`Failed to fetch products with name matching "${productName}":`, error);
-      throw new Error(`Failed to fetch products with name matching "${productName}".`);
+      console.error(
+        `Failed to fetch products with name matching "${productName}":`,
+        error,
+      );
+      throw new Error(
+        `Failed to fetch products with name matching "${productName}".`,
+      );
     }
   }
 
-
-  async changeProductActiveStatus(productId: string, active: boolean): Promise<{updatedRows:number}> {
+  async changeProductActiveStatus(
+    productId: string,
+    active: boolean,
+  ): Promise<{ updatedRows: number }> {
     try {
       const result = await sql`
         UPDATE products
@@ -132,22 +139,30 @@ class ProductsRepository {
         WHERE id = ${productId}
       `;
 
-      if(!active){
-        const result2 = await sql`
+      if (!active) {
+        await sql`
           DELETE FROM orderitems
           WHERE productid = ${productId}
-        `;  
+        `;
       }
       return {
-        updatedRows: result.rowCount
-      }
+        updatedRows: result.rowCount,
+      };
     } catch (error) {
-      console.error(`Failed to change active status for product with ID ${productId}:`, error);
-      throw new Error(`Failed to change active status for product with ID ${productId}.`);
+      console.error(
+        `Failed to change active status for product with ID ${productId}:`,
+        error,
+      );
+      throw new Error(
+        `Failed to change active status for product with ID ${productId}.`,
+      );
     }
   }
 
-  async updateStock(productId: string, newStock:number): Promise<{updatedRows:number}> {
+  async updateStock(
+    productId: string,
+    newStock: number,
+  ): Promise<{ updatedRows: number }> {
     try {
       const result = await sql`
         UPDATE products
@@ -155,11 +170,16 @@ class ProductsRepository {
         WHERE id = ${productId}
       `;
       return {
-        updatedRows: result.rowCount
-      }
+        updatedRows: result.rowCount,
+      };
     } catch (error) {
-      console.error(`Failed to change active status for product with ID ${productId}:`, error);
-      throw new Error(`Failed to change active status for product with ID ${productId}.`);
+      console.error(
+        `Failed to change active status for product with ID ${productId}:`,
+        error,
+      );
+      throw new Error(
+        `Failed to change active status for product with ID ${productId}.`,
+      );
     }
   }
 
@@ -171,8 +191,8 @@ class ProductsRepository {
       `;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch out-of-stock products:', error);
-      throw new Error('Failed to fetch out-of-stock products.');
+      console.error("Failed to fetch out-of-stock products:", error);
+      throw new Error("Failed to fetch out-of-stock products.");
     }
   }
 
@@ -185,8 +205,8 @@ class ProductsRepository {
       `;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch recently added products:', error);
-      throw new Error('Failed to fetch recently added products.');
+      console.error("Failed to fetch recently added products:", error);
+      throw new Error("Failed to fetch recently added products.");
     }
   }
 
@@ -202,11 +222,10 @@ class ProductsRepository {
       `;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch top selling products:', error);
-      throw new Error('Failed to fetch top selling products.');
+      console.error("Failed to fetch top selling products:", error);
+      throw new Error("Failed to fetch top selling products.");
     }
   }
-
 }
 
 export default ProductsRepository;

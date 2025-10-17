@@ -1,7 +1,7 @@
-import SalesRepository from '@/app/lib/Repositories/SalesRepository'
-import { NextResponse } from 'next/server';
+import SalesRepository from "@/app/lib/Repositories/SalesRepository";
+import { NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(_req: any, context: { params: { id: string } }) {
   try {
@@ -9,8 +9,9 @@ export async function GET(_req: any, context: { params: { id: string } }) {
     const sale = await salesRepository.getSaleById(context.params.id);
     return NextResponse.json({ sale }, { status: 200 });
   } catch (err) {
-    return NextResponse.json({ msg: 'Error trying to fetch sale' }, { status: 500 });
+    return NextResponse.json(
+      { msg: "Error trying to fetch sale" },
+      { status: 500 },
+    );
   }
 }
-
-

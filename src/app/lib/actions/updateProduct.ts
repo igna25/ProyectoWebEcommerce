@@ -19,7 +19,6 @@ export async function updateProduct(formData: FormData) {
   const stock = formData.get("stock");
   const image = formData.get("image") as File;
 
-
   //esto se podría poner en una carpeta utils para tener la misma validación tanto en la creación como en la actualización
   if (
     !productName ||
@@ -78,10 +77,10 @@ export async function updateProduct(formData: FormData) {
                   return;
                 }
                 resolve(result);
-              }
+              },
             )
             .end(buffer);
-        }
+        },
       );
 
       await new Promise((resolve, reject) => {
@@ -93,7 +92,7 @@ export async function updateProduct(formData: FormData) {
               return;
             }
             resolve(result);
-          }
+          },
         );
       });
 

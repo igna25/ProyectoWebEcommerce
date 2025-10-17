@@ -1,22 +1,29 @@
-import { sql } from '@vercel/postgres';
-import { OrderItem } from '../Entities/Order';
-import { Product } from '../Entities/Product';
-
+import { sql } from "@vercel/postgres";
+import { OrderItem } from "../Entities/Order";
+import { Product } from "../Entities/Product";
 
 class OrderItemsRepository {
   async getOrderItemById(orderItemId: string): Promise<OrderItem | undefined> {
     try {
-      const query = await sql<OrderItem>`SELECT * FROM orderItems WHERE id = ${orderItemId}`;
+      const query =
+        await sql<OrderItem>`SELECT * FROM orderItems WHERE id = ${orderItemId}`;
       return query.rows[0];
     } catch (error) {
-      console.error(`Failed to fetch order item with ID ${orderItemId}:`, error);
+      console.error(
+        `Failed to fetch order item with ID ${orderItemId}:`,
+        error,
+      );
       throw new Error(`Failed to fetch order item with ID ${orderItemId}.`);
     }
   }
 
-  async getOrderByCartAndProductId(cartId: string, productId:string): Promise<OrderItem | undefined> {
+  async getOrderByCartAndProductId(
+    cartId: string,
+    productId: string,
+  ): Promise<OrderItem | undefined> {
     try {
-      const query = await sql<OrderItem>`SELECT * FROM orderItems WHERE cartid = ${cartId} AND productid = ${productId}`;
+      const query =
+        await sql<OrderItem>`SELECT * FROM orderItems WHERE cartid = ${cartId} AND productid = ${productId}`;
       return query.rows[0];
     } catch (error) {
       console.error(`Failed to fetch order item with ID ${productId}:`, error);
@@ -28,7 +35,7 @@ class OrderItemsRepository {
     cartID: string,
     productID: string,
     quantity: number,
-    productPrice: number
+    productPrice: number,
   ): Promise<string> {
     try {
       const query = await sql`
@@ -38,27 +45,27 @@ class OrderItemsRepository {
       `;
       return query.rows[0].id;
     } catch (error) {
-      console.error('Failed to create order item:', error);
-      throw new Error('Failed to create order item.');
+      console.error("Failed to create order item:", error);
+      throw new Error("Failed to create order item.");
     }
   }
 
   async updateOrderItem(
     orderItemId: string,
     quantity: number,
-    productPrice: number
+    productPrice: number,
   ): Promise<void> {
     try {
-      console.log(quantity)
-      console.log(orderItemId)
+      console.log(quantity);
+      console.log(orderItemId);
       await sql`
         UPDATE orderItems 
         SET quantity = ${quantity}, productPrice = ${productPrice} 
         WHERE id = ${orderItemId}
       `;
     } catch (error) {
-      console.error('Failed to update order item:', error);
-      throw new Error('Failed to update order item.');
+      console.error("Failed to update order item:", error);
+      throw new Error("Failed to update order item.");
     }
   }
 
@@ -69,8 +76,8 @@ class OrderItemsRepository {
         WHERE id = ${orderItemId}
       `;
     } catch (error) {
-      console.error('Failed to delete order item:', error);
-      throw new Error('Failed to delete order item.');
+      console.error("Failed to delete order item:", error);
+      throw new Error("Failed to delete order item.");
     }
   }
 
@@ -81,8 +88,8 @@ class OrderItemsRepository {
         WHERE cartid = ${cartId}
       `;
     } catch (error) {
-      console.error('Failed to delete order item:', error);
-      throw new Error('Failed to delete order item.');
+      console.error("Failed to delete order item:", error);
+      throw new Error("Failed to delete order item.");
     }
   }
 
@@ -91,14 +98,14 @@ class OrderItemsRepository {
       const query = await sql<OrderItem>`SELECT * FROM orderItems`;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch order items:', error);
-      throw new Error('Failed to fetch order items.');
+      console.error("Failed to fetch order items:", error);
+      throw new Error("Failed to fetch order items.");
     }
   }
 
   async getOrdersByCartId(cartId: string): Promise<(OrderItem & Product)[]> {
     try {
-      const query = await sql<(OrderItem & Product) >`
+      const query = await sql<OrderItem & Product>`
         SELECT 
           orderItems.id AS id,
           orderItems.cartID,
@@ -119,21 +126,29 @@ class OrderItemsRepository {
         WHERE orderItems.cartID = ${cartId}`;
       return query.rows;
     } catch (error) {
-      console.error(`Failed to fetch products for cart with ID ${cartId}:`, error);
+      console.error(
+        `Failed to fetch products for cart with ID ${cartId}:`,
+        error,
+      );
       throw new Error(`Failed to fetch products for cart with ID ${cartId}.`);
     }
   }
 
-  async getOrderItemsByCartId(cartId: string): Promise<(OrderItem & { productname: string })[]> {
+  async getOrderItemsByCartId(
+    cartId: string,
+  ): Promise<(OrderItem & { productname: string })[]> {
     try {
-      const query = await sql<(OrderItem & { productname: string })>`
+      const query = await sql<OrderItem & { productname: string }>`
         SELECT orderItems.*, products.productName
         FROM orderItems
         JOIN products ON orderItems.productID = products.id
         WHERE orderItems.cartID = ${cartId}`;
       return query.rows;
     } catch (error) {
-      console.error(`Failed to fetch products for cart with ID ${cartId}:`, error);
+      console.error(
+        `Failed to fetch products for cart with ID ${cartId}:`,
+        error,
+      );
       throw new Error(`Failed to fetch products for cart with ID ${cartId}.`);
     }
   }

@@ -1,12 +1,12 @@
-import { QueryResult } from '@vercel/postgres';
-import { v4 as uuidv4 } from 'uuid';
-import { SalesOrder } from '../Entities';
-import { sql } from '@vercel/postgres';
+import { sql } from "@vercel/postgres";
+import { v4 as uuidv4 } from "uuid";
+import { SalesOrder } from "../Entities";
 
 class SalesOrdersRepository {
   async getOrderById(orderId: string): Promise<SalesOrder | undefined> {
     try {
-      const query = await sql<SalesOrder>`SELECT * FROM sales_orders WHERE id = ${orderId}`;
+      const query =
+        await sql<SalesOrder>`SELECT * FROM sales_orders WHERE id = ${orderId}`;
       return query.rows[0];
     } catch (error) {
       console.error(`Failed to fetch order with ID ${orderId}:`, error);
@@ -14,7 +14,13 @@ class SalesOrdersRepository {
     }
   }
 
-  async createOrder(saleID: string, productID: string, quantity: number, price: number, productname:string): Promise<string> {
+  async createOrder(
+    saleID: string,
+    productID: string,
+    quantity: number,
+    price: number,
+    productname: string,
+  ): Promise<string> {
     try {
       const orderId = uuidv4();
       await sql`
@@ -23,12 +29,16 @@ class SalesOrdersRepository {
       `;
       return orderId;
     } catch (error) {
-      console.error('Failed to create order:', error);
-      throw new Error('Failed to create order.');
+      console.error("Failed to create order:", error);
+      throw new Error("Failed to create order.");
     }
   }
 
-  async updateOrder(orderId: string, quantity: number, price: number): Promise<void> {
+  async updateOrder(
+    orderId: string,
+    quantity: number,
+    price: number,
+  ): Promise<void> {
     try {
       await sql`
         UPDATE sales_orders 
@@ -36,8 +46,8 @@ class SalesOrdersRepository {
         WHERE id = ${orderId}
       `;
     } catch (error) {
-      console.error('Failed to update order:', error);
-      throw new Error('Failed to update order.');
+      console.error("Failed to update order:", error);
+      throw new Error("Failed to update order.");
     }
   }
 
@@ -48,17 +58,21 @@ class SalesOrdersRepository {
         WHERE id = ${orderId}
       `;
     } catch (error) {
-      console.error('Failed to delete order:', error);
-      throw new Error('Failed to delete order.');
+      console.error("Failed to delete order:", error);
+      throw new Error("Failed to delete order.");
     }
   }
 
   async getOrdersBySaleId(saleId: string): Promise<SalesOrder[]> {
     try {
-      const query = await sql<SalesOrder>`SELECT * FROM sales_orders WHERE saleID = ${saleId}`;
+      const query =
+        await sql<SalesOrder>`SELECT * FROM sales_orders WHERE saleID = ${saleId}`;
       return query.rows;
     } catch (error) {
-      console.error(`Failed to fetch orders for sale with ID ${saleId}:`, error);
+      console.error(
+        `Failed to fetch orders for sale with ID ${saleId}:`,
+        error,
+      );
       throw new Error(`Failed to fetch orders for sale with ID ${saleId}.`);
     }
   }
@@ -68,8 +82,8 @@ class SalesOrdersRepository {
       const query = await sql<SalesOrder>`SELECT * FROM sales_orders`;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch orders:', error);
-      throw new Error('Failed to fetch orders.');
+      console.error("Failed to fetch orders:", error);
+      throw new Error("Failed to fetch orders.");
     }
   }
 }

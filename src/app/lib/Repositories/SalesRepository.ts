@@ -1,7 +1,6 @@
-import { QueryResult } from '@vercel/postgres';
-import { v4 as uuidv4 } from 'uuid';
-import { Sale } from '../Entities/Sale';
-import { sql } from '@vercel/postgres';
+import { sql } from "@vercel/postgres";
+import { v4 as uuidv4 } from "uuid";
+import { Sale } from "../Entities/Sale";
 
 class SalesRepository {
   async getSaleById(saleId: string): Promise<Sale | undefined> {
@@ -14,7 +13,13 @@ class SalesRepository {
     }
   }
 
-  async createSale(userID: string, totalPrice: number, totalProducts:number, username:string = "", mercadoPagoID?: string): Promise<string> {
+  async createSale(
+    userID: string,
+    totalPrice: number,
+    totalProducts: number,
+    username: string = "",
+    mercadoPagoID?: string,
+  ): Promise<string> {
     try {
       const saleId = uuidv4();
       await sql`
@@ -23,8 +28,8 @@ class SalesRepository {
       `;
       return saleId;
     } catch (error) {
-      console.error('Failed to create sale:', error);
-      throw new Error('Failed to create sale.');
+      console.error("Failed to create sale:", error);
+      throw new Error("Failed to create sale.");
     }
   }
 
@@ -35,8 +40,8 @@ class SalesRepository {
         WHERE id = ${saleId}
       `;
     } catch (error) {
-      console.error('Failed to delete sale:', error);
-      throw new Error('Failed to delete sale.');
+      console.error("Failed to delete sale:", error);
+      throw new Error("Failed to delete sale.");
     }
   }
 
@@ -45,61 +50,58 @@ class SalesRepository {
       const query = await sql<Sale>`SELECT * FROM sales`;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch sales:', error);
-      throw new Error('Failed to fetch sales.');
+      console.error("Failed to fetch sales:", error);
+      throw new Error("Failed to fetch sales.");
     }
   }
 
   async getAllSalesPaginated(
     page: number,
     pageSize: number,
-  ): Promise<{sales:Sale[], total:number}> {
+  ): Promise<{ sales: Sale[]; total: number }> {
     try {
-        const offset = (page - 1) * pageSize;
-        const query = await sql<Sale>
-        `SELECT * FROM sales
+      const offset = (page - 1) * pageSize;
+      const query = await sql<Sale>`SELECT * FROM sales
         ORDER BY creationDate
         LIMIT ${pageSize} OFFSET ${offset}`;
 
-        const totalQuery = await sql<{ count: number }>`
+      const totalQuery = await sql<{ count: number }>`
             SELECT COUNT(*) as count FROM sales`;
-        const total = totalQuery.rows[0].count;
-        
-        return {
-            sales:query.rows,
-            total
-        }
+      const total = totalQuery.rows[0].count;
+
+      return {
+        sales: query.rows,
+        total,
+      };
     } catch (error) {
-        console.error('Failed to fetch sales:', error);
-        throw new Error('Failed to fetch sales.');
+      console.error("Failed to fetch sales:", error);
+      throw new Error("Failed to fetch sales.");
     }
   }
-
 
   async getAllSalesPaginatedWithUserId(
     page: number,
     pageSize: number,
-    userId: string = ""
-  ): Promise<{sales:Sale[], total:number}> {
+    userId: string = "",
+  ): Promise<{ sales: Sale[]; total: number }> {
     try {
-        const offset = (page - 1) * pageSize;
-        const query = await sql<Sale>
-        `SELECT * FROM sales
+      const offset = (page - 1) * pageSize;
+      const query = await sql<Sale>`SELECT * FROM sales
         WHERE userid= ${userId}
         ORDER BY creationDate
         LIMIT ${pageSize} OFFSET ${offset}`;
 
-        const totalQuery = await sql<{ count: number }>`
+      const totalQuery = await sql<{ count: number }>`
             SELECT COUNT(*) as count FROM sales WHERE userid= ${userId}`;
-        const total = totalQuery.rows[0].count;
-        
-        return {
-            sales:query.rows,
-            total
-        }
+      const total = totalQuery.rows[0].count;
+
+      return {
+        sales: query.rows,
+        total,
+      };
     } catch (error) {
-        console.error('Failed to fetch sales:', error);
-        throw new Error('Failed to fetch sales.');
+      console.error("Failed to fetch sales:", error);
+      throw new Error("Failed to fetch sales.");
     }
   }
 
@@ -112,28 +114,42 @@ class SalesRepository {
       `;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch recent sales:', error);
-      throw new Error('Failed to fetch recent sales.');
+      console.error("Failed to fetch recent sales:", error);
+      throw new Error("Failed to fetch recent sales.");
     }
   }
 
-  async getMonthlyEarnings(): Promise<{ totalEarnings: number, totalSales: number }> {
+  async getMonthlyEarnings(): Promise<{
+    totalEarnings: number;
+    totalSales: number;
+  }> {
     try {
       const currentDate = new Date();
-      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const firstDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1,
+      );
+      const lastDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0,
+      );
 
       const query = await sql<Sale>`
         SELECT * FROM sales
         WHERE creationDate >= ${firstDayOfMonth.toISOString()} AND creationDate <= ${lastDayOfMonth.toISOString()}`;
 
-      const totalEarnings = query.rows.reduce((total, sale) => total + parseFloat(""+sale.totalprice), 0);
+      const totalEarnings = query.rows.reduce(
+        (total, sale) => total + parseFloat("" + sale.totalprice),
+        0,
+      );
       const totalSales = query.rows.length;
 
       return { totalEarnings, totalSales };
     } catch (error) {
-      console.error('Failed to fetch monthly earnings:', error);
-      throw new Error('Failed to fetch monthly earnings.');
+      console.error("Failed to fetch monthly earnings:", error);
+      throw new Error("Failed to fetch monthly earnings.");
     }
   }
 }

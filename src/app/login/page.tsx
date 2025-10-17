@@ -1,8 +1,5 @@
 import LoginForm from "./loginform";
 
 export default function LoginPage() {
-
-  return (
-    <LoginForm></LoginForm>
-  );
+  return <LoginForm></LoginForm>;
 }

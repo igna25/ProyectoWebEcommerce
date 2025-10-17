@@ -1,8 +1,5 @@
-import { sql } from '@vercel/postgres';
-import { v4 as uuidv4 } from 'uuid';
-import { Cart } from '../Entities/Cart';
-
-
+import { sql } from "@vercel/postgres";
+import { Cart } from "../Entities/Cart";
 
 class CartsRepository {
   async getCartById(cartId: string): Promise<Cart | undefined> {
@@ -15,7 +12,11 @@ class CartsRepository {
     }
   }
 
-  async createCart(userID: string, totalPrice: number, mercadoPagoID?: string): Promise<string> {
+  async createCart(
+    userID: string,
+    totalPrice: number,
+    mercadoPagoID?: string,
+  ): Promise<string> {
     try {
       const query = await sql`
         INSERT INTO carts(userID, totalPrice, mercadoPagoID) 
@@ -24,12 +25,16 @@ class CartsRepository {
       `;
       return query.rows[0].id;
     } catch (error) {
-      console.error('Failed to create cart:', error);
-      throw new Error('Failed to create cart.');
+      console.error("Failed to create cart:", error);
+      throw new Error("Failed to create cart.");
     }
   }
 
-  async updateCart(cartId: string, totalPrice: number, mercadoPagoID?: string): Promise<void> {
+  async updateCart(
+    cartId: string,
+    totalPrice: number,
+    mercadoPagoID?: string,
+  ): Promise<void> {
     try {
       await sql`
         UPDATE carts 
@@ -37,8 +42,8 @@ class CartsRepository {
         WHERE id = ${cartId}
       `;
     } catch (error) {
-      console.error('Failed to update cart:', error);
-      throw new Error('Failed to update cart.');
+      console.error("Failed to update cart:", error);
+      throw new Error("Failed to update cart.");
     }
   }
 
@@ -49,8 +54,8 @@ class CartsRepository {
         WHERE id = ${cartId}
       `;
     } catch (error) {
-      console.error('Failed to delete cart:', error);
-      throw new Error('Failed to delete cart.');
+      console.error("Failed to delete cart:", error);
+      throw new Error("Failed to delete cart.");
     }
   }
 
@@ -59,14 +64,15 @@ class CartsRepository {
       const query = await sql<Cart>`SELECT * FROM carts`;
       return query.rows;
     } catch (error) {
-      console.error('Failed to fetch carts:', error);
-      throw new Error('Failed to fetch carts.');
+      console.error("Failed to fetch carts:", error);
+      throw new Error("Failed to fetch carts.");
     }
   }
 
   async getCartByUserId(userID: string): Promise<Cart | undefined> {
     try {
-      const query = await sql<Cart>`SELECT * FROM carts WHERE userID = ${userID} LIMIT 1`;
+      const query =
+        await sql<Cart>`SELECT * FROM carts WHERE userID = ${userID} LIMIT 1`;
       return query.rows[0];
     } catch (error) {
       console.error(`Failed to fetch cart for user with ID ${userID}:`, error);
@@ -74,14 +80,14 @@ class CartsRepository {
     }
   }
 
-  async addMercadopagoId(cartId:string,preferenceId:string){
-    try{
+  async addMercadopagoId(cartId: string, preferenceId: string) {
+    try {
       const query = await sql<Cart>` 
         UPDATE carts 
         SET mercadopagoid = ${cartId}, mercadoPagoID = ${preferenceId} 
         WHERE id = ${cartId}`;
       return query.rows[0];
-    }catch(err){
+    } catch (err) {
       throw new Error(`Failed to update cart`);
     }
   }
