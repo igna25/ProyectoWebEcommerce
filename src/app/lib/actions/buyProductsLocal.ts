@@ -46,7 +46,7 @@ export async function buyProductsLocal(
     );
 
     const cartId = await cartsRepository.createCart(user.id, totalPrice, "abc");
-    if (cartId == (null || undefined)) {
+    if (!cartId) {
       throw new Error("Cart not found.");
     } else {
       cartProducts.map((cartProduct: OrderItem & Product) =>

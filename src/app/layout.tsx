@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import RegisterSW from "./pwa/RegisterSW";
@@ -13,14 +13,14 @@ export const metadata: Metadata = {
   description:
     "IAW Commerce es una aplicación web progresiva desarrollada en el marco de la materia Ingeniería de Aplicaciones Web. Permite gestionar un bazar online con funcionalidades de catálogo, carrito de compras y administración, ofreciendo una experiencia fluida tanto en modo online como offline.",
   manifest: "/manifest.webmanifest",
-  themeColor: {
-    media: "(prefers-color-scheme: light)",
-    color: "#004AAD",
-  },
   icons: {
     icon: "/favicon.ico",
     apple: "/icons/apple-touch-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#004AAD",
 };
 
 export default async function RootLayout({
