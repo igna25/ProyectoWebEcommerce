@@ -1,32 +1,38 @@
-import { getServerSession, Session } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/auth-config";
-import CartsRepository from "../lib/Repositories/CartsRepository";
+"use client";
+import { useEffect, useState, Fragment } from "react";
 import ProductList from "../ui/cart/ProductList";
-import { Product } from "../lib/Entities/Product";
-import OrderItemsRepository from "../lib/Repositories/OrdersRepository";
-import { OrderItem } from "../lib/Entities/Order";
-import { unstable_noStore as noStore } from 'next/cache';
-import { Fragment } from "react";
-export default async function CartPage() {
-  noStore();
-  const session: Session | null = await getServerSession(authOptions)
 
-  const cartsRepository = new CartsRepository()
+export default function CartPage() {
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [cartProducts, setCartProducts] = useState<any[]>([]);
 
-  const ordersRepository = new OrderItemsRepository()
+  useEffect(() => {
+    const id = typeof window !== 'undefined' ? localStorage.getItem('userId') || undefined : undefined;
+    setUserId(id);
+  }, []);
 
-  let cartProducts: (OrderItem & Product)[] = []
-  if (session != null) {
-    let cart = await cartsRepository.getCartByUserId(session.user.id)
-    if (!!cart)
-      cartProducts = await ordersRepository.getOrdersByCartId(cart.id)
-  }
-  
+  useEffect(() => {
+    const sync = async () => {
+      try {
+        const local = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (userId && navigator.onLine) {
+          await fetch('/api/cart/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, items: local.map((p:any)=>({ productid:p.productid, quantity:p.quantity, productprice:p.productprice })) }) });
+          const res = await fetch(`/api/cart?userId=${userId}`);
+          const json = await res.json();
+          setCartProducts(json.items || []);
+        } else {
+          setCartProducts(local);
+        }
+      } catch {}
+    };
+    sync();
+  }, [userId]);
+
   return (
     <Fragment>
       <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">Tu carrito</h1>
       <section className="w-full mb-2">
-      <ProductList cartProducts={cartProducts} userId={session?.user.id}></ProductList>
+        <ProductList cartProducts={cartProducts} userId={userId}></ProductList>
       </section>
     </Fragment>
   )
