@@ -35,6 +35,7 @@ function isSalesApi(url) { return url.pathname.startsWith('/api/sales'); }
 function isNextImage(url) {
   return url.pathname.startsWith('/_next/image');
 }
+function isCartApi(url) { return url.pathname.startsWith('/api/cart'); }
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -57,7 +58,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (isProductsApi(url) || isSalesApi(url)) {
+  if (isProductsApi(url) || isSalesApi(url) || isCartApi(url)) {
     event.respondWith(
       fetch(request)
         .then((res) => {
