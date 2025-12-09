@@ -1,22 +1,28 @@
 "use client";
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export default function PersistUserId() {
+  const { data: session, status } = useSession();
+
   useEffect(() => {
-    const persist = async () => {
+    const persist = () => {
       try {
         if (typeof window === "undefined") return;
-        if (!navigator.onLine) return;
-        const res = await fetch("/api/auth/session");
-        if (!res.ok) return;
-        const json = await res.json();
-        const id = json?.user?.id;
-        if (id) {
-          localStorage.setItem("userId", id);
+
+        const userId = session?.user?.id;
+        if (userId) {
+          localStorage.setItem("userId", userId);
+        } else if (status === "unauthenticated") {
+          localStorage.removeItem("userId");
         }
-      } catch {}
+      } catch (error) {
+        console.error("Error al persistir userId:", error);
+      }
     };
+
     persist();
-  }, []);
+  }, [session, status]);
+
   return null;
 }
