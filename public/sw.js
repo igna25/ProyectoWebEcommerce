@@ -4,6 +4,15 @@ const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const IMAGES_CACHE = `images-${CACHE_VERSION}`;
 
 const OFFLINE_URL = "/offline";
+const MAX_CACHE_SIZE = 50;
+
+async function cleanOldCaches(cacheName) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  if (keys.length > MAX_CACHE_SIZE) {
+    await cache.delete(keys[0]);
+  }
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -61,11 +70,12 @@ self.addEventListener("fetch", (event) => {
   if (isNavigationRequest(request)) {
     event.respondWith(
       fetch(request)
-        .then((res) => {
-          const resClone = res.clone();
-          caches
-            .open(APP_SHELL_CACHE)
-            .then((cache) => cache.put(request, resClone));
+        .then(async (res) => {
+          if (res.ok) {
+            const resClone = res.clone();
+            const cache = await caches.open(APP_SHELL_CACHE);
+            await cache.put(request, resClone);
+          }
           return res;
         })
         .catch(async () => {
@@ -80,14 +90,34 @@ self.addEventListener("fetch", (event) => {
   if (isProductsApi(url) || isSalesApi(url) || isCartApi(url)) {
     event.respondWith(
       fetch(request)
-        .then((res) => {
-          const resClone = res.clone();
-          caches
-            .open(RUNTIME_API_CACHE)
-            .then((cache) => cache.put(request, resClone));
+        .then(async (res) => {
+          if (res.ok) {
+            const resClone = res.clone();
+            const cache = await caches.open(RUNTIME_API_CACHE);
+            await cache.put(request, resClone);
+            await cleanOldCaches(RUNTIME_API_CACHE);
+          }
           return res;
         })
-        .catch(() => caches.match(request)),
+        .catch(async () => {
+          const cached = await caches.match(request);
+          if (cached) {
+            const headers = new Headers(cached.headers);
+            headers.set("X-From-Cache", "true");
+            return new Response(cached.body, {
+              status: cached.status,
+              statusText: cached.statusText,
+              headers: headers,
+            });
+          }
+          return new Response(
+            JSON.stringify({ error: "No disponible offline" }),
+            {
+              status: 503,
+              headers: { "Content-Type": "application/json" },
+            },
+          );
+        }),
     );
     return;
   }
@@ -97,11 +127,13 @@ self.addEventListener("fetch", (event) => {
       caches.match(request).then(
         (cached) =>
           cached ||
-          fetch(request).then((res) => {
-            const resClone = res.clone();
-            caches
-              .open(IMAGES_CACHE)
-              .then((cache) => cache.put(request, resClone));
+          fetch(request).then(async (res) => {
+            if (res.ok) {
+              const resClone = res.clone();
+              const cache = await caches.open(IMAGES_CACHE);
+              await cache.put(request, resClone);
+              await cleanOldCaches(IMAGES_CACHE);
+            }
             return res;
           }),
       ),
