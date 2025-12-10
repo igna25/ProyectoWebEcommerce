@@ -8,7 +8,12 @@ import ProductDetails from "@/app/ui/dashboard/ProductDetails";
 export default function ProductDetailsPage() {
   const params = useParams();
   const productIdParam = params?.productId;
-  const productId = typeof productIdParam === "string" ? productIdParam : Array.isArray(productIdParam) ? productIdParam[0] : "";
+  const productId =
+    typeof productIdParam === "string"
+      ? productIdParam
+      : Array.isArray(productIdParam)
+        ? productIdParam[0]
+        : "";
   const { data: session } = useSession();
   const [product, setProduct] = useState<any | null>(null);
   const [isNotFound, setIsNotFound] = useState(false);
@@ -20,7 +25,7 @@ export default function ProductDetailsPage() {
         const response = await fetch(`/api/products/${productId}`);
         if (!response.ok) throw new Error("request-failed");
         const json = await response.json();
-        if (json && json.product){
+        if (json && json.product) {
           setProduct(json.product);
         } else {
           setIsNotFound(true);

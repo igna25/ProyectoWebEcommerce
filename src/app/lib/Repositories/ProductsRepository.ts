@@ -1,11 +1,12 @@
-import { pooler as sql} from "@/app/lib/db/db";
+import { pooler as sql } from "@/app/lib/db/db";
 import { Product } from "../Entities/Product";
 export const fetchCache = "force-no-store";
 
 class ProductsRepository {
   async getProductById(productId: string): Promise<Product | undefined> {
     try {
-      const query = await sql<Product>`SELECT * FROM products WHERE id = ${productId}`;
+      const query =
+        await sql<Product>`SELECT * FROM products WHERE id = ${productId}`;
       return query.rows[0];
     } catch (error) {
       console.error(`Failed to fetch product with ID ${productId}:`, error);

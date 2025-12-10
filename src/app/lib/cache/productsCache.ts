@@ -21,14 +21,17 @@ export function saveProductsToLocalCache(products: ProductLike[]): void {
   } catch {}
 }
 
-export function getProductFromLocalCache(productId: string): ProductLike | null {
+export function getProductFromLocalCache(
+  productId: string,
+): ProductLike | null {
   try {
     const existingMapJson = localStorage.getItem(PRODUCTS_BY_ID_KEY);
     if (!existingMapJson) {
       return null;
     }
-      
-    const productsById: Record<string, ProductLike> = JSON.parse(existingMapJson);
+
+    const productsById: Record<string, ProductLike> =
+      JSON.parse(existingMapJson);
     return productsById[productId] || null;
   } catch {
     return null;

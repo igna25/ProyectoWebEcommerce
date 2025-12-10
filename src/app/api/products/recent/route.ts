@@ -8,15 +8,15 @@ export async function GET() {
     const productsRepository = new ProductsRepository();
     const products = await productsRepository.getRecentlyAddedProducts();
     return NextResponse.json(
-      { 
-        products 
+      {
+        products,
       },
-      { 
+      {
         status: 200,
-        headers: { 
-          "Cache-Control": "no-store" 
-        } 
-      }
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
     );
   } catch (err) {
     return NextResponse.json(

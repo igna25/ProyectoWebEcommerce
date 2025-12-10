@@ -21,7 +21,7 @@ export default function RegisterSW() {
 
                 if (
                   confirm(
-                    "Hay una actualización disponible. ¿Deseas recargar la página?"
+                    "Hay una actualización disponible. ¿Deseas recargar la página?",
                   )
                 ) {
                   window.location.reload();

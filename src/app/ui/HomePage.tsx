@@ -21,10 +21,7 @@ export default function HomePage() {
         const top = topResponse.products || [];
         setRecentProducts(recent);
         setTopSellingProducts(top);
-        saveProductsToLocalCache([
-          ...recent,
-          ...top,
-        ]);
+        saveProductsToLocalCache([...recent, ...top]);
       } finally {
         setIsLoading(false);
       }
