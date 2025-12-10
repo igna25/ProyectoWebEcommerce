@@ -34,7 +34,7 @@ export async function GET(req: any) {
         },
         {
           status: 200,
-          headers: { "Cache-Control": "no-store" },
+          headers: { "Cache-Control": "no-cache" },
         },
       );
     }
@@ -45,7 +45,7 @@ export async function GET(req: any) {
     );
     return NextResponse.json(
       { products: result.products, total: result.total, page, pageSize },
-      { status: 200, headers: { "Cache-Control": "no-store" } },
+      { status: 200, headers: { "Cache-Control": "no-cache" } },
     );
   } catch (err) {
     return NextResponse.json(

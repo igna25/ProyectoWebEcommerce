@@ -16,7 +16,7 @@ export async function GET(_req: any, context: { params: { id: string } }) {
         {
           status: 404,
           headers: {
-            "Cache-Control": "no-store",
+            "Cache-Control": "no-cache",
           },
         },
       );
@@ -28,7 +28,7 @@ export async function GET(_req: any, context: { params: { id: string } }) {
       {
         status: 200,
         headers: {
-          "Cache-Control": "no-store",
+          "Cache-Control": "no-cache",
         },
       },
     );
