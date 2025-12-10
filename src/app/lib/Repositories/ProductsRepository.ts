@@ -1,12 +1,11 @@
-import { sql } from "@vercel/postgres";
+import { pooler as sql} from "@/app/lib/db/db";
 import { Product } from "../Entities/Product";
 export const fetchCache = "force-no-store";
 
 class ProductsRepository {
   async getProductById(productId: string): Promise<Product | undefined> {
     try {
-      const query =
-        await sql<Product>`SELECT * FROM products WHERE id = ${productId}`;
+      const query = await sql<Product>`SELECT * FROM products WHERE id = ${productId}`;
       return query.rows[0];
     } catch (error) {
       console.error(`Failed to fetch product with ID ${productId}:`, error);
@@ -203,6 +202,11 @@ class ProductsRepository {
         ORDER BY publicationdate DESC
         LIMIT 3
       `;
+
+      const querytest = await sql`SELECT * FROM products`;
+
+      console.log("querytest", querytest.rows);
+      console.log("query", query.rows);
       return query.rows;
     } catch (error) {
       console.error("Failed to fetch recently added products:", error);

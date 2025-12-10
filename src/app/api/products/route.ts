@@ -25,14 +25,16 @@ export async function GET(req: any) {
         true,
       );
       return NextResponse.json(
-        {
-          products: result.products,
-          total: result.total,
-          page,
-          pageSize,
-          query: queryParam,
+        { 
+          products: result.products, 
+          total: result.total, 
+          page, 
+          pageSize, 
+          query: queryParam 
         },
-        { status: 200 },
+        { 
+          status: 200, 
+          headers: { 'Cache-Control': 'no-store' } },
       );
     }
     const result = await productsRepository.getAllProductsPaginated(
@@ -42,7 +44,7 @@ export async function GET(req: any) {
     );
     return NextResponse.json(
       { products: result.products, total: result.total, page, pageSize },
-      { status: 200 },
+      { status: 200, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (err) {
     return NextResponse.json(

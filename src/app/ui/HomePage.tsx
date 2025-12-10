@@ -2,30 +2,37 @@
 import { useEffect, useState } from "react";
 import ProductListDashboard from "../ui/dashboard/productListDasboard";
 import { useSession } from "next-auth/react";
+import { saveProductsToLocalCache } from "../lib/cache/productsCache";
 
 export default function HomePage() {
-  const [recent, setRecent] = useState<any[]>([]);
-  const [top, setTop] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [recentProducts, setRecentProducts] = useState<any[]>([]);
+  const [topSellingProducts, setTopSellingProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
   const userId = session?.user?.id;
   useEffect(() => {
-    const load = async () => {
+    const loadProducts = async () => {
       try {
-        const [r, t] = await Promise.all([
+        const [recentResponse, topResponse] = await Promise.all([
           fetch("/api/products/recent").then((res) => res.json()),
           fetch("/api/products/top").then((res) => res.json()),
         ]);
-        setRecent(r.products || []);
-        setTop(t.products || []);
+        const recent = recentResponse.products || [];
+        const top = topResponse.products || [];
+        setRecentProducts(recent);
+        setTopSellingProducts(top);
+        saveProductsToLocalCache([
+          ...recent,
+          ...top,
+        ]);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
-    load();
+    loadProducts();
   }, []);
 
-  if (loading) {
+  if (isLoading) {
     return null;
   }
 
@@ -35,11 +42,11 @@ export default function HomePage() {
         <h2 className="text-3xl font-bold mb-4">
           Productos Añadidos Recientemente
         </h2>
-        <ProductListDashboard products={recent} userId={userId} />
+        <ProductListDashboard products={recentProducts} userId={userId} />
       </section>
       <section>
         <h2 className="text-3xl font-bold mb-4">Productos Más Vendidos</h2>
-        <ProductListDashboard products={top} userId={userId} />
+        <ProductListDashboard products={topSellingProducts} userId={userId} />
       </section>
     </div>
   );
