@@ -5,178 +5,105 @@ import Link from "next/link";
 import CartWrapper from "./CartCard";
 import { Product } from "@/app/lib/Entities/Product";
 import { OrderItem } from "@/app/lib/Entities/Order";
-import {
-  removeProduct,
-  increaseQuantity,
-  decreaseQuantity,
-  clearCart,
-} from "./../../lib/actions/cartActions";
 import { buyProducts } from "@/app/lib/actions/buyProducts";
 import { buyProductsLocal } from "@/app/lib/actions/buyProductsLocal";
 import { useRouter } from "next/navigation";
-import { getCartProductsFromLocalStorage } from "@/app/lib/actions/getProductFromLocalStorage";
+import {
+  getLocalCart,
+  increaseItemQuantity,
+  decreaseItemQuantity,
+  removeItemFromLocalCart,
+  clearLocalCart,
+  syncCartToServer,
+  CartItem,
+} from "@/app/lib/cache/cartCache";
+import { getProductFromLocalCache } from "@/app/lib/cache/productsCache";
+
+type EnrichedCartItem = CartItem &
+  Product & { id: string; cartid: string; dateadded: Date };
 
 export default function ProductList({
-  cartProducts,
   userId,
 }: {
-  cartProducts: (OrderItem & Product)[];
   userId: string | undefined;
 }) {
   const router = useRouter();
-  const isLogged = userId != undefined;
+  const [products, setProducts] = useState<EnrichedCartItem[]>([]);
 
-  const [products, setProducts] = useState<(OrderItem & Product)[]>(
-    cartProducts || [],
-  );
-  const [cartId, setCartId] = useState<string>("");
+  const enrichCartItems = (): EnrichedCartItem[] => {
+    const cartItems = getLocalCart();
+    return cartItems
+      .map((item) => {
+        const product = getProductFromLocalCache(item.productid);
+        if (!product) return null;
+        return {
+          ...item,
+          ...product,
+          id: item.productid,
+          cartid: "",
+          dateadded: new Date(),
+        };
+      })
+      .filter((item): item is EnrichedCartItem => item !== null);
+  };
 
   useEffect(() => {
-    if (isLogged) {
-      if (cartProducts.length > 0) {
-        setCartId(cartProducts[0].cartid);
-      }
-    } else {
-      setProducts([...getCartProductsFromLocalStorage()]);
-    }
-  }, [cartProducts, isLogged]);
+    setProducts(enrichCartItems());
 
-  const handleRemoveProduct = async (
-    orderitemid: string,
-    productid: string,
-  ) => {
-    if (isLogged) {
-      const handlerResult = await removeProduct(orderitemid, cartId);
-      if (handlerResult.success) {
-        const updatedProducts = products.filter(
-          (product) => product.id !== orderitemid,
-        );
-        setProducts(updatedProducts);
-      }
-    } else {
-      const cartString = localStorage.getItem("cart");
-      if (cartString) {
-        const cart: (OrderItem & Product)[] = JSON.parse(cartString);
-        const updatedCart = cart.filter((item) => item.productid !== productid);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-        setProducts(updatedCart);
-      }
+    const handleCartUpdate = () => {
+      setProducts(enrichCartItems());
+    };
+
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, []);
+
+  const handleRemoveProduct = (productId: string) => {
+    removeItemFromLocalCart(productId);
+    setProducts(enrichCartItems());
+    if (userId && navigator.onLine) {
+      syncCartToServer(userId).catch(() => {});
     }
   };
 
-  const handleIncreaseQuantity = async (
-    orderitemid: string,
-    productid: string,
-  ) => {
-    if (isLogged) {
-      const handlerResult = await increaseQuantity(orderitemid, cartId);
-      if (handlerResult.success) {
-        const updatedProducts = products.map((product) =>
-          product.id == orderitemid
-            ? { ...product, quantity: product.quantity + 1 }
-            : product,
-        );
-        setProducts(updatedProducts);
-      }
-    } else {
-      const cartString = localStorage.getItem("cart");
-      if (cartString) {
-        const cart: (OrderItem & Product)[] = JSON.parse(cartString);
-        const existingProductIndex = cart.findIndex(
-          (item: OrderItem & Product) => item.productid === productid,
-        );
-        if (existingProductIndex !== -1) {
-          cart[existingProductIndex].quantity++;
-          localStorage.setItem("cart", JSON.stringify(cart));
-          setProducts(cart);
-        }
-      }
+  const handleIncreaseQuantity = (productId: string) => {
+    increaseItemQuantity(productId);
+    setProducts(enrichCartItems());
+    if (userId && navigator.onLine) {
+      syncCartToServer(userId).catch(() => {});
     }
   };
 
-  const handleDecreaseQuantity = async (
-    orderitemid: string,
-    productid: string,
-  ) => {
-    if (isLogged) {
-      const handlerResult = await decreaseQuantity(orderitemid, cartId);
-      if (handlerResult.success) {
-        const updatedProducts = products.map((product) =>
-          product.id == orderitemid && product.quantity > 1
-            ? { ...product, quantity: product.quantity - 1 }
-            : product,
-        );
-        setProducts(updatedProducts);
-      }
-    } else {
-      const cartString = localStorage.getItem("cart");
-      if (cartString) {
-        const cart: (OrderItem & Product)[] = JSON.parse(cartString);
-        const existingProductIndex = cart.findIndex(
-          (item: OrderItem & Product) =>
-            item.productid == productid && item.quantity > 1,
-        );
-        if (existingProductIndex !== -1) {
-          cart[existingProductIndex].quantity--;
-          localStorage.setItem("cart", JSON.stringify(cart));
-          setProducts(cart);
-        }
-      }
+  const handleDecreaseQuantity = (productId: string) => {
+    decreaseItemQuantity(productId);
+    setProducts(enrichCartItems());
+    if (userId && navigator.onLine) {
+      syncCartToServer(userId).catch(() => {});
     }
   };
 
-  const handleClearCart = async () => {
-    if (isLogged) {
-      const handlerResult = await clearCart(cartId);
-      if (handlerResult.success) {
-        setProducts([]);
-      }
-    } else {
-      const cartString = localStorage.getItem("cart");
-      if (cartString) {
-        localStorage.removeItem("cart");
-        setProducts([]);
-      }
+  const handleClearCart = () => {
+    clearLocalCart();
+    setProducts([]);
+    if (userId && navigator.onLine) {
+      syncCartToServer(userId).catch(() => {});
     }
   };
 
   const handleSubmit = async () => {
     try {
-      const formData: FormData = new FormData();
-
-      products.map((product: OrderItem & Product) => {
-        //Campos orderItem
-        formData.append("orderId", product.id);
-        formData.append("cartId", product.cartid);
-        formData.append("date", product.dateadded.toString());
-        formData.append("quantity", String(product.quantity));
-        formData.append("orderItemPrice", String(product.productprice));
-        //Campos Product
-        formData.append("productId", product.productid);
-        formData.append("productName", product.productname);
-        formData.append("description", product.description);
-        formData.append("image", product.imageurl);
-        formData.append("productPrice", String(product.price));
-        formData.append("publicationDate", product.publicationdate.toString());
-        formData.append("productStock", String(product.stock));
-        formData.append("productActive", String(product.active));
-      });
-
-      let result;
-      if (isLogged) {
-        result = await buyProducts(userId);
+      if (userId && navigator.onLine) {
+        await syncCartToServer(userId);
+        const result = await buyProducts(userId);
         if (result.success && result.redirectUrl) {
           router.push(result.redirectUrl);
-        } else {
-          console.error("Error during purchase:");
         }
       } else {
-        result = await buyProductsLocal(products);
+        const result = await buyProductsLocal(products);
         if (result.success && result.redirectUrl) {
           router.push(result.redirectUrl);
-          console.log("compra exitosa");
-        } else {
-          console.error("Error during purchase:");
         }
       }
     } catch (error) {
@@ -192,18 +119,12 @@ export default function ProductList({
             <Fragment>
               {products.map((product: OrderItem & Product) => (
                 <CartWrapper
-                  key={product.id}
+                  key={product.productid}
                   product={product}
-                  isLogged={isLogged}
-                  onIncrease={() =>
-                    handleIncreaseQuantity(product.id, product.productid)
-                  }
-                  onDecrease={() =>
-                    handleDecreaseQuantity(product.id, product.productid)
-                  }
-                  onRemove={() =>
-                    handleRemoveProduct(product.id, product.productid)
-                  }
+                  isLogged={!!userId}
+                  onIncrease={() => handleIncreaseQuantity(product.productid)}
+                  onDecrease={() => handleDecreaseQuantity(product.productid)}
+                  onRemove={() => handleRemoveProduct(product.productid)}
                 />
               ))}
               <div className="flex-1 flex mt-4">

@@ -11,8 +11,10 @@ import {
 import { Product } from "@/app/lib/Entities/Product";
 
 import Link from "next/link";
-import { addProductToCart } from "@/app/lib/actions/addProductToCart";
-import { addProductToLocalStorage } from "@/app/lib/actions/addProductToLocalStorage";
+import {
+  addItemToLocalCart,
+  syncCartToServer,
+} from "@/app/lib/cache/cartCache";
 
 function AddCartButton({
   product,
@@ -23,10 +25,9 @@ function AddCartButton({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const handleClick = () => {
-    if (!userID) {
-      addProductToLocalStorage(product);
-    } else {
-      addProductToCart(product, userID);
+    addItemToLocalCart(product);
+    if (userID && navigator.onLine) {
+      syncCartToServer(userID).catch(() => {});
     }
     setIsOpen(true);
   };

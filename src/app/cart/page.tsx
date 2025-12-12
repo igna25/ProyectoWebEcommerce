@@ -1,46 +1,42 @@
 "use client";
 import { Fragment, useEffect, useState } from "react";
 import ProductList from "../ui/cart/ProductList";
+import { syncCartToServer } from "../lib/cache/cartCache";
 
 export default function CartPage() {
   const [userId, setUserId] = useState<string | undefined>(undefined);
-  const [cartProducts, setCartProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const id =
+    const storedUserId =
       typeof window !== "undefined"
         ? localStorage.getItem("userId") || undefined
         : undefined;
-    setUserId(id);
+    setUserId(storedUserId);
   }, []);
 
   useEffect(() => {
-    const sync = async () => {
+    const loadCart = async () => {
       try {
-        const local = JSON.parse(localStorage.getItem("cart") || "[]");
         if (userId && navigator.onLine) {
-          await fetch("/api/cart/sync", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId,
-              items: local.map((p: any) => ({
-                productid: p.productid,
-                quantity: p.quantity,
-                productprice: p.productprice,
-              })),
-            }),
-          });
-          const res = await fetch(`/api/cart?userId=${userId}`);
-          const json = await res.json();
-          setCartProducts(json.items || []);
-        } else {
-          setCartProducts(local);
+          await syncCartToServer(userId);
         }
-      } catch {}
+      } finally {
+        setIsLoading(false);
+      }
     };
-    sync();
+    loadCart();
   }, [userId]);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center text-gray-700">
+          <p className="text-xl">Cargando carrito...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Fragment>
@@ -48,7 +44,7 @@ export default function CartPage() {
         Tu carrito
       </h1>
       <section className="w-full mb-2">
-        <ProductList cartProducts={cartProducts} userId={userId}></ProductList>
+        <ProductList userId={userId}></ProductList>
       </section>
     </Fragment>
   );
