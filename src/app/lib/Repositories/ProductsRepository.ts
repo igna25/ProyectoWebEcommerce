@@ -203,11 +203,6 @@ class ProductsRepository {
         ORDER BY publicationdate DESC
         LIMIT 3
       `;
-
-      const querytest = await sql`SELECT * FROM products`;
-
-      console.log("querytest", querytest.rows);
-      console.log("query", query.rows);
       return query.rows;
     } catch (error) {
       console.error("Failed to fetch recently added products:", error);
