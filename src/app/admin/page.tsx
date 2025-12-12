@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import Link from "next/link";
 import SalesRepository from "../lib/Repositories/SalesRepositor";
 import { Sale } from "../lib/Entities";
+import { Button } from "@headlessui/react";
 
 export default async function AdminPage() {
   noStore();
@@ -80,10 +81,10 @@ export default async function AdminPage() {
                 </p>
               )}
             </div>
-            <Link href={`/admin/activos}`}>
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
+            <Link href={"/admin/activos"}>
+              <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
                 Ir a Productos
-              </button>
+              </Button>
             </Link>
           </div>
         </div>

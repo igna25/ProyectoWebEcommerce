@@ -26,7 +26,7 @@ export default async function SalePage({
     <Fragment>
       <div className="container mx-auto px-4">
         {sale ? (
-          <SaleDetail sale={sale} orders={orders} />
+          <SaleDetail saleId={params.saleId} sale={sale} orders={orders} />
         ) : (
           <div className="h-screen flex items-center justify-center bg-gray-100">
             <div className="text-center text-gray-700">

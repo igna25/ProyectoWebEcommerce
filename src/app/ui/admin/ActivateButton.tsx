@@ -1,23 +1,48 @@
 "use client";
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
-import { activateProduct } from "@/app/lib/actions/activateProduct";
 
 const ActivateButton = ({ data }: { data: { id: string } }) => {
   const { id } = data;
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const openModal = () => setModalIsOpen(true);
-  const closeModal = () => setModalIsOpen(false);
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setError(null);
+  };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const form = new FormData();
-      form.append("id", id);
+      setIsLoading(true);
+      setError(null);
 
-      activateProduct(form);
+      const response = await fetch("/api/admin/products/status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          productId: id,
+          active: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to activate product");
+      }
+
       closeModal();
-    } catch (error) {}
+      window.location.reload();
+    } catch (err) {
+      setError("Error al activar el producto");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -32,29 +57,32 @@ const ActivateButton = ({ data }: { data: { id: string } }) => {
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        contentLabel="Confirm Delete"
+        contentLabel="Confirm Activation"
         className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       >
         <div className="bg-white p-4 rounded shadow-lg w-96">
           <h2 className="text-xl font-bold mb-4">
-            Confirmar activacion de producto
+            Confirmar activación de producto
           </h2>
           <p className="mb-4">
             ¿Estás seguro de que deseas volver a activar este producto?
           </p>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <div className="flex justify-end space-x-4">
             <button
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
               onClick={closeModal}
+              disabled={isLoading}
             >
               Cancelar
             </button>
             <form onSubmit={handleSubmit}>
               <button
                 type="submit"
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                disabled={isLoading}
               >
-                Activar
+                {isLoading ? "Activando..." : "Activar"}
               </button>
             </form>
           </div>
