@@ -1,6 +1,7 @@
 const CACHE_VERSION = "v2";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
+const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
 const IMAGES_CACHE = `images-${CACHE_VERSION}`;
 
 const OFFLINE_URL = "/offline";
@@ -34,9 +35,12 @@ self.addEventListener("activate", (event) => {
           keys
             .filter(
               (key) =>
-                ![APP_SHELL_CACHE, RUNTIME_API_CACHE, IMAGES_CACHE].includes(
-                  key,
-                ),
+                ![
+                  APP_SHELL_CACHE,
+                  RUNTIME_API_CACHE,
+                  ADMIN_API_CACHE,
+                  IMAGES_CACHE,
+                ].includes(key),
             )
             .map((key) => caches.delete(key)),
         ),
@@ -52,6 +56,11 @@ function isNavigationRequest(request) {
 function isProductsApi(url) {
   return url.pathname.startsWith("/api/products");
 }
+
+function isAdminApi(url) {
+  return url.pathname.startsWith("/api/admin");
+}
+
 function isSalesApi(url) {
   return url.pathname.startsWith("/api/sales");
 }
@@ -59,6 +68,7 @@ function isSalesApi(url) {
 function isNextImage(url) {
   return url.pathname.startsWith("/_next/image");
 }
+
 function isCartApi(url) {
   return url.pathname.startsWith("/api/cart");
 }
@@ -84,6 +94,59 @@ self.addEventListener("fetch", (event) => {
           return caches.match(OFFLINE_URL);
         }),
     );
+    return;
+  }
+
+  if (isAdminApi(url)) {
+    if (request.method === "GET") {
+      event.respondWith(
+        fetch(request)
+          .then(async (res) => {
+            if (res.ok) {
+              const resClone = res.clone();
+              const cache = await caches.open(ADMIN_API_CACHE);
+              await cache.put(request, resClone);
+              await cleanOldCaches(ADMIN_API_CACHE);
+            }
+            return res;
+          })
+          .catch(async () => {
+            const cached = await caches.match(request);
+            if (cached) {
+              const headers = new Headers(cached.headers);
+              headers.set("X-From-Cache", "true");
+              return new Response(cached.body, {
+                status: cached.status,
+                statusText: cached.statusText,
+                headers: headers,
+              });
+            }
+            return new Response(
+              JSON.stringify({ error: "No disponible offline" }),
+              {
+                status: 503,
+                headers: { "Content-Type": "application/json" },
+              },
+            );
+          }),
+      );
+    } else {
+      // Para POST, PATCH, PUT - requiere conexión
+      event.respondWith(
+        fetch(request).catch(
+          () =>
+            new Response(
+              JSON.stringify({
+                error: "Requiere conexión para actualizaciones",
+              }),
+              {
+                status: 503,
+                headers: { "Content-Type": "application/json" },
+              },
+            ),
+        ),
+      );
+    }
     return;
   }
 

@@ -1,5 +1,6 @@
 import { Product } from "@/app/lib/Entities/Product";
 import React from "react";
+import Image from "next/image";
 
 const ProductCard = ({
   product,
@@ -10,10 +11,12 @@ const ProductCard = ({
 }) => {
   return (
     <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white m-4 flex flex-col">
-      <img
+      <Image
         src={product.imageurl}
         alt={product.productname}
         className="w-full h-48 sm:h-64 object-cover"
+        width={100}
+        height={100}
       />
       <div className="px-6 py-4 flex-1 flex flex-col justify-between">
         <div>
