@@ -1,11 +1,22 @@
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
 const IMAGES_CACHE = `images-${CACHE_VERSION}`;
+const STATIC_CACHE = `static-${CACHE_VERSION}`;
 
 const OFFLINE_URL = "/offline";
 const MAX_CACHE_SIZE = 50;
+
+const CORE_ROUTES = ["/", OFFLINE_URL, "/manifest.webmanifest"];
+const OPTIONAL_ROUTES = [
+  "/login",
+  "/register",
+  "/dashboard",
+  "/cart",
+  "/admin",
+  "/buyProduct",
+];
 
 async function cleanOldCaches(cacheName) {
   const cache = await caches.open(cacheName);
@@ -19,9 +30,12 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(APP_SHELL_CACHE)
-      .then((cache) =>
-        cache.addAll(["/", OFFLINE_URL, "/manifest.webmanifest"]),
-      )
+      .then(async (cache) => {
+        await cache.addAll(CORE_ROUTES);
+        await Promise.allSettled(
+          OPTIONAL_ROUTES.map((route) => cache.add(route)),
+        );
+      })
       .then(() => self.skipWaiting()),
   );
 });
@@ -40,6 +54,7 @@ self.addEventListener("activate", (event) => {
                   RUNTIME_API_CACHE,
                   ADMIN_API_CACHE,
                   IMAGES_CACHE,
+                  STATIC_CACHE,
                 ].includes(key),
             )
             .map((key) => caches.delete(key)),
@@ -48,6 +63,10 @@ self.addEventListener("activate", (event) => {
       .then(() => self.clients.claim()),
   );
 });
+
+function isNextStatic(url) {
+  return url.pathname.startsWith("/_next/static/");
+}
 
 function isNavigationRequest(request) {
   return request.mode === "navigate";
@@ -181,6 +200,24 @@ self.addEventListener("fetch", (event) => {
             },
           );
         }),
+    );
+    return;
+  }
+
+  if (isNextStatic(url)) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then(async (res) => {
+            if (res.ok) {
+              const resClone = res.clone();
+              const cache = await caches.open(STATIC_CACHE);
+              await cache.put(request, resClone);
+            }
+            return res;
+          }),
+      ),
     );
     return;
   }
