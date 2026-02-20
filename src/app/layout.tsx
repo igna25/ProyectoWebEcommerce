@@ -4,6 +4,7 @@ import "./globals.css";
 import RegisterSW from "./pwa/RegisterSW";
 import Providers from "./Providers";
 import PersistUserId from "./pwa/PersistUserId";
+import ConnectionStatus from "./pwa/ConnectionStatus";
 import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -35,6 +36,7 @@ export default async function RootLayout({
           <Providers>
             <RegisterSW />
             <PersistUserId />
+            <ConnectionStatus />
             {children}
           </Providers>
         </body>
