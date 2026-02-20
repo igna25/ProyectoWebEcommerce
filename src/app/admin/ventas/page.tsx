@@ -1,10 +1,10 @@
 import SalesRepository from "@/app/lib/Repositories/SalesRepository";
-import SaleSummary from "@/app/ui/admin/SaleSummary";
+import SalesListAdmin from "@/app/ui/admin/SalesListAdmin";
+import Pagination from "../../ui/admin/Pagination";
 import { unstable_noStore as noStore } from "next/cache";
 import { Fragment } from "react";
-import Pagination from "../../ui/admin/Pagination";
 
-export default async function LoginPage({
+export default async function SalesPage({
   searchParams,
 }: {
   searchParams?: {
@@ -16,13 +16,12 @@ export default async function LoginPage({
   const ITEMS_PER_PAGE = 5;
   const currentPage = Number(searchParams?.page) || 1;
   const salesRepository = new SalesRepository();
-  let totalPages = 5;
 
   const { sales, total } = await salesRepository.getAllSalesPaginated(
     currentPage,
     ITEMS_PER_PAGE,
   );
-  totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   return (
     <Fragment>
@@ -37,12 +36,8 @@ export default async function LoginPage({
           </div>
         ) : (
           <div className="flex flex-col items-center">
-            <div className="w-full max-w-4xl mx-4 ">
-              {sales.map((sale, index) => (
-                <div key={index} className="w-full items-center">
-                  <SaleSummary sale={sale} />
-                </div>
-              ))}
+            <div className="w-full max-w-4xl mx-4">
+              <SalesListAdmin sales={sales} />
             </div>
             <Pagination totalPages={totalPages} currentPage={currentPage} />
           </div>

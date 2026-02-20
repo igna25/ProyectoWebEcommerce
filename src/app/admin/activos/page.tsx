@@ -1,14 +1,12 @@
 import { Product } from "@/app/lib/Entities/Product";
 import ProductsRepository from "@/app/lib/Repositories/ProductsRepository";
-import DeleteButton from "@/app/ui/admin/deleteButton";
+import ProductsListAdmin from "@/app/ui/admin/ProductsListAdmin";
 import Pagination from "@/app/ui/admin/Pagination";
-import ProductCard from "@/app/ui/admin/productCard";
 import SearchBar from "@/app/ui/admin/searchBar";
-import StockModal from "@/app/ui/admin/stockModal";
 import { unstable_noStore as noStore } from "next/cache";
 import { Fragment } from "react";
 
-export default async function LoginPage({
+export default async function ActiveProductsPage({
   searchParams,
 }: {
   searchParams?: {
@@ -19,7 +17,6 @@ export default async function LoginPage({
   noStore();
 
   const ITEMS_PER_PAGE = 6;
-
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const productsRepository = new ProductsRepository();
@@ -51,24 +48,13 @@ export default async function LoginPage({
           <div className="h-screen flex items-center justify-center bg-gray-100">
             <div className="text-center text-gray-700">
               <p className="text-xl">
-                parece que no encontramos resultados para su búsqueda..
+                Parece que no encontramos resultados para su búsqueda...
               </p>
             </div>
           </div>
         ) : (
           <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product}>
-                  <StockModal
-                    data={{ id: product.id, currentStock: product.stock }}
-                  />
-                  <DeleteButton
-                    data={{ id: product.id, imageId: product.imagekey }}
-                  />
-                </ProductCard>
-              ))}
-            </div>
+            <ProductsListAdmin products={products} />
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}
