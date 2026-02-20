@@ -8,49 +8,60 @@ type AdminSummary = {
   lowStockProducts: Product[];
 };
 
+type CacheEntry<T> = {
+  data: T;
+  expiresAt: number;
+};
+
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
 const ADMIN_SUMMARY_KEY = "adminSummary";
 const ADMIN_PRODUCTS_KEY = "adminProducts";
 const ADMIN_SALES_KEY = "adminSales";
 const ADMIN_SALES_ORDERS_KEY = "adminSalesOrders";
 
-/**
- * Guarda el resumen del admin en localStorage
- */
+function createEntry<T>(data: T): CacheEntry<T> {
+  return { data, expiresAt: Date.now() + CACHE_TTL_MS };
+}
+
+function isValid<T>(entry: CacheEntry<T>): boolean {
+  return Date.now() < entry.expiresAt;
+}
+
 export function saveAdminSummaryToCache(summary: AdminSummary): void {
   try {
-    localStorage.setItem(ADMIN_SUMMARY_KEY, JSON.stringify(summary));
+    localStorage.setItem(ADMIN_SUMMARY_KEY, JSON.stringify(createEntry(summary)));
   } catch (error) {
     console.error("Error al guardar resumen del admin en caché:", error);
   }
 }
 
-/**
- * Obtiene el resumen del admin desde localStorage
- */
 export function getAdminSummaryFromCache(): AdminSummary | null {
   try {
-    const cachedSummary = localStorage.getItem(ADMIN_SUMMARY_KEY);
+    const raw = localStorage.getItem(ADMIN_SUMMARY_KEY);
+    if (!raw) return null;
 
-    if (!cachedSummary) {
+    const entry: CacheEntry<AdminSummary> = JSON.parse(raw);
+    if (!isValid(entry)) {
+      localStorage.removeItem(ADMIN_SUMMARY_KEY);
       return null;
     }
 
-    return JSON.parse(cachedSummary);
+    return entry.data;
   } catch (error) {
     console.error("Error al recuperar resumen del admin desde caché:", error);
     return null;
   }
 }
 
-/**
- * Guarda productos en caché del admin
- */
 export function saveAdminProductsToCache(products: Product[]): void {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_PRODUCTS_KEY);
-    const productsById: Record<string, Product> = existingMapJson
-      ? JSON.parse(existingMapJson)
-      : {};
+    const existingRaw = localStorage.getItem(ADMIN_PRODUCTS_KEY);
+    const existingEntry: CacheEntry<Record<string, Product>> | null =
+      existingRaw ? JSON.parse(existingRaw) : null;
+
+    const productsById: Record<string, Product> =
+      existingEntry && isValid(existingEntry) ? existingEntry.data : {};
 
     for (const product of products || []) {
       if (product && typeof product.id === "string") {
@@ -58,24 +69,27 @@ export function saveAdminProductsToCache(products: Product[]): void {
       }
     }
 
-    localStorage.setItem(ADMIN_PRODUCTS_KEY, JSON.stringify(productsById));
+    localStorage.setItem(
+      ADMIN_PRODUCTS_KEY,
+      JSON.stringify(createEntry(productsById)),
+    );
   } catch (error) {
     console.error("Error al guardar productos del admin en caché:", error);
   }
 }
 
-/**
- * Obtiene un producto del caché del admin
- */
 export function getAdminProductFromCache(productId: string): Product | null {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_PRODUCTS_KEY);
-    if (!existingMapJson) {
+    const raw = localStorage.getItem(ADMIN_PRODUCTS_KEY);
+    if (!raw) return null;
+
+    const entry: CacheEntry<Record<string, Product>> = JSON.parse(raw);
+    if (!isValid(entry)) {
+      localStorage.removeItem(ADMIN_PRODUCTS_KEY);
       return null;
     }
 
-    const productsById: Record<string, Product> = JSON.parse(existingMapJson);
-    return productsById[productId] || null;
+    return entry.data[productId] || null;
   } catch (error) {
     console.error("Error al recuperar producto del admin desde caché:", error);
     return null;
@@ -84,27 +98,30 @@ export function getAdminProductFromCache(productId: string): Product | null {
 
 export function getAllAdminProductsFromCache(): Product[] {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_PRODUCTS_KEY);
-    if (!existingMapJson) {
+    const raw = localStorage.getItem(ADMIN_PRODUCTS_KEY);
+    if (!raw) return [];
+
+    const entry: CacheEntry<Record<string, Product>> = JSON.parse(raw);
+    if (!isValid(entry)) {
+      localStorage.removeItem(ADMIN_PRODUCTS_KEY);
       return [];
     }
-    const productsById: Record<string, Product> = JSON.parse(existingMapJson);
-    return Object.values(productsById);
+
+    return Object.values(entry.data);
   } catch (error) {
     console.error("Error al recuperar productos del admin desde caché:", error);
     return [];
   }
 }
 
-/**
- * Guarda ventas en caché del admin
- */
 export function saveAdminSalesToCache(sales: Sale[]): void {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_SALES_KEY);
-    const salesById: Record<string, Sale> = existingMapJson
-      ? JSON.parse(existingMapJson)
-      : {};
+    const existingRaw = localStorage.getItem(ADMIN_SALES_KEY);
+    const existingEntry: CacheEntry<Record<string, Sale>> | null =
+      existingRaw ? JSON.parse(existingRaw) : null;
+
+    const salesById: Record<string, Sale> =
+      existingEntry && isValid(existingEntry) ? existingEntry.data : {};
 
     for (const sale of sales || []) {
       if (sale && typeof sale.id === "string") {
@@ -112,24 +129,27 @@ export function saveAdminSalesToCache(sales: Sale[]): void {
       }
     }
 
-    localStorage.setItem(ADMIN_SALES_KEY, JSON.stringify(salesById));
+    localStorage.setItem(
+      ADMIN_SALES_KEY,
+      JSON.stringify(createEntry(salesById)),
+    );
   } catch (error) {
     console.error("Error al guardar ventas del admin en caché:", error);
   }
 }
 
-/**
- * Obtiene una venta del caché del admin
- */
 export function getAdminSaleFromCache(saleId: string): Sale | null {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_SALES_KEY);
-    if (!existingMapJson) {
+    const raw = localStorage.getItem(ADMIN_SALES_KEY);
+    if (!raw) return null;
+
+    const entry: CacheEntry<Record<string, Sale>> = JSON.parse(raw);
+    if (!isValid(entry)) {
+      localStorage.removeItem(ADMIN_SALES_KEY);
       return null;
     }
 
-    const salesById: Record<string, Sale> = JSON.parse(existingMapJson);
-    return salesById[saleId] || null;
+    return entry.data[saleId] || null;
   } catch (error) {
     console.error("Error al recuperar venta del admin desde caché:", error);
     return null;
@@ -138,55 +158,57 @@ export function getAdminSaleFromCache(saleId: string): Sale | null {
 
 export function getAllAdminSalesFromCache(): Sale[] {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_SALES_KEY);
-    if (!existingMapJson) {
+    const raw = localStorage.getItem(ADMIN_SALES_KEY);
+    if (!raw) return [];
+
+    const entry: CacheEntry<Record<string, Sale>> = JSON.parse(raw);
+    if (!isValid(entry)) {
+      localStorage.removeItem(ADMIN_SALES_KEY);
       return [];
     }
-    const salesById: Record<string, Sale> = JSON.parse(existingMapJson);
-    return Object.values(salesById);
+
+    return Object.values(entry.data);
   } catch (error) {
     console.error("Error al recuperar ventas del admin desde caché:", error);
     return [];
   }
 }
 
-/**
- * Guarda órdenes de venta en caché del admin (indexadas por saleId)
- */
 export function saveAdminSalesOrdersToCache(
   saleId: string,
   orders: SalesOrder[],
 ): void {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_SALES_ORDERS_KEY);
-    const ordersBySaleId: Record<string, SalesOrder[]> = existingMapJson
-      ? JSON.parse(existingMapJson)
-      : {};
+    const existingRaw = localStorage.getItem(ADMIN_SALES_ORDERS_KEY);
+    const existingEntry: CacheEntry<Record<string, SalesOrder[]>> | null =
+      existingRaw ? JSON.parse(existingRaw) : null;
+
+    const ordersBySaleId: Record<string, SalesOrder[]> =
+      existingEntry && isValid(existingEntry) ? existingEntry.data : {};
 
     ordersBySaleId[saleId] = orders || [];
 
     localStorage.setItem(
       ADMIN_SALES_ORDERS_KEY,
-      JSON.stringify(ordersBySaleId),
+      JSON.stringify(createEntry(ordersBySaleId)),
     );
   } catch (error) {
     console.error("Error al guardar órdenes de venta en caché:", error);
   }
 }
 
-/**
- * Obtiene las órdenes de una venta del caché del admin
- */
 export function getAdminSalesOrdersFromCache(saleId: string): SalesOrder[] {
   try {
-    const existingMapJson = localStorage.getItem(ADMIN_SALES_ORDERS_KEY);
-    if (!existingMapJson) {
+    const raw = localStorage.getItem(ADMIN_SALES_ORDERS_KEY);
+    if (!raw) return [];
+
+    const entry: CacheEntry<Record<string, SalesOrder[]>> = JSON.parse(raw);
+    if (!isValid(entry)) {
+      localStorage.removeItem(ADMIN_SALES_ORDERS_KEY);
       return [];
     }
 
-    const ordersBySaleId: Record<string, SalesOrder[]> =
-      JSON.parse(existingMapJson);
-    return ordersBySaleId[saleId] || [];
+    return entry.data[saleId] || [];
   } catch (error) {
     console.error("Error al recuperar órdenes de venta del caché:", error);
     return [];
