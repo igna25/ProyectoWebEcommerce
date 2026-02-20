@@ -3,7 +3,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { Product } from "../lib/Entities/Product";
 import { Fragment } from "react";
 import Link from "next/link";
-import SalesRepository from "../lib/Repositories/SalesRepositor";
+import SalesRepository from "../lib/Repositories/SalesRepository";
 import { Sale } from "../lib/Entities";
 import { Button } from "@headlessui/react";
 

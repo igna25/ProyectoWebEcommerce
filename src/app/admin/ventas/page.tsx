@@ -1,4 +1,4 @@
-import SalesRepository from "@/app/lib/Repositories/SalesRepositor";
+import SalesRepository from "@/app/lib/Repositories/SalesRepository";
 import SaleSummary from "@/app/ui/admin/SaleSummary";
 import { unstable_noStore as noStore } from "next/cache";
 import { Fragment } from "react";

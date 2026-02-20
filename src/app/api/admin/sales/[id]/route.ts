@@ -1,4 +1,4 @@
-import SalesRepository from "@/app/lib/Repositories/SalesRepositor";
+import SalesRepository from "@/app/lib/Repositories/SalesRepository";
 import SalesOrdersRepository from "@/app/lib/Repositories/SalesOrdersRepository";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
