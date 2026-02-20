@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Product } from "@/app/lib/Entities";
 import {
   saveAdminProductsToCache,
-  getAdminProductFromCache,
+  getAllAdminProductsFromCache,
 } from "@/app/lib/cache/adminCache";
 
 interface ProductsListAdminProps {
@@ -25,10 +25,7 @@ export default function ProductsListAdmin({
       saveAdminProductsToCache(products);
       setCachedProducts(products);
     } else {
-      // Si no hay productos, intentar obtener del caché
-      const cached = products
-        .map((p) => getAdminProductFromCache(p.id))
-        .filter(Boolean) as Product[];
+      const cached = getAllAdminProductsFromCache();
       if (cached.length > 0) {
         setCachedProducts(cached);
       }

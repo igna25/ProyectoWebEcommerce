@@ -82,6 +82,20 @@ export function getAdminProductFromCache(productId: string): Product | null {
   }
 }
 
+export function getAllAdminProductsFromCache(): Product[] {
+  try {
+    const existingMapJson = localStorage.getItem(ADMIN_PRODUCTS_KEY);
+    if (!existingMapJson) {
+      return [];
+    }
+    const productsById: Record<string, Product> = JSON.parse(existingMapJson);
+    return Object.values(productsById);
+  } catch (error) {
+    console.error("Error al recuperar productos del admin desde caché:", error);
+    return [];
+  }
+}
+
 /**
  * Guarda ventas en caché del admin
  */
@@ -119,6 +133,20 @@ export function getAdminSaleFromCache(saleId: string): Sale | null {
   } catch (error) {
     console.error("Error al recuperar venta del admin desde caché:", error);
     return null;
+  }
+}
+
+export function getAllAdminSalesFromCache(): Sale[] {
+  try {
+    const existingMapJson = localStorage.getItem(ADMIN_SALES_KEY);
+    if (!existingMapJson) {
+      return [];
+    }
+    const salesById: Record<string, Sale> = JSON.parse(existingMapJson);
+    return Object.values(salesById);
+  } catch (error) {
+    console.error("Error al recuperar ventas del admin desde caché:", error);
+    return [];
   }
 }
 

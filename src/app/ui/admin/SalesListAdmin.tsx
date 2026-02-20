@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Sale } from "@/app/lib/Entities";
 import {
   saveAdminSalesToCache,
-  getAdminSaleFromCache,
+  getAllAdminSalesFromCache,
 } from "@/app/lib/cache/adminCache";
 
 interface SalesListAdminProps {
@@ -25,10 +25,7 @@ export default function SalesListAdmin({
       saveAdminSalesToCache(sales);
       setCachedSales(sales);
     } else {
-      // Si no hay ventas, intentar obtener del caché
-      const cached = sales
-        .map((s) => getAdminSaleFromCache(s.id))
-        .filter(Boolean) as Sale[];
+      const cached = getAllAdminSalesFromCache();
       if (cached.length > 0) {
         setCachedSales(cached);
       }
