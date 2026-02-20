@@ -1,7 +1,7 @@
 {
   "name": "IAW-commerce",
   "short_name": "IAW",
-  "description": "",
+  "description": "IAW Commerce es una aplicación web progresiva desarrollada en el marco de la materia Ingeniería de Aplicaciones Web. Permite gestionar un bazar online con funcionalidades de catálogo, carrito de compras y administración, ofreciendo una experiencia fluida tanto en modo online como offline.",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
