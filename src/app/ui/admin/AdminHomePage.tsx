@@ -31,20 +31,17 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
   useEffect(() => {
     const loadAdminData = async () => {
       try {
-        setIsLoading(true);
         setError(null);
-
-        // Intentar obtener del caché primero
         const cachedSummary = getAdminSummaryFromCache();
 
         if (cachedSummary) {
           setSummary(cachedSummary);
           onDataLoaded?.(cachedSummary);
           setIsLoading(false);
-          return;
+        } else {
+          setIsLoading(true);
         }
 
-        // Si el caché está expirado o no existe, obtener del servidor
         const response = await fetch("/api/admin", {
           method: "GET",
           credentials: "include",
@@ -55,24 +52,20 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
         }
 
         const data: AdminSummary = await response.json();
-
-        // Guardar en caché
         saveAdminSummaryToCache(data);
         saveAdminProductsToCache(data.lowStockProducts);
         saveAdminSalesToCache(data.recentSales);
-
         setSummary(data);
         onDataLoaded?.(data);
       } catch (err) {
         console.error("Error cargando datos del admin:", err);
-        setError("Error al cargar los datos del administrador");
-
-        // Intentar usar caché aunque esté expirado
         const fallbackCache = getAdminSummaryFromCache();
         if (fallbackCache) {
           setSummary(fallbackCache);
           onDataLoaded?.(fallbackCache);
           setError(null);
+        } else {
+          setError("Error al cargar los datos del administrador");
         }
       } finally {
         setIsLoading(false);
