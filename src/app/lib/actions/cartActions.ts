@@ -31,7 +31,7 @@ export const removeProduct = async (orderitemid: string, cartId: string) => {
     };
   } catch (error) {
     return {
-      mgs: "Error deleting a product",
+      msg: "Error deleting a product",
       success: false,
     };
   }
@@ -60,7 +60,7 @@ export const increaseQuantity = async (orderitemid: string, cartId: string) => {
     };
   } catch (error) {
     return {
-      mgs: "Error deleting a product",
+      msg: "Error increasing quantity",
       success: false,
     };
   }
@@ -89,7 +89,7 @@ export const decreaseQuantity = async (orderitemid: string, cartId: string) => {
     };
   } catch (error) {
     return {
-      mgs: "Error deleting a product",
+      msg: "Error decreasing quantity",
       success: false,
     };
   }
@@ -109,7 +109,7 @@ export const clearCart = async (cartId: string) => {
     };
   } catch (error) {
     return {
-      mgs: "Error deleting a product",
+      msg: "Error clearing cart",
       success: false,
     };
   }
