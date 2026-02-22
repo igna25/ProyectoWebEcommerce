@@ -4,6 +4,7 @@ import "./globals.css";
 import RegisterSW from "./pwa/RegisterSW";
 import Providers from "./Providers";
 import PersistUserId from "./pwa/PersistUserId";
+import PersistAdminRole from "./pwa/PersistAdminRole";
 import ConnectionStatus from "./pwa/ConnectionStatus";
 import { Fragment } from "react";
 
@@ -36,6 +37,7 @@ export default async function RootLayout({
           <Providers>
             <RegisterSW />
             <PersistUserId />
+            <PersistAdminRole />
             <ConnectionStatus />
             {children}
           </Providers>

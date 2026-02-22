@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import SideNav from "../ui/admin/sideBar/SideBar";
 import HeaderMobile from "../ui/admin/sideBar/header-mobile";
-import PersistAdminRole from "../pwa/PersistAdminRole";
 
 export default function RootLayout({
   children,
@@ -10,7 +9,6 @@ export default function RootLayout({
 }>) {
   return (
     <Fragment>
-      <PersistAdminRole />
       <SideNav></SideNav>
       <main className="flex-1">
         <div className="flex flex-col md:ml-60 sm:border-r sm:border-zinc-700 min-h-screen">
