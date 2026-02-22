@@ -30,7 +30,10 @@ function isValid<T>(entry: CacheEntry<T>): boolean {
 
 export function saveAdminSummaryToCache(summary: AdminSummary): void {
   try {
-    localStorage.setItem(ADMIN_SUMMARY_KEY, JSON.stringify(createEntry(summary)));
+    localStorage.setItem(
+      ADMIN_SUMMARY_KEY,
+      JSON.stringify(createEntry(summary)),
+    );
   } catch (error) {
     console.error("Error al guardar resumen del admin en caché:", error);
   }
@@ -117,8 +120,9 @@ export function getAllAdminProductsFromCache(): Product[] {
 export function saveAdminSalesToCache(sales: Sale[]): void {
   try {
     const existingRaw = localStorage.getItem(ADMIN_SALES_KEY);
-    const existingEntry: CacheEntry<Record<string, Sale>> | null =
-      existingRaw ? JSON.parse(existingRaw) : null;
+    const existingEntry: CacheEntry<Record<string, Sale>> | null = existingRaw
+      ? JSON.parse(existingRaw)
+      : null;
 
     const salesById: Record<string, Sale> =
       existingEntry && isValid(existingEntry) ? existingEntry.data : {};

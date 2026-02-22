@@ -55,7 +55,13 @@ export async function GET(req: any) {
       active,
     );
     return NextResponse.json(
-      { products: result.products, total: result.total, page, pageSize, active },
+      {
+        products: result.products,
+        total: result.total,
+        page,
+        pageSize,
+        active,
+      },
       { status: 200, headers: { "Cache-Control": "no-cache" } },
     );
   } catch (err) {
