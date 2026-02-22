@@ -1,4 +1,4 @@
-import { sql } from "@vercel/postgres";
+import { pooler as sql } from "@/app/lib/db/db";
 import { v4 as uuidv4 } from "uuid";
 import { Sale } from "../Entities/Sale";
 

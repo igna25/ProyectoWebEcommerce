@@ -5,7 +5,15 @@ const SYNC_TAG = "pending-ops";
 function getFullUrl(url: string): string {
   if (typeof window === "undefined") return url;
   if (url.startsWith("http")) return url;
-  return `${window.location.origin}${url.startsWith("/") ? url : `/${url}`}`;
+  const path = url.startsWith("/") ? url : `/${url}`;
+  return `${window.location.origin}${path}`;
+}
+
+function hasSyncSupport(): boolean {
+  return !!(
+    "serviceWorker" in navigator &&
+    "sync" in ServiceWorkerRegistration.prototype
+  );
 }
 
 function openDb(): Promise<IDBDatabase> {
@@ -16,7 +24,10 @@ function openDb(): Promise<IDBDatabase> {
     req.onupgradeneeded = (e) => {
       const db = (e.target as IDBOpenDBRequest).result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+        db.createObjectStore(STORE_NAME, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
       }
     };
   });
@@ -57,10 +68,13 @@ export function queueOfflineOp(op: QueuedOp): Promise<void> {
       });
     })
     .then(() => {
-      if ("serviceWorker" in navigator && "sync" in ServiceWorkerRegistration.prototype) {
-        return navigator.serviceWorker.ready.then((reg) =>
-          (reg as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register(SYNC_TAG),
-        );
+      if (hasSyncSupport()) {
+        return navigator.serviceWorker.ready.then((reg) => {
+          const regWithSync = reg as ServiceWorkerRegistration & {
+            sync: { register: (tag: string) => Promise<void> };
+          };
+          return regWithSync.sync.register(SYNC_TAG);
+        });
       }
     })
     .then(() => {})
@@ -69,9 +83,5 @@ export function queueOfflineOp(op: QueuedOp): Promise<void> {
 
 export function isOfflineSyncSupported(): boolean {
   if (typeof window === "undefined") return false;
-  return !!(
-    "serviceWorker" in navigator &&
-    "sync" in ServiceWorkerRegistration.prototype &&
-    "indexedDB" in window
-  );
+  return hasSyncSupport() && "indexedDB" in window;
 }

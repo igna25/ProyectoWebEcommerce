@@ -1,4 +1,4 @@
-import { sql } from "@vercel/postgres";
+import { pooler as sql } from "@/app/lib/db/db";
 import { Cart } from "../Entities/Cart";
 
 class CartsRepository {
