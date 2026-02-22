@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { FileUploader } from "react-drag-drop-files";
-import { updateProduct } from "@/app/lib/actions/updateProduct"; // Asumiendo que tienes una función para actualizar productos
+import { Button } from "@headlessui/react";
+import { updateProduct } from "@/app/lib/actions/updateProduct";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Product } from "@/app/lib/Entities";
@@ -207,7 +208,7 @@ const EditProductForm = ({ product }: { product: Product }) => {
             <p className="text-red-500 text-xs mt-1">{errors.file}</p>
           )}
           <div className="text-center">
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
               className={clsx(
@@ -218,7 +219,7 @@ const EditProductForm = ({ product }: { product: Product }) => {
               )}
             >
               {isSubmitting ? "Actualizando..." : "Actualizar Producto"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

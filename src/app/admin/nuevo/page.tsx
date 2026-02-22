@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import { FileUploader } from "react-drag-drop-files";
+import { Button } from "@headlessui/react";
 import { createProduct } from "@/app/lib/actions/createProduct";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -197,7 +198,7 @@ const NewProductForm: React.FC<NewProductFormProps> = () => {
             <p className="text-red-500 text-xs mt-1">{errors.file}</p>
           )}
           <div className="text-center">
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
               className={clsx(
@@ -208,7 +209,7 @@ const NewProductForm: React.FC<NewProductFormProps> = () => {
               )}
             >
               {isSubmitting ? "Enviando..." : "Crear Producto"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

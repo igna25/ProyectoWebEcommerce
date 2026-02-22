@@ -2,6 +2,7 @@
 import { deactivateProduct } from "@/app/lib/actions/deactivateProduct";
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
+import { Button } from "@headlessui/react";
 
 const DeleteButton = ({ data }: { data: { id: string; imageId: string } }) => {
   const { id, imageId } = data;
@@ -23,13 +24,13 @@ const DeleteButton = ({ data }: { data: { id: string; imageId: string } }) => {
 
   return (
     <Fragment>
-      <button
-        type="submit"
+      <Button
+        type="button"
         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full"
         onClick={openModal}
       >
         Desactivar
-      </button>
+      </Button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -46,19 +47,19 @@ const DeleteButton = ({ data }: { data: { id: string; imageId: string } }) => {
             podrá ser comprado de los carritos de los usuarios
           </p>
           <div className="flex justify-end space-x-4">
-            <button
+            <Button
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
               onClick={closeModal}
             >
               Cancelar
-            </button>
+            </Button>
             <form onSubmit={handleSubmit}>
-              <button
+              <Button
                 type="submit"
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
               >
                 Desactivar
-              </button>
+              </Button>
             </form>
           </div>
         </div>

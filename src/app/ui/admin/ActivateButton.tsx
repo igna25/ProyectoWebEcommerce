@@ -1,6 +1,7 @@
 "use client";
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
+import { Button } from "@headlessui/react";
 import { queueOfflineOp, isOfflineSyncSupported } from "@/app/lib/offlineQueue";
 
 const ActivateButton = ({ data }: { data: { id: string } }) => {
@@ -70,13 +71,13 @@ const ActivateButton = ({ data }: { data: { id: string } }) => {
 
   return (
     <Fragment>
-      <button
-        type="submit"
+      <Button
+        type="button"
         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full"
         onClick={openModal}
       >
         Activar
-      </button>
+      </Button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -97,21 +98,21 @@ const ActivateButton = ({ data }: { data: { id: string } }) => {
             </p>
           )}
           <div className="flex justify-end space-x-4">
-            <button
+            <Button
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
               onClick={closeModal}
               disabled={isLoading}
             >
               Cancelar
-            </button>
+            </Button>
             <form onSubmit={handleSubmit}>
-              <button
+              <Button
                 type="submit"
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                 disabled={isLoading}
               >
                 {isLoading ? "Activando..." : "Activar"}
-              </button>
+              </Button>
             </form>
           </div>
         </div>

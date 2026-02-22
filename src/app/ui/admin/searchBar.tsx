@@ -1,6 +1,7 @@
 "use client";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@headlessui/react";
 
 export default function SearchBar() {
   const searchParams = useSearchParams();
@@ -32,12 +33,12 @@ export default function SearchBar() {
             setSearch(e.target.value);
           }}
         />
-        <button
+        <Button
           onClick={handleSearch}
           className="px-4 py-2 bg-blue-500 text-white border-2 border-blue-500 rounded-r-lg hover:bg-blue-600 focus:outline-none"
         >
           Buscar
-        </button>
+        </Button>
       </div>
     </div>
   );

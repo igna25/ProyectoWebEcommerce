@@ -1,6 +1,7 @@
 "use client";
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
+import { Button } from "@headlessui/react";
 import { queueOfflineOp, isOfflineSyncSupported } from "@/app/lib/offlineQueue";
 
 const StockModal = ({
@@ -81,13 +82,13 @@ const StockModal = ({
 
   return (
     <Fragment>
-      <button
+      <Button
         type="button"
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
         onClick={openModal}
       >
         Stock
-      </button>
+      </Button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -113,21 +114,21 @@ const StockModal = ({
               </p>
             )}
             <div className="flex justify-end space-x-4">
-              <button
+              <Button
                 type="button"
                 className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
                 onClick={closeModal}
                 disabled={isLoading}
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                 disabled={isLoading}
               >
                 {isLoading ? "Actualizando..." : "Actualizar"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

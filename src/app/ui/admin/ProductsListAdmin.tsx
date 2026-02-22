@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Button } from "@headlessui/react";
 import { Product } from "@/app/lib/Entities";
 import {
   saveAdminProductsToCache,
@@ -71,13 +72,13 @@ export default function ProductsListAdmin({
       )}
 
       {onLoadMore && cachedProducts.length > 0 && (
-        <button
+        <Button
           onClick={onLoadMore}
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
           disabled={isLoading}
         >
           {isLoading ? "Cargando..." : "Cargar más productos"}
-        </button>
+        </Button>
       )}
     </div>
   );

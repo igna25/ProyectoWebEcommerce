@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Button } from "@headlessui/react";
 import { Sale } from "@/app/lib/Entities";
 import {
   saveAdminSalesToCache,
@@ -56,9 +57,9 @@ export default function SalesListAdmin({
               </p>
             </div>
             <Link href={`/admin/ventas/${sale.id}`}>
-              <button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              <Button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Ver detalle
-              </button>
+              </Button>
             </Link>
           </div>
         </div>
@@ -71,13 +72,13 @@ export default function SalesListAdmin({
       )}
 
       {onLoadMore && cachedSales.length > 0 && (
-        <button
+        <Button
           onClick={onLoadMore}
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
           disabled={isLoading}
         >
           {isLoading ? "Cargando..." : "Cargar más ventas"}
-        </button>
+        </Button>
       )}
     </div>
   );

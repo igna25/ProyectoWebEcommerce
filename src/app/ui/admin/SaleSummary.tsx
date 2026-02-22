@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import { Sale } from "@/app/lib/Entities/Sale";
 import Link from "next/link";
+import { Button } from "@headlessui/react";
+import { Sale } from "@/app/lib/Entities/Sale";
 
 const SaleSummary = ({ sale }: { sale: Sale }) => {
   return (
@@ -20,9 +21,9 @@ const SaleSummary = ({ sale }: { sale: Sale }) => {
         <div className="text-right">
           <p className="text-lg font-semibold">Total: ${sale.totalprice}</p>
           <Link href={`/admin/ventas/${sale.id}`}>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Ver Detalle
-            </button>
+            </Button>
           </Link>
         </div>
       </div>

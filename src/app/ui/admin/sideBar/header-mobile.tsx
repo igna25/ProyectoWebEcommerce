@@ -4,6 +4,7 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Button } from "@headlessui/react";
 
 import { SIDENAV_ITEMS } from "./constants";
 import { SideNavItem } from "./types";
@@ -94,7 +95,7 @@ const HeaderMobile = () => {
 export default HeaderMobile;
 
 const MenuToggle = ({ toggle }: { toggle: any }) => (
-  <button
+  <Button
     onClick={toggle}
     className="pointer-events-auto absolute right-4 top-[14px] z-30"
   >
@@ -120,7 +121,7 @@ const MenuToggle = ({ toggle }: { toggle: any }) => (
         }}
       />
     </svg>
-  </button>
+  </Button>
 );
 
 const Path = (props: any) => (
@@ -157,7 +158,7 @@ const MenuItemWithSubMenu: React.FC<MenuItemWithSubMenuProps> = ({
   return (
     <>
       <MenuItem>
-        <button
+        <Button
           className="flex w-full text-2xl"
           onClick={() => setSubMenuOpen(!subMenuOpen)}
         >
@@ -171,7 +172,7 @@ const MenuItemWithSubMenu: React.FC<MenuItemWithSubMenuProps> = ({
               <Icon icon="lucide:chevron-down" width="24" height="24" />
             </div>
           </div>
-        </button>
+        </Button>
       </MenuItem>
       <div className="mt-2 ml-2 flex flex-col space-y-2">
         {subMenuOpen && (

@@ -58,7 +58,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
     <div className="">
       {item.submenu ? (
         <>
-          <button
+          <Button
             onClick={toggleSubMenu}
             className={`flex flex-row items-center p-2 rounded-lg hover:bg-gray-800 w-full justify-between ${
               pathname.includes(item.path) ? "bg-gray-800" : ""
@@ -72,7 +72,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
             <div className={`${subMenuOpen ? "rotate-180" : ""} flex`}>
               <Icon icon="lucide:chevron-down" width="24" height="24" />
             </div>
-          </button>
+          </Button>
 
           {subMenuOpen && (
             <div className="my-2 ml-12 flex flex-col space-y-4">
