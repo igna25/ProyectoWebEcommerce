@@ -128,11 +128,11 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
             </div>
           ))}
         </div>
-        <a href="/admin/ventas">
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+        <Link href="/admin/ventas">
+          <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
             Ir a Ventas
-          </button>
-        </a>
+          </Button>
+        </Link>
       </div>
 
       <div>

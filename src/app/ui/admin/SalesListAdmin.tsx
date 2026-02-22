@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Sale } from "@/app/lib/Entities";
 import {
   saveAdminSalesToCache,
@@ -54,11 +55,11 @@ export default function SalesListAdmin({
                 Fecha: {new Date(sale.creationdate).toLocaleDateString()}
               </p>
             </div>
-            <a href={`/admin/ventas/${sale.id}`}>
+            <Link href={`/admin/ventas/${sale.id}`}>
               <button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Ver detalle
               </button>
-            </a>
+            </Link>
           </div>
         </div>
       ))}
