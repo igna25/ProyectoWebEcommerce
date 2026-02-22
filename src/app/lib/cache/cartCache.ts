@@ -1,6 +1,7 @@
 "use client";
 import { Product } from "../Entities/Product";
 import { saveProductsToLocalCache } from "./productsCache";
+import { queueOfflineOp, isOfflineSyncSupported } from "../offlineQueue";
 
 export type CartItem = {
   productid: string;
@@ -93,13 +94,25 @@ export function clearLocalCart(): void {
 
 export async function syncCartToServer(userId: string): Promise<boolean> {
   try {
-    if (!navigator.onLine) return false;
     const localItems = getLocalCart();
+    const payload = { userId, items: localItems };
+
+    if (!navigator.onLine) {
+      if (isOfflineSyncSupported()) {
+        await queueOfflineOp({
+          url: "/api/cart/sync",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+      return false;
+    }
 
     await fetch("/api/cart/sync", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, items: localItems }),
+      body: JSON.stringify(payload),
     });
 
     const response = await fetch(`/api/cart?userId=${userId}`);
@@ -118,6 +131,15 @@ export async function syncCartToServer(userId: string): Promise<boolean> {
     window.dispatchEvent(new Event("cartUpdated"));
     return true;
   } catch {
+    if (isOfflineSyncSupported()) {
+      const localItems = getLocalCart();
+      await queueOfflineOp({
+        url: "/api/cart/sync",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, items: localItems }),
+      });
+    }
     return false;
   }
 }

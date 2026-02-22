@@ -7,6 +7,9 @@ const STATIC_CACHE = `static-${CACHE_VERSION}`;
 
 const OFFLINE_URL = "/offline";
 const MAX_CACHE_SIZE = 50;
+const OFFLINE_QUEUE_DB = "pwa-offline-queue";
+const OFFLINE_QUEUE_STORE = "pendingOps";
+const SYNC_TAG = "pending-ops";
 
 const CORE_ROUTES = ["/", OFFLINE_URL, "/manifest.webmanifest"];
 const OPTIONAL_ROUTES = [
@@ -38,6 +41,72 @@ self.addEventListener("install", (event) => {
       })
       .then(() => self.skipWaiting()),
   );
+});
+
+function openOfflineQueueDb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(OFFLINE_QUEUE_DB, 1);
+    req.onerror = () => reject(req.error);
+    req.onsuccess = () => resolve(req.result);
+    req.onupgradeneeded = function (e) {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(OFFLINE_QUEUE_STORE)) {
+        db.createObjectStore(OFFLINE_QUEUE_STORE, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+    };
+  });
+}
+
+function getAllPendingOps(db) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(OFFLINE_QUEUE_STORE, "readonly");
+    const store = tx.objectStore(OFFLINE_QUEUE_STORE);
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function deletePendingOp(db, id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(OFFLINE_QUEUE_STORE, "readwrite");
+    const store = tx.objectStore(OFFLINE_QUEUE_STORE);
+    store.delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function replayPendingOps() {
+  return openOfflineQueueDb().then((db) => {
+    return getAllPendingOps(db).then((ops) => {
+      return Promise.all(
+        ops.map((op) => {
+          const opts = {
+            method: op.method,
+            credentials: "include",
+            headers: new Headers(op.headers || {}),
+          };
+          if (op.body) opts.body = op.body;
+          return fetch(op.url, opts)
+            .then((res) => {
+              if (res.ok) return deletePendingOp(db, op.id);
+            })
+            .catch(() => {});
+        }),
+      ).then(() => {
+        db.close();
+      });
+    });
+  });
+}
+
+self.addEventListener("sync", (event) => {
+  if (event.tag !== SYNC_TAG) return;
+  event.waitUntil(replayPendingOps());
 });
 
 self.addEventListener("activate", (event) => {

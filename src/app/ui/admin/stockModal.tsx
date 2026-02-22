@@ -1,6 +1,7 @@
 "use client";
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
+import { queueOfflineOp, isOfflineSyncSupported } from "@/app/lib/offlineQueue";
 
 const StockModal = ({
   data,
@@ -12,12 +13,14 @@ const StockModal = ({
   const [stock, setStock] = useState(currentStock || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [queued, setQueued] = useState(false);
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => {
     setModalIsOpen(false);
     setStock(currentStock);
     setError(null);
+    setQueued(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,12 +47,32 @@ const StockModal = ({
       });
 
       if (!response.ok) {
+        if (response.status === 503 && isOfflineSyncSupported()) {
+          await queueOfflineOp({
+            url: "/api/admin/products/stock",
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId: id, stock }),
+          });
+          setQueued(true);
+          return;
+        }
         throw new Error("Failed to update stock");
       }
 
       closeModal();
       window.location.reload();
     } catch (err) {
+      if (isOfflineSyncSupported()) {
+        await queueOfflineOp({
+          url: "/api/admin/products/stock",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: id, stock }),
+        });
+        setQueued(true);
+        return;
+      }
       setError("Error al actualizar el stock");
     } finally {
       setIsLoading(false);
@@ -84,6 +107,11 @@ const StockModal = ({
               disabled={isLoading}
             />
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            {queued && (
+              <p className="text-amber-600 text-sm mb-4">
+                Sin conexión. Se actualizará cuando vuelva la conexión.
+              </p>
+            )}
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
