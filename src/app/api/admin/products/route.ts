@@ -16,6 +16,8 @@ export async function GET(req: any) {
     const { searchParams } = new URL(req.url || "");
     const pageParam = Number(searchParams.get("page") ?? "1");
     const pageSizeParam = Number(searchParams.get("pageSize") ?? "6");
+    const activeParam = searchParams.get("active");
+    const active = activeParam === "false" ? false : true;
     const queryParam = (
       searchParams.get("query") ??
       searchParams.get("q") ??
@@ -30,7 +32,7 @@ export async function GET(req: any) {
         queryParam,
         page,
         pageSize,
-        true,
+        active,
       );
       return NextResponse.json(
         {
@@ -39,6 +41,7 @@ export async function GET(req: any) {
           page,
           pageSize,
           query: queryParam,
+          active,
         },
         {
           status: 200,
@@ -49,10 +52,10 @@ export async function GET(req: any) {
     const result = await productsRepository.getAllProductsPaginated(
       page,
       pageSize,
-      true,
+      active,
     );
     return NextResponse.json(
-      { products: result.products, total: result.total, page, pageSize },
+      { products: result.products, total: result.total, page, pageSize, active },
       { status: 200, headers: { "Cache-Control": "no-cache" } },
     );
   } catch (err) {
