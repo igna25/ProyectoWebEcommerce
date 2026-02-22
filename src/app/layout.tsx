@@ -6,6 +6,7 @@ import Providers from "./Providers";
 import PersistUserId from "./pwa/PersistUserId";
 import PersistAdminRole from "./pwa/PersistAdminRole";
 import ConnectionStatus from "./pwa/ConnectionStatus";
+import InstallPrompt from "./pwa/InstallPrompt";
 import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -39,6 +40,7 @@ export default async function RootLayout({
             <PersistUserId />
             <PersistAdminRole />
             <ConnectionStatus />
+            <InstallPrompt />
             {children}
           </Providers>
         </body>
