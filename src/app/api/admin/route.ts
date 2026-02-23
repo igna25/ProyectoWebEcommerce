@@ -1,7 +1,6 @@
-import SalesRepository from "@/lib/Repositories/SalesRepository";
-import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { getAdminSummary } from "@/lib/services/AdminService";
 
 export const dynamic = "force-dynamic";
 
@@ -12,25 +11,12 @@ export async function GET(req: any) {
       return NextResponse.json({ msg: "Unauthorized" }, { status: 401 });
     }
 
-    const salesRepository = new SalesRepository();
-    const productsRepository = new ProductsRepository();
+    const summary = await getAdminSummary();
 
-    const [recentSales, { totalEarnings, totalSales }, lowStockProducts] =
-      await Promise.all([
-        salesRepository.getRecentSales(3),
-        salesRepository.getMonthlyEarnings(),
-        productsRepository.getOutOfStockProducts(),
-      ]);
-
-    return NextResponse.json(
-      {
-        recentSales,
-        totalEarnings,
-        totalSales,
-        lowStockProducts,
-      },
-      { status: 200, headers: { "Cache-Control": "no-cache" } },
-    );
+    return NextResponse.json(summary, {
+      status: 200,
+      headers: { "Cache-Control": "no-cache" },
+    });
   } catch (err) {
     console.error("Error fetching summary:", err);
     return NextResponse.json(
