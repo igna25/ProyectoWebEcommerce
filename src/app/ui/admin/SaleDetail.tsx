@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
-import { Sale, SalesOrder } from "@/app/lib/Entities";
-import { saveAdminSalesOrdersToCache } from "@/app/lib/cache/adminCache";
+import { Sale, SalesOrder } from "@/lib/Entities";
+import { saveAdminSalesOrdersToCache } from "@/lib/cache/adminCache";
 
 interface SaleDetailProps {
   saleId: string;

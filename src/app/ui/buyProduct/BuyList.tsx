@@ -1,14 +1,14 @@
 "use client";
 
-import { OrderItem } from "@/app/lib/Entities/Order";
-import { Product } from "@/app/lib/Entities/Product";
-import { buyProducts } from "@/app/lib/actions/buyProducts";
+import { OrderItem } from "@/lib/Entities/Order";
+import { Product } from "@/lib/Entities/Product";
+import { buyProducts } from "@/lib/actions/buyProducts";
 import clsx from "clsx";
 import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-//import { buyProductsLocal } from '@/app/lib/actions/buyProductsLocal';
+//import { buyProductsLocal } from '@/lib/actions/buyProductsLocal';
 
 interface BuyListProps {
   products: (OrderItem & Product)[];

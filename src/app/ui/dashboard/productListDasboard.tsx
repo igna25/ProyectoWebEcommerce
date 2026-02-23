@@ -1,6 +1,6 @@
 "use client";
 import CardWrapper from "./Cards";
-import { Product } from "@/app/lib/Entities";
+import { Product } from "@/lib/Entities";
 
 export default function ProductListDashboard({
   products,

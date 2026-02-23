@@ -1,4 +1,4 @@
-import { pooler as sql } from "@/app/lib/db/db";
+import { pooler as sql } from "@/lib/db/db";
 import { OrderItem } from "../Entities/Order";
 import { Product } from "../Entities/Product";
 

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import { FileUploader } from "react-drag-drop-files";
 import { Button } from "@headlessui/react";
-import { createProduct } from "@/app/lib/actions/createProduct";
+import { createProduct } from "@/lib/actions/createProduct";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

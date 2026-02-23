@@ -2,11 +2,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@headlessui/react";
-import { Sale } from "@/app/lib/Entities";
+import { Sale } from "@/lib/Entities";
 import {
   saveAdminSalesToCache,
   getAllAdminSalesFromCache,
-} from "@/app/lib/cache/adminCache";
+} from "@/lib/cache/adminCache";
 
 interface SalesListAdminProps {
   sales: Sale[];

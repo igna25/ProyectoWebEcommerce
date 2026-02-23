@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@headlessui/react";
-import { Sale } from "@/app/lib/Entities/Sale";
+import { Sale } from "@/lib/Entities/Sale";
 
 const SaleSummary = ({ sale }: { sale: Sale }) => {
   return (

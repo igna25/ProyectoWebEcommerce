@@ -1,6 +1,6 @@
-import CartsRepository from "@/app/lib/Repositories/CartsRepository";
-import OrderItemsRepository from "@/app/lib/Repositories/OrdersRepository";
-import ProductsRepository from "@/app/lib/Repositories/ProductsRepository";
+import CartsRepository from "@/lib/Repositories/CartsRepository";
+import OrderItemsRepository from "@/lib/Repositories/OrdersRepository";
+import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

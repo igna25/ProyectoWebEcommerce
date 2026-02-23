@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import Image from "next/image";
 import AddToCartButton from "./AddToCartButton";
-import { Product } from "@/app/lib/Entities/Product";
+import { Product } from "@/lib/Entities/Product";
 import Link from "next/link";
 
 const ProductDetails = ({

@@ -1,5 +1,5 @@
-import { Sale } from "@/app/lib/Entities/Sale";
-import { SalesOrder } from "@/app/lib/Entities/SalesOrder";
+import { Sale } from "@/lib/Entities/Sale";
+import { SalesOrder } from "@/lib/Entities/SalesOrder";
 import React from "react";
 
 interface SaleDetailProps {

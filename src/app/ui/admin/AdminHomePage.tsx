@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Product, Sale } from "../../lib/Entities";
+import { Product, Sale } from "@/lib/Entities";
 import {
   saveAdminSummaryToCache,
   getAdminSummaryFromCache,
   saveAdminProductsToCache,
   saveAdminSalesToCache,
-} from "../../lib/cache/adminCache";
+} from "@/lib/cache/adminCache";
 import Link from "next/link";
 import { Button } from "@headlessui/react";
 

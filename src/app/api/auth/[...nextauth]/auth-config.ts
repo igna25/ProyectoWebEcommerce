@@ -1,4 +1,4 @@
-import type { User } from "@/app/lib/Entities/User";
+import type { User } from "@/lib/Entities/User";
 import { sql } from "@vercel/postgres";
 import bcrypt from "bcrypt";
 import { NextAuthOptions } from "next-auth";

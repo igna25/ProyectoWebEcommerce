@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Sale } from "@/app/lib/Entities/Sale";
+import { Sale } from "@/lib/Entities/Sale";
 import Link from "next/link";
 
 const SaleSummary = ({ sale }: { sale: Sale }) => {

@@ -1,5 +1,5 @@
 "use client";
-import { Product } from "@/app/lib/Entities/Product";
+import { Product } from "@/lib/Entities/Product";
 import Image from "next/image";
 import AddToCartButton from "./AddToCartButton";
 import ViewProductDetails from "./ViewProductDetailsButton";

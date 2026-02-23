@@ -1,4 +1,4 @@
-import SalesRepository from "@/app/lib/Repositories/SalesRepository";
+import SalesRepository from "@/lib/Repositories/SalesRepository";
 import SalesListAdmin from "@/app/ui/admin/SalesListAdmin";
 import Pagination from "../../ui/admin/Pagination";
 import { unstable_noStore as noStore } from "next/cache";

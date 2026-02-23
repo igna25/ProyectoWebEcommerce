@@ -1,5 +1,5 @@
 "use client";
-import { deactivateProduct } from "@/app/lib/actions/deactivateProduct";
+import { deactivateProduct } from "@/lib/actions/deactivateProduct";
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
 import { Button } from "@headlessui/react";

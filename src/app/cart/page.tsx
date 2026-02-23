@@ -1,7 +1,7 @@
 "use client";
 import { Fragment, useEffect, useState } from "react";
 import ProductList from "../ui/cart/ProductList";
-import { syncCartToServer } from "../lib/cache/cartCache";
+import { syncCartToServer } from "@/lib/cache/cartCache";
 
 export default function CartPage() {
   const [userId, setUserId] = useState<string | undefined>(undefined);

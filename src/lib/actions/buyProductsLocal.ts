@@ -23,14 +23,12 @@ export async function buyProductsLocal(
     const user = await usersRepository.getUsersByName("Guest User");
 
     const orders: (OrderItem & Product)[] = cartProducts.map((cartProduct) => ({
-      //orderItem
       id: cartProduct.id,
       cartid: cartProduct.cartid,
       productid: cartProduct.productid,
       dateadded: cartProduct.dateadded,
       quantity: cartProduct.quantity,
       productprice: cartProduct.price,
-      //product
       productname: cartProduct.productname,
       description: cartProduct.description,
       imageurl: cartProduct.imageurl,

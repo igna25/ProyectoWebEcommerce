@@ -1,4 +1,4 @@
-import { Product } from "@/app/lib/Entities/Product";
+import { Product } from "@/lib/Entities/Product";
 import React from "react";
 import Image from "next/image";
 

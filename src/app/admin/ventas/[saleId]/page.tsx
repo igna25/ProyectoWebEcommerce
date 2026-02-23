@@ -1,9 +1,9 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { Fragment } from "react";
-import SalesOrdersRepository from "@/app/lib/Repositories/SalesOrdersRepository";
+import SalesOrdersRepository from "@/lib/Repositories/SalesOrdersRepository";
 import SaleDetail from "@/app/ui/admin/SaleDetail";
-import SalesRepository from "@/app/lib/Repositories/SalesRepository";
-import { SalesOrder } from "@/app/lib/Entities";
+import SalesRepository from "@/lib/Repositories/SalesRepository";
+import { SalesOrder } from "@/lib/Entities";
 
 export default async function SalePage({
   params,

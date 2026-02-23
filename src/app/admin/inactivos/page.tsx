@@ -1,5 +1,5 @@
-import { Product } from "@/app/lib/Entities/Product";
-import ProductsRepository from "@/app/lib/Repositories/ProductsRepository";
+import { Product } from "@/lib/Entities/Product";
+import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import ProductsListAdmin from "@/app/ui/admin/ProductsListAdmin";
 import Pagination from "@/app/ui/admin/Pagination";
 import SearchBar from "@/app/ui/admin/searchBar";

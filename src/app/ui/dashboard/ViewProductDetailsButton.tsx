@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@headlessui/react";
-import { Product } from "@/app/lib/Entities/Product";
+import { Product } from "@/lib/Entities/Product";
 
 function ViewProductDetailsButton({ product }: { product: Product }) {
   return (

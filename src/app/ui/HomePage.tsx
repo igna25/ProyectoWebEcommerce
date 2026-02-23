@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import ProductListDashboard from "../ui/dashboard/productListDasboard";
 import { useSession } from "next-auth/react";
-import { saveProductsToLocalCache } from "../lib/cache/productsCache";
+import { saveProductsToLocalCache } from "@/lib/cache/productsCache";
 
 export default function HomePage() {
   const [recentProducts, setRecentProducts] = useState<any[]>([]);

@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { FileUploader } from "react-drag-drop-files";
 import { Button } from "@headlessui/react";
-import { updateProduct } from "@/app/lib/actions/updateProduct";
+import { updateProduct } from "@/lib/actions/updateProduct";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Product } from "@/app/lib/Entities";
+import { Product } from "@/lib/Entities";
 
 const fileTypes = ["JPG", "PNG"];
 

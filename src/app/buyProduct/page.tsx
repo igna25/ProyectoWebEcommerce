@@ -2,10 +2,10 @@ import { getServerSession, Session } from "next-auth";
 import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
 import { authOptions } from "../api/auth/[...nextauth]/auth-config";
-import { OrderItem } from "../lib/Entities/Order";
-import { Product } from "../lib/Entities/Product";
-import CartsRepository from "../lib/Repositories/CartsRepository";
-import OrderItemsRepository from "../lib/Repositories/OrdersRepository";
+import { OrderItem } from "@/lib/Entities/Order";
+import { Product } from "@/lib/Entities/Product";
+import CartsRepository from "@/lib/Repositories/CartsRepository";
+import OrderItemsRepository from "@/lib/Repositories/OrdersRepository";
 import { BuyList } from "../ui/buyProduct/BuyList";
 
 export default async function BuyPage() {

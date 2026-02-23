@@ -3,10 +3,10 @@
 import React, { useState, Fragment, useEffect } from "react";
 import Link from "next/link";
 import CartWrapper from "./CartCard";
-import { Product } from "@/app/lib/Entities/Product";
-import { OrderItem } from "@/app/lib/Entities/Order";
-import { buyProducts } from "@/app/lib/actions/buyProducts";
-import { buyProductsLocal } from "@/app/lib/actions/buyProductsLocal";
+import { Product } from "@/lib/Entities/Product";
+import { OrderItem } from "@/lib/Entities/Order";
+import { buyProducts } from "@/lib/actions/buyProducts";
+import { buyProductsLocal } from "@/lib/actions/buyProductsLocal";
 import { useRouter } from "next/navigation";
 import {
   getLocalCart,
@@ -16,8 +16,8 @@ import {
   clearLocalCart,
   syncCartToServer,
   CartItem,
-} from "@/app/lib/cache/cartCache";
-import { getProductFromLocalCache } from "@/app/lib/cache/productsCache";
+} from "@/lib/cache/cartCache";
+import { getProductFromLocalCache } from "@/lib/cache/productsCache";
 
 type EnrichedCartItem = CartItem &
   Product & { id: string; cartid: string; dateadded: Date };

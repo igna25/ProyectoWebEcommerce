@@ -1,4 +1,4 @@
-import SalesRepository from "@/app/lib/Repositories/SalesRepository";
+import SalesRepository from "@/lib/Repositories/SalesRepository";
 import { NextResponse } from "next/server";
 
 export async function GET(req: any) {

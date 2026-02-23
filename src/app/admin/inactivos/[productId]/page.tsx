@@ -1,4 +1,4 @@
-import ProductsRepository from "@/app/lib/Repositories/ProductsRepository";
+import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import EditProductForm from "../../../ui/admin/UpdateComponent";
 
 const EditProductPage = async ({

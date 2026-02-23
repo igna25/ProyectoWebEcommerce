@@ -19,7 +19,6 @@ export async function updateProduct(formData: FormData) {
   const stock = formData.get("stock");
   const image = formData.get("image") as File;
 
-  //esto se podría poner en una carpeta utils para tener la misma validación tanto en la creación como en la actualización
   if (
     !productName ||
     typeof productName !== "string" ||
@@ -62,7 +61,7 @@ export async function updateProduct(formData: FormData) {
     }
     let imageURL = product.imageurl;
     let imageKey = product.imagekey;
-    if (formData.has("image")) {
+    if (formData.has("image") && image) {
       const arrayBuffer = await image.arrayBuffer();
       const buffer = new Uint8Array(arrayBuffer);
 

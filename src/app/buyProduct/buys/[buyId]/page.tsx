@@ -1,8 +1,8 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { Fragment } from "react";
-import SalesOrdersRepository from "@/app/lib/Repositories/SalesOrdersRepository";
-import SalesRepository from "@/app/lib/Repositories/SalesRepository";
-import { SalesOrder } from "@/app/lib/Entities/SalesOrder";
+import SalesOrdersRepository from "@/lib/Repositories/SalesOrdersRepository";
+import SalesRepository from "@/lib/Repositories/SalesRepository";
+import { SalesOrder } from "@/lib/Entities/SalesOrder";
 import SaleDetail from "@/app/ui/buyProduct/SaleDetail";
 import { notFound } from "next/navigation";
 

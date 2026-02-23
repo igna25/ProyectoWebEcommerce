@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "@headlessui/react";
-import { Product } from "@/app/lib/Entities";
+import { Product } from "@/lib/Entities";
 import {
   saveAdminProductsToCache,
   getAllAdminProductsFromCache,
-} from "@/app/lib/cache/adminCache";
+} from "@/lib/cache/adminCache";
 
 interface ProductsListAdminProps {
   products: Product[];

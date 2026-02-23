@@ -8,13 +8,13 @@ import {
   DialogTitle,
   Transition,
 } from "@headlessui/react";
-import { Product } from "@/app/lib/Entities/Product";
+import { Product } from "@/lib/Entities/Product";
 
 import Link from "next/link";
 import {
   addItemToLocalCart,
   syncCartToServer,
-} from "@/app/lib/cache/cartCache";
+} from "@/lib/cache/cartCache";
 
 function AddCartButton({
   product,

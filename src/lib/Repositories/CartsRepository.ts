@@ -1,4 +1,4 @@
-import { pooler as sql } from "@/app/lib/db/db";
+import { pooler as sql } from "@/lib/db/db";
 import { Cart } from "../Entities/Cart";
 
 class CartsRepository {

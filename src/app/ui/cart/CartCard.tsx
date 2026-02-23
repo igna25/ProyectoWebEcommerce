@@ -1,7 +1,7 @@
 "use client";
 
-import { OrderItem } from "@/app/lib/Entities/Order";
-import { Product } from "@/app/lib/Entities/Product";
+import { OrderItem } from "@/lib/Entities/Order";
+import { Product } from "@/lib/Entities/Product";
 import Image from "next/image";
 import React, { Fragment } from "react";
 

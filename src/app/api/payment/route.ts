@@ -1,4 +1,4 @@
-import processPayment from "@/app/lib/actions/processPayment";
+import processPayment from "@/lib/actions/processPayment";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import { NextRequest, NextResponse } from "next/server";
 

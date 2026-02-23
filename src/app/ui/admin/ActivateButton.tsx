@@ -2,7 +2,7 @@
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
 import { Button } from "@headlessui/react";
-import { queueOfflineOp, isOfflineSyncSupported } from "@/app/lib/offlineQueue";
+import { queueOfflineOp, isOfflineSyncSupported } from "@/lib/offlineQueue";
 
 const ActivateButton = ({ data }: { data: { id: string } }) => {
   const { id } = data;

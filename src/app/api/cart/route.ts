@@ -1,5 +1,5 @@
-import CartsRepository from "@/app/lib/Repositories/CartsRepository";
-import OrderItemsRepository from "@/app/lib/Repositories/OrdersRepository";
+import CartsRepository from "@/lib/Repositories/CartsRepository";
+import OrderItemsRepository from "@/lib/Repositories/OrdersRepository";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

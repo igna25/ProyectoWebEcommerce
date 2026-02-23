@@ -1,4 +1,4 @@
-import ProductsRepository from "@/app/lib/Repositories/ProductsRepository";
+import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

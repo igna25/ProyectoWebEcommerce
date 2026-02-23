@@ -1,4 +1,4 @@
-import { pooler as sql } from "@/app/lib/db/db";
+import { pooler as sql } from "@/lib/db/db";
 import { Product } from "../Entities/Product";
 export const fetchCache = "force-no-store";
 

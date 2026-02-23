@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { getProductFromLocalCache } from "@/app/lib/cache/productsCache";
+import { getProductFromLocalCache } from "@/lib/cache/productsCache";
 import ProductDetails from "@/app/ui/dashboard/ProductDetails";
 
 export default function ProductDetailsPage() {
