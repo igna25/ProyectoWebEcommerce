@@ -11,10 +11,7 @@ import {
 import { Product } from "@/lib/Entities/Product";
 
 import Link from "next/link";
-import {
-  addItemToLocalCart,
-  syncCartToServer,
-} from "@/lib/cache/cartCache";
+import { addItemToLocalCart, syncCartToServer } from "@/lib/cache/cartCache";
 
 function AddCartButton({
   product,

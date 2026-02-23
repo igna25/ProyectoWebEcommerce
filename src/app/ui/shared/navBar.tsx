@@ -3,12 +3,12 @@ import { CursorArrowRippleIcon } from "@heroicons/react/24/outline";
 import { getServerSession, Session } from "next-auth";
 import Link from "next/link";
 import { Fragment } from "react";
-import { authOptions } from "../api/auth/[...nextauth]/auth-config";
+import { authOptions } from "../../api/auth/[...nextauth]/auth-config";
 import BuysRecordButton from "./BuysRecordButton";
 import HomeButton from "./HomeButton";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
-import CartButton from "./dashboard/CartButton";
+import CartButton from "./CartButton";
 
 const NavBar = async () => {
   const session: Session | null = await getServerSession(authOptions);
