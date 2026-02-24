@@ -2,7 +2,7 @@ import { Product } from "@/lib/Entities/Product";
 import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import ProductsListAdmin from "@/app/ui/admin/ProductsListAdmin";
 import Pagination from "@/app/ui/admin/Pagination";
-import SearchBar from "@/app/ui/admin/searchBar";
+import SearchBar from "@/app/ui/admin/SearchBar";
 import { unstable_noStore as noStore } from "next/cache";
 import { Fragment } from "react";
 

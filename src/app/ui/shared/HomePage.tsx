@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import ProductListDashboard from "../dashboard/productListDasboard";
+import ProductListDashboard from "../dashboard/ProductListDashboard";
 import { useSession } from "next-auth/react";
 import { saveProductsToLocalCache } from "@/lib/cache/productsCache";
 

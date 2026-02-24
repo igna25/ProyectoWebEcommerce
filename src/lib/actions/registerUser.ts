@@ -1,4 +1,4 @@
-import UsersRepository from "../Repositories/Usersrepository";
+import UsersRepository from "../Repositories/UsersRepository";
 
 export async function registerUser(
   email: string,

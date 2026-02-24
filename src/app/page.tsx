@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import Link from "next/link";
 import HomePage from "./ui/shared/HomePage";
-import NavBar from "./ui/shared/navBar";
+import NavBar from "./ui/shared/NavBar";
 import { Button } from "@headlessui/react";
 
 const LandingPage = () => {

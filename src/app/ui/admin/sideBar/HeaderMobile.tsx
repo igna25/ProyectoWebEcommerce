@@ -6,8 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@headlessui/react";
 
-import { SIDENAV_ITEMS } from "./constants";
-import { SideNavItem } from "./types";
+import { SIDENAV_ITEMS } from "./Constants";
+import { SideNavItem } from "./Types";
 import { Icon } from "@iconify/react";
 import { motion, useCycle } from "framer-motion";
 
@@ -60,7 +60,7 @@ const HeaderMobile = () => {
         className="absolute grid w-full gap-3 px-10 py-16 max-h-screen overflow-y-auto"
       >
         {SIDENAV_ITEMS.map((item, idx) => {
-          const isLastItem = idx === SIDENAV_ITEMS.length - 1; // Check if it's the last item
+          const isLastItem = idx === SIDENAV_ITEMS.length - 1;
 
           return (
             <div key={idx}>
@@ -234,7 +234,6 @@ const useDimensions = (ref: any) => {
       dimensions.current.width = ref.current.offsetWidth;
       dimensions.current.height = ref.current.offsetHeight;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref]);
 
   return dimensions.current;

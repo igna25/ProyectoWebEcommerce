@@ -4,7 +4,7 @@ import OrderItemsRepository from "../Repositories/OrdersRepository";
 import SalesOrdersRepository from "../Repositories/SalesOrdersRepository";
 
 import SalesRepository from "../Repositories/SalesRepository";
-import UsersRepository from "../Repositories/Usersrepository";
+import UsersRepository from "../Repositories/UsersRepository";
 
 const cartsRepository = new CartsRepository();
 const orderItemsRepository = new OrderItemsRepository();

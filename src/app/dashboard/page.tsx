@@ -6,7 +6,7 @@ import { Product } from "@/lib/Entities/Product";
 import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import Pagination from "../ui/dashboard/Pagination";
 import SearchBar from "../ui/dashboard/SearchBar";
-import ProductListDashboard from "../ui/dashboard/productListDasboard";
+import ProductListDashboard from "../ui/dashboard/ProductListDashboard";
 
 export default async function DashboardPage({
   searchParams,

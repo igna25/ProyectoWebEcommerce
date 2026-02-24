@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import SideNav from "../ui/admin/sideBar/SideBar";
-import HeaderMobile from "../ui/admin/sideBar/header-mobile";
+import HeaderMobile from "../ui/admin/sideBar/HeaderMobile";
 
 export default function RootLayout({
   children,

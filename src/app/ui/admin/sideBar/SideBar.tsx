@@ -5,8 +5,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { SIDENAV_ITEMS } from "./constants";
-import { SideNavItem } from "./types";
+import { SIDENAV_ITEMS } from "./Constants";
+import { SideNavItem } from "./Types";
 import { Icon } from "@iconify/react";
 
 import { signOut } from "next-auth/react";

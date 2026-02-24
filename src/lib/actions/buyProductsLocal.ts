@@ -6,7 +6,7 @@ import { OrderItem } from "../Entities/Order";
 import { Product } from "../Entities/Product";
 import CartsRepository from "../Repositories/CartsRepository";
 import OrderItemsRepository from "../Repositories/OrdersRepository";
-import UsersRepository from "../Repositories/Usersrepository";
+import UsersRepository from "../Repositories/UsersRepository";
 import processPayment from "./processPayment";
 
 const client = new MercadoPagoConfig({

@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import NavBar from "../ui/shared/navBar";
+import NavBar from "../ui/shared/NavBar";
 export default function RootLayout({
   children,
 }: Readonly<{
