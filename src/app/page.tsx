@@ -1,13 +1,11 @@
-import React, { Fragment } from "react";
 import Link from "next/link";
 import HomePage from "./ui/shared/HomePage";
 import NavBar from "./ui/shared/NavBar";
-import { Button } from "@headlessui/react";
 
 const LandingPage = () => {
   return (
-    <Fragment>
-      <NavBar></NavBar>
+    <>
+      <NavBar />
       <div className="bg-gray-100 min-h-screen">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900 text-center">
@@ -17,14 +15,17 @@ const LandingPage = () => {
             Encuentra los productos de la mejor calidad y a los mejores precios.
           </p>
           <div className="flex justify-center mt-4">
-            <Button className="bg-white text-gray-800 font-bold py-2 px-4 rounded">
-              <Link href="/dashboard">Ver todos los productos</Link>
-            </Button>
+            <Link
+              href="/dashboard"
+              className="bg-white text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-50 transition-colors"
+            >
+              Ver todos los productos
+            </Link>
           </div>
         </div>
 
         <main>
-          <section className="bg-white ">
+          <section className="bg-white">
             <div className="mt-10">
               <HomePage />
             </div>
@@ -36,14 +37,17 @@ const LandingPage = () => {
               <p className="mt-2">
                 Explora nuestra colección y encuentra lo que necesitas.
               </p>
-              <Button className="mt-4 inline-block bg-white text-gray-800 font-bold py-2 px-4 rounded">
-                <Link href="/dashboard">Ver todos los productos</Link>
-              </Button>
+              <Link
+                href="/dashboard"
+                className="mt-4 inline-block bg-white text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-50 transition-colors"
+              >
+                Ver todos los productos
+              </Link>
             </div>
           </section>
         </main>
       </div>
-    </Fragment>
+    </>
   );
 };
 
