@@ -117,6 +117,10 @@ export function getAllAdminProductsFromCache(): Product[] {
   }
 }
 
+export function getAdminProductsByActiveFromCache(active: boolean): Product[] {
+  return getAllAdminProductsFromCache().filter((p) => p.active === active);
+}
+
 export function saveAdminSalesToCache(sales: Sale[]): void {
   try {
     const existingRaw = localStorage.getItem(ADMIN_SALES_KEY);

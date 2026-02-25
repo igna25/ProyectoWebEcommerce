@@ -1,70 +1,16 @@
-import { Product } from "@/lib/Entities/Product";
-import ProductsRepository from "@/lib/Repositories/ProductsRepository";
-import ProductsListAdmin from "@/app/ui/admin/ProductsListAdmin";
-import Pagination from "@/app/ui/admin/Pagination";
-import SearchBar from "@/app/ui/admin/SearchBar";
-import { unstable_noStore as noStore } from "next/cache";
-import { Fragment } from "react";
+import { Suspense } from "react";
+import AdminProductsPage from "@/app/ui/admin/AdminProductsPage";
 
-export default async function InactiveProductsPage({
-  searchParams,
-}: {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
-}) {
-  noStore();
-
-  const ITEMS_PER_PAGE = 6;
-  const query = searchParams?.query || "";
-  const currentPage = Number(searchParams?.page) || 1;
-  const productsRepository = new ProductsRepository();
-  let products: Product[] = [];
-  let totalPages = 1;
-
-  if (query.length > 0) {
-    const result = await productsRepository.searchProductsByName(
-      query,
-      currentPage,
-      ITEMS_PER_PAGE,
-      false,
-    );
-    products = result.products;
-    totalPages = Math.ceil(result.total / ITEMS_PER_PAGE);
-  } else {
-    const result = await productsRepository.getAllProductsPaginated(
-      currentPage,
-      ITEMS_PER_PAGE,
-      false,
-    );
-    products = result.products;
-    totalPages = Math.ceil(result.total / ITEMS_PER_PAGE);
-  }
-
+export default function InactiveProductsPage() {
   return (
-    <Fragment>
-      <div className="container mx-auto px-4">
-        <SearchBar />
-        {products.length === 0 ? (
-          <div className="h-screen flex items-center justify-center bg-gray-100">
-            <div className="text-center text-gray-700">
-              <p className="text-xl">
-                Parece que no encontramos resultados para su búsqueda...
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <ProductsListAdmin products={products} />
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              query={query}
-            />
-          </div>
-        )}
-      </div>
-    </Fragment>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      }
+    >
+      <AdminProductsPage active={false} />
+    </Suspense>
   );
 }
