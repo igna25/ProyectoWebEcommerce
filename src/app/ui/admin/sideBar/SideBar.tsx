@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import { SIDENAV_ITEMS } from './constants';
-import { SideNavItem } from './types';
-import { Icon } from '@iconify/react';
+import { SIDENAV_ITEMS } from "./Constants";
+import { SideNavItem } from "./Types";
+import { Icon } from "@iconify/react";
 
-import { signOut } from "next-auth/react"
-import { Button } from '@headlessui/react';
+import { signOut } from "next-auth/react";
+import { Button } from "@headlessui/react";
 
 const SideNav = () => {
   return (
@@ -30,17 +30,17 @@ const SideNav = () => {
               return <MenuItem key={idx} item={item} />;
             })}
           </div>
-          
         </div>
-        <Button 
-        onClick={()=>{
-          signOut()
-        }}
-        className="flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-gray-800 mb-4">
-            < Icon icon="lucide:log-out" width="24" height="24" />
-            <span className="font-semibold text-xl flex">Cerrar sesión</span>
+        <Button
+          onClick={() => {
+            signOut();
+          }}
+          className="flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-gray-800 mb-4"
+        >
+          <Icon icon="lucide:log-out" width="24" height="24" />
+          <span className="font-semibold text-xl flex">Cerrar sesión</span>
         </Button>
-    </div>
+      </div>
     </div>
   );
 };
@@ -58,10 +58,10 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
     <div className="">
       {item.submenu ? (
         <>
-          <button
+          <Button
             onClick={toggleSubMenu}
             className={`flex flex-row items-center p-2 rounded-lg hover:bg-gray-800 w-full justify-between ${
-              pathname.includes(item.path) ? 'bg-gray-800' : ''
+              pathname.includes(item.path) ? "bg-gray-800" : ""
             }`}
           >
             <div className="flex flex-row space-x-4 items-center">
@@ -69,10 +69,10 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
               <span className="font-semibold text-xl flex">{item.title}</span>
             </div>
 
-            <div className={`${subMenuOpen ? 'rotate-180' : ''} flex`}>
+            <div className={`${subMenuOpen ? "rotate-180" : ""} flex`}>
               <Icon icon="lucide:chevron-down" width="24" height="24" />
             </div>
-          </button>
+          </Button>
 
           {subMenuOpen && (
             <div className="my-2 ml-12 flex flex-col space-y-4">
@@ -82,7 +82,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
                     key={idx}
                     href={subItem.path}
                     className={`${
-                      subItem.path === pathname ? 'font-bold' : ''
+                      subItem.path === pathname ? "font-bold" : ""
                     }`}
                   >
                     <span>{subItem.title}</span>
@@ -96,7 +96,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
         <Link
           href={item.path}
           className={`flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-gray-800 ${
-            item.path === pathname ? 'bg-gray-800' : ''
+            item.path === pathname ? "bg-gray-800" : ""
           }`}
         >
           {item.icon}

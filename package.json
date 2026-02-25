@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "eslint . --ext .jsx,.ts,.tsx --fix",
     "seedDatabase": "node -r dotenv/config ./scripts/seed.js",
     "dropDatabase": "node -r dotenv/config ./scripts/dropDatabase.js"
   },
@@ -41,9 +42,13 @@
     "@types/react-dom": "^18",
     "@types/react-modal": "^3.16.3",
     "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "7.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "postcss": "^8",
+    "prettier": "^3.6.2",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.4.5"
   },

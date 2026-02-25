@@ -1,91 +1,126 @@
-const { db } = require('@vercel/postgres');
-const bcrypt = require('bcrypt');
-const { v4: uuidv4 } = require('uuid');
+const { db } = require("@vercel/postgres");
+const bcrypt = require("bcrypt");
 
 const users = [
-  { name: 'John Doe', email: 'john.doe@example.com', password: 'password123', role: "user" },
-  { name: 'Jane Smith', email: 'jane.smith@example.com', password: 'password456', role: "user" },
-  { name: 'Bob Johnson', email: 'bob.johnson@example.com', password: 'password789', role: "admin" },
-  { name: 'Guest User', email: 'guest@example.com', password: '', role: "guest" }
+  {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    password: "password123",
+    role: "user",
+  },
+  {
+    name: "Jane Smith",
+    email: "jane.smith@example.com",
+    password: "password456",
+    role: "user",
+  },
+  {
+    name: "Bob Johnson",
+    email: "bob.johnson@example.com",
+    password: "password789",
+    role: "admin",
+  },
+  {
+    name: "Guest User",
+    email: "guest@example.com",
+    password: "",
+    role: "guest",
+  },
 ];
 const carts = [
-  { username: 'John Doe', totalPrice: 0.00, mercadoPagoID: 'MP123456' },
-  { username: 'Jane Smith', totalPrice: 0.00, mercadoPagoID: 'MP654321' },
-  { username: 'Bob Johnson', totalPrice: 0.00, mercadoPagoID: 'MP789012' }
+  { username: "John Doe", totalPrice: 0.0, mercadoPagoID: "MP123456" },
+  { username: "Jane Smith", totalPrice: 0.0, mercadoPagoID: "MP654321" },
+  { username: "Bob Johnson", totalPrice: 0.0, mercadoPagoID: "MP789012" },
 ];
 const products = [
   {
-    productName: 'Tetera de Metal',
-    description: 'Elegante tetera de metal con diseño clásico, marca TeaMaster, capacidad de 1.5 litros.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228690/proyecto_web/tetera_aw9onw.jpg',
-    imageKey: 'tetera123',
+    productName: "Tetera de Metal",
+    description:
+      "Elegante tetera de metal con diseño clásico, marca TeaMaster, capacidad de 1.5 litros.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228690/proyecto_web/tetera_aw9onw.jpg",
+    imageKey: "tetera123",
     price: 29.99,
-    publicationDate: new Date('2023-03-15'),
-    stock: 75
+    publicationDate: new Date("2023-03-15"),
+    stock: 75,
   },
   {
-    productName: 'Tazas de Café de Vidrio',
-    description: 'Juego de 6 tazas de café de vidrio templado, marca CoffeeClear, capacidad de 250 ml cada una.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228688/proyecto_web/tazacafe_klegvn.png',
-    imageKey: 'tazacafe123',
+    productName: "Tazas de Café de Vidrio",
+    description:
+      "Juego de 6 tazas de café de vidrio templado, marca CoffeeClear, capacidad de 250 ml cada una.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228688/proyecto_web/tazacafe_klegvn.png",
+    imageKey: "tazacafe123",
     price: 19.99,
-    publicationDate: new Date('2023-02-10'),
-    stock: 150
+    publicationDate: new Date("2023-02-10"),
+    stock: 150,
   },
   {
-    productName: 'Jarra de Vidrio',
-    description: 'Jarra de vidrio transparente de alta capacidad, marca PureGlass, capacidad de 2 litros.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228687/proyecto_web/jarra_z8xty8.jpg',
-    imageKey: 'jarra123',
+    productName: "Jarra de Vidrio",
+    description:
+      "Jarra de vidrio transparente de alta capacidad, marca PureGlass, capacidad de 2 litros.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228687/proyecto_web/jarra_z8xty8.jpg",
+    imageKey: "jarra123",
     price: 14.99,
-    publicationDate: new Date('2023-01-25'),
-    stock: 120
+    publicationDate: new Date("2023-01-25"),
+    stock: 120,
   },
   {
-    productName: 'Vaso de Vidrio',
-    description: 'Vaso de vidrio resistente para bebidas frías, marca ChillGlass, capacidad de 350 ml.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228685/proyecto_web/vaso_niukh0.jpg',
-    imageKey: 'vaso123',
+    productName: "Vaso de Vidrio",
+    description:
+      "Vaso de vidrio resistente para bebidas frías, marca ChillGlass, capacidad de 350 ml.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228685/proyecto_web/vaso_niukh0.jpg",
+    imageKey: "vaso123",
     price: 4.99,
-    publicationDate: new Date('2023-04-05'),
-    stock: 200
+    publicationDate: new Date("2023-04-05"),
+    stock: 200,
   },
   {
-    productName: 'Tupper de Plástico',
-    description: 'Tupper de plástico hermético para alimentos, marca FreshKeep, capacidad de 1 litro.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228683/proyecto_web/tupper_souqyc.jpg',
-    imageKey: 'tupper123',
+    productName: "Tupper de Plástico",
+    description:
+      "Tupper de plástico hermético para alimentos, marca FreshKeep, capacidad de 1 litro.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228683/proyecto_web/tupper_souqyc.jpg",
+    imageKey: "tupper123",
     price: 9.99,
-    publicationDate: new Date('2023-03-01'),
-    stock: 250
+    publicationDate: new Date("2023-03-01"),
+    stock: 250,
   },
   {
-    productName: 'Plato de Porcelana',
-    description: 'Plato de porcelana elegante para ocasiones especiales, marca FineDine, diámetro de 28 cm.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228681/proyecto_web/plato_hcvzur.jpg',
-    imageKey: 'plato123',
+    productName: "Plato de Porcelana",
+    description:
+      "Plato de porcelana elegante para ocasiones especiales, marca FineDine, diámetro de 28 cm.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228681/proyecto_web/plato_hcvzur.jpg",
+    imageKey: "plato123",
     price: 12.99,
-    publicationDate: new Date('2023-02-20'),
-    stock: 80
+    publicationDate: new Date("2023-02-20"),
+    stock: 80,
   },
   {
-    productName: 'Especiero de Vidrio',
-    description: 'Especiero de vidrio con soporte de madera, marca SpiceSet, incluye 8 frascos.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228680/proyecto_web/especiero_agkwvg.png',
-    imageKey: 'especiero123',
+    productName: "Especiero de Vidrio",
+    description:
+      "Especiero de vidrio con soporte de madera, marca SpiceSet, incluye 8 frascos.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228680/proyecto_web/especiero_agkwvg.png",
+    imageKey: "especiero123",
     price: 24.99,
-    publicationDate: new Date('2023-03-10'),
-    stock: 60
+    publicationDate: new Date("2023-03-10"),
+    stock: 60,
   },
   {
-    productName: 'Set de Tablas de Madera',
-    description: 'Set de 3 tablas de madera para cortar alimentos, marca WoodWorks, diferentes tamaños.',
-    imageURL: 'https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228678/proyecto_web/tablamadera_h3pkcb.jpg',
-    imageKey: 'tablas123',
+    productName: "Set de Tablas de Madera",
+    description:
+      "Set de 3 tablas de madera para cortar alimentos, marca WoodWorks, diferentes tamaños.",
+    imageURL:
+      "https://res.cloudinary.com/dzr4mku7x/image/upload/v1719228678/proyecto_web/tablamadera_h3pkcb.jpg",
+    imageKey: "tablas123",
     price: 34.99,
-    publicationDate: new Date('2023-01-15'),
-    stock: 50
-  }
+    publicationDate: new Date("2023-01-15"),
+    stock: 50,
+  },
 ];
 
 async function seedUsers(client) {
@@ -103,25 +138,32 @@ async function seedUsers(client) {
 
     console.log(`Tabla "users" creada`);
 
-    const hashedPasswords = await Promise.all(users.map(async (user) => {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-      return hashedPassword;
-    }));
+    const hashedPasswords = await Promise.all(
+      users.map(async (user) => {
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+        return hashedPassword;
+      }),
+    );
 
-    const insertedUsers = await Promise.all(users.map(async (user, index) => {
-      const hashedPassword = hashedPasswords[index];
-      return client.query(`
+    const insertedUsers = await Promise.all(
+      users.map(async (user, index) => {
+        const hashedPassword = hashedPasswords[index];
+        return client.query(
+          `
         INSERT INTO users (name, email, password, role)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (email) DO NOTHING;
-      `, [user.name, user.email, hashedPassword, user.role]);
-    }));
+      `,
+          [user.name, user.email, hashedPassword, user.role],
+        );
+      }),
+    );
 
     console.log(`Se han insertado ${insertedUsers.length} usuarios`);
 
     return insertedUsers;
   } catch (error) {
-    console.error('Error al insertar usuarios:', error);
+    console.error("Error al insertar usuarios:", error);
     throw error;
   }
 }
@@ -141,21 +183,29 @@ async function seedCarts(client) {
 
     console.log(`Tabla "carts" creada`);
 
-    const insertedCarts = await Promise.all(carts.map(async cart => {
-      const user = await client.query('SELECT id FROM users WHERE name = $1', [cart.username]);
-      const userID = user.rows[0].id;
-      return client.query(`
+    const insertedCarts = await Promise.all(
+      carts.map(async (cart) => {
+        const user = await client.query(
+          "SELECT id FROM users WHERE name = $1",
+          [cart.username],
+        );
+        const userID = user.rows[0].id;
+        return client.query(
+          `
         INSERT INTO carts (userID, totalPrice, mercadoPagoID)
         VALUES ($1, $2, $3)
         ON CONFLICT (id) DO NOTHING;
-      `, [userID, cart.totalPrice, cart.mercadoPagoID]);
-    }));
+      `,
+          [userID, cart.totalPrice, cart.mercadoPagoID],
+        );
+      }),
+    );
 
     console.log(`Se han insertado ${insertedCarts.length} carritos`);
 
     return insertedCarts;
   } catch (error) {
-    console.error('Error al insertar carritos:', error);
+    console.error("Error al insertar carritos:", error);
     throw error;
   }
 }
@@ -178,19 +228,31 @@ async function seedProducts(client) {
 
     console.log(`Tabla "products" creada`);
 
-    const insertedProducts = await Promise.all(products.map(async product => {
-      return client.query(`
+    const insertedProducts = await Promise.all(
+      products.map(async (product) => {
+        return client.query(
+          `
         INSERT INTO products (productName, description, imageURL, imageKey, price, stock)
         VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (id) DO NOTHING;
-      `, [product.productName, product.description, product.imageURL, product.imageKey, product.price, product.stock]);
-    }));
+      `,
+          [
+            product.productName,
+            product.description,
+            product.imageURL,
+            product.imageKey,
+            product.price,
+            product.stock,
+          ],
+        );
+      }),
+    );
 
     console.log(`Se han insertado ${insertedProducts.length} productos`);
 
     return insertedProducts;
   } catch (error) {
-    console.error('Error al insertar productos:', error);
+    console.error("Error al insertar productos:", error);
     throw error;
   }
 }
@@ -227,67 +289,135 @@ async function seedSales(client) {
 
     console.log(`Tabla "sales_orders" creada`);
 
-    const usersResult = await client.query('SELECT id, name FROM users WHERE name IN ($1, $2)', ['John Doe', 'Jane Smith']);
-    const users = usersResult.rows.map(row => ({ id: row.id, name: row.name }));
+    const usersResult = await client.query(
+      "SELECT id, name FROM users WHERE name IN ($1, $2)",
+      ["John Doe", "Jane Smith"],
+    );
+    const users = usersResult.rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+    }));
 
-
-    const productsResult = await client.query('SELECT id, productname, price FROM products');
-    const products = productsResult.rows.map(row => ({ id: row.id, name: row.productname, price: row.price }));
+    const productsResult = await client.query(
+      "SELECT id, productname, price FROM products",
+    );
+    const products = productsResult.rows.map((row) => ({
+      id: row.id,
+      name: row.productname,
+      price: row.price,
+    }));
 
     const salesData = [
       {
         userID: users[0].id,
         username: users[0].name,
-        totalPrice: parseFloat(products[0].price) + parseFloat(products[1].price) + parseFloat(products[2].price),
+        totalPrice:
+          parseFloat(products[0].price) +
+          parseFloat(products[1].price) +
+          parseFloat(products[2].price),
         totalProducts: 3,
-        mercadoPagoID: 'MP123456',
+        mercadoPagoID: "MP123456",
         products: [
-          { productID: products[0].id, productName: products[0].name, quantity: 1, price: products[0].price },
-          { productID: products[1].id, productName: products[1].name, quantity: 1, price: products[1].price },
-          { productID: products[2].id, productName: products[2].name, quantity: 1, price: products[2].price }
-        ]
+          {
+            productID: products[0].id,
+            productName: products[0].name,
+            quantity: 1,
+            price: products[0].price,
+          },
+          {
+            productID: products[1].id,
+            productName: products[1].name,
+            quantity: 1,
+            price: products[1].price,
+          },
+          {
+            productID: products[2].id,
+            productName: products[2].name,
+            quantity: 1,
+            price: products[2].price,
+          },
+        ],
       },
       {
         userID: users[1].id,
         username: users[1].name,
-        totalPrice: parseFloat(products[0].price) + parseFloat(products[1].price) + parseFloat(products[2].price),
+        totalPrice:
+          parseFloat(products[0].price) +
+          parseFloat(products[1].price) +
+          parseFloat(products[2].price),
         totalProducts: 3,
-        mercadoPagoID: 'MP654321',
+        mercadoPagoID: "MP654321",
         products: [
-          { productID: products[0].id, productName: products[0].name, quantity: 1, price: products[0].price },
-          { productID: products[1].id, productName: products[1].name, quantity: 1, price: products[1].price },
-          { productID: products[2].id, productName: products[2].name, quantity: 1, price: products[2].price }
-        ]
-      }
+          {
+            productID: products[0].id,
+            productName: products[0].name,
+            quantity: 1,
+            price: products[0].price,
+          },
+          {
+            productID: products[1].id,
+            productName: products[1].name,
+            quantity: 1,
+            price: products[1].price,
+          },
+          {
+            productID: products[2].id,
+            productName: products[2].name,
+            quantity: 1,
+            price: products[2].price,
+          },
+        ],
+      },
     ];
 
-    const insertedSales = await Promise.all(salesData.map(async sale => {
-      const saleResult = await client.query(`
+    const insertedSales = await Promise.all(
+      salesData.map(async (sale) => {
+        const saleResult = await client.query(
+          `
         INSERT INTO sales (userID, username, totalPrice, totalProducts, mercadoPagoID)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id;
-      `, [sale.userID, sale.username, sale.totalPrice, sale.totalProducts, sale.mercadoPagoID]);
-      const saleID = saleResult.rows[0].id;
+      `,
+          [
+            sale.userID,
+            sale.username,
+            sale.totalPrice,
+            sale.totalProducts,
+            sale.mercadoPagoID,
+          ],
+        );
+        const saleID = saleResult.rows[0].id;
 
-      await Promise.all(sale.products.map(async product => {
-        return client.query(`
+        await Promise.all(
+          sale.products.map(async (product) => {
+            return client.query(
+              `
           INSERT INTO sales_orders (saleID, productID, productName, quantity, price)
           VALUES ($1, $2, $3, $4, $5);
-        `, [saleID, product.productID, product.productName, product.quantity, product.price]);
-      }));
+        `,
+              [
+                saleID,
+                product.productID,
+                product.productName,
+                product.quantity,
+                product.price,
+              ],
+            );
+          }),
+        );
 
-      return saleID;
-    }));
+        return saleID;
+      }),
+    );
 
     console.log(`Se han insertado ${insertedSales.length} ventas`);
 
     return insertedSales;
   } catch (error) {
-    console.error('Error al insertar ventas:', error);
+    console.error("Error al insertar ventas:", error);
     throw error;
   }
 }
-
 
 async function seedOrderItems(client) {
   try {
@@ -304,12 +434,10 @@ async function seedOrderItems(client) {
       );
     `);
     console.log("Tabla orderItems creada");
-  }
-  catch (error) {
-    console.error('Error al insertar elementos de orden:', error);
+  } catch (error) {
+    console.error("Error al insertar elementos de orden:", error);
     throw error;
   }
-
 }
 
 async function main() {
@@ -322,12 +450,12 @@ async function main() {
     await seedSales(client);
     await seedOrderItems(client);
   } catch (error) {
-    console.error('Error al seedear la base de datos:', error);
+    console.error("Error al seedear la base de datos:", error);
   } finally {
     await client.end();
   }
 }
 
 main().catch((err) => {
-  console.error('Error:', err);
+  console.error("Error:", err);
 });

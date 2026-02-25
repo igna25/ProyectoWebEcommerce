@@ -16,19 +16,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-      <div className="flex w-full h-screen bg-gray-200">
-      <div className="w-full flex items-center justify-center lg:w-1/2">
-        {children}
-      </div>
-      <div className= "hidden lg:flex w-1/2 h-full items-center justify-center bg-gray-200">
-        <div className="w-60 h-60 bg-gradient-to-tr from-violet-500 to-pink-500 rounded-full">
+        <div className="flex w-full h-screen bg-gray-200">
+          <div className="w-full flex items-center justify-center lg:w-1/2">
+            {children}
+          </div>
+          <div className="hidden lg:flex w-1/2 h-full items-center justify-center bg-gray-200">
+            <div className="w-60 h-60 bg-gradient-to-tr from-violet-500 to-pink-500 rounded-full"></div>
+          </div>
         </div>
-
-
-      </div>
-    </div>
-    </body>
-
+      </body>
     </html>
   );
 }
