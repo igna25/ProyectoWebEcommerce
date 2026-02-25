@@ -18,6 +18,9 @@ const OPTIONAL_ROUTES = [
   "/dashboard",
   "/cart",
   "/admin",
+  "/admin/activos",
+  "/admin/inactivos",
+  "/admin/ventas",
   "/buyProduct",
 ];
 

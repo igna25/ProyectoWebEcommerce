@@ -7,7 +7,6 @@ import PersistUserId from "./pwa/PersistUserId";
 import PersistAdminRole from "./pwa/PersistAdminRole";
 import ConnectionStatus from "./pwa/ConnectionStatus";
 import InstallPrompt from "./pwa/InstallPrompt";
-import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +18,14 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     apple: "/icons/apple-touch-icon.png",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 };
 
@@ -32,19 +39,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Fragment>
-      <html lang="en">
-        <body className={inter.className}>
-          <Providers>
-            <RegisterSW />
-            <PersistUserId />
-            <PersistAdminRole />
-            <ConnectionStatus />
-            <InstallPrompt />
-            {children}
-          </Providers>
-        </body>
-      </html>
-    </Fragment>
+    <html lang="es">
+      <body className={inter.className}>
+        <Providers>
+          <RegisterSW />
+          <PersistUserId />
+          <PersistAdminRole />
+          <ConnectionStatus />
+          <InstallPrompt />
+          {children}
+        </Providers>
+      </body>
+    </html>
   );
 }
