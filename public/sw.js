@@ -20,6 +20,7 @@ const OPTIONAL_ROUTES = [
   "/admin",
   "/admin/activos",
   "/admin/inactivos",
+  "/admin/ventas",
   "/buyProduct",
 ];
 
