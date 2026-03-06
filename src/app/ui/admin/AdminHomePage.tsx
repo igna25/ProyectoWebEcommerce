@@ -42,6 +42,11 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
           setIsLoading(true);
         }
 
+        if (session?.user?.role !== "admin") {
+          setIsLoading(false);
+          return;
+        }
+
         const response = await fetch("/api/admin", {
           method: "GET",
           credentials: "include",
@@ -64,7 +69,7 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
           setSummary(fallbackCache);
           onDataLoaded?.(fallbackCache);
           setError(null);
-        } else {
+        } else if (session?.user?.role === "admin") {
           setError("Error al cargar los datos del administrador");
         }
       } finally {
@@ -72,9 +77,7 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
       }
     };
 
-    if (session?.user?.role === "admin") {
-      loadAdminData();
-    }
+    loadAdminData();
   }, [session, onDataLoaded]);
 
   if (isLoading) {
