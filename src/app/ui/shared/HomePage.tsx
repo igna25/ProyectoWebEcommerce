@@ -34,15 +34,17 @@ export default function HomePage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl py-4">
+    <div className="mx-auto max-w-7xl px-4 py-4">
       <section className="mb-8">
-        <h2 className="text-3xl font-bold mb-4">
+        <h2 className="text-xl sm:text-3xl font-bold mb-4">
           Productos Añadidos Recientemente
         </h2>
         <ProductListDashboard products={recentProducts} userId={userId} />
       </section>
       <section>
-        <h2 className="text-3xl font-bold mb-4">Productos Más Vendidos</h2>
+        <h2 className="text-xl sm:text-3xl font-bold mb-4">
+          Productos Más Vendidos
+        </h2>
         <ProductListDashboard products={topSellingProducts} userId={userId} />
       </section>
     </div>

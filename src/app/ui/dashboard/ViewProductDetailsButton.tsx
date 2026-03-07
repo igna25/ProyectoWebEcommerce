@@ -1,13 +1,16 @@
 "use client";
 import Link from "next/link";
-import { Button } from "@headlessui/react";
 import { Product } from "@/lib/Entities/Product";
 
 function ViewProductDetailsButton({ product }: { product: Product }) {
   return (
-    <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-      <Link href={"/dashboard/" + product.id}>Ver detalles</Link>
-    </Button>
+    <Link
+      href={"/dashboard/" + product.id}
+      className="w-full text-center py-2 px-4 rounded-xl text-sm font-semibold text-[#004AAD] border border-[#004AAD] hover:bg-blue-50 transition-colors"
+    >
+      Ver detalles
+    </Link>
   );
 }
+
 export default ViewProductDetailsButton;

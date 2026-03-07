@@ -1,19 +1,16 @@
-import { Button } from "@headlessui/react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 const CartButton = () => {
   return (
-    <div className="flex justify-center pt-4">
-      <div className="flex gap-3">
-        <Link href="/cart">
-          <Button className="text-sm/6 font-semibold text-gray-100 focus:outline-none data-[active]:text-white data-[hover]:text-white data-[focus]:outline-1 data-[focus]:outline-white">
-            <ShoppingCartIcon />
-            Cart
-          </Button>
-        </Link>
-      </div>
-    </div>
+    <Link
+      href="/cart"
+      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+    >
+      <ShoppingCartIcon className="w-5 h-5" />
+      <span className="hidden sm:inline">Carrito</span>
+    </Link>
   );
 };
+
 export default CartButton;

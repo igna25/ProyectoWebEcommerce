@@ -47,9 +47,9 @@ export default async function DashboardPage({
 
   return (
     <Fragment>
-      <div className="mx-auto max-w-7xl" id="discover">
+      <div className="mx-auto max-w-7xl px-4" id="discover">
         <div className="text-start mb-2">
-          <h1 className="text-4xl font-extrabold text-center">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-center">
             Nuestros productos
           </h1>
           <p className="text-center">

@@ -1,17 +1,16 @@
-import Link from "next/link";
 import { TicketIcon } from "@heroicons/react/24/outline";
-import { Button } from "@headlessui/react";
+import Link from "next/link";
 
 const BuysRecordButton = () => {
   return (
-    <div className="justify-between items-center">
-      <Button className="pt-2 text-sm/4 font-semibold text-gray-100 focus:outline-none data-[active]:text-white data-[hover]:text-white data-[focus]:outline-1 data-[focus]:outline-white">
-        <Link href="/buyProduct/buys">
-          <TicketIcon className="size-10" />
-          Tus compras
-        </Link>
-      </Button>
-    </div>
+    <Link
+      href="/buyProduct/buys"
+      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+    >
+      <TicketIcon className="w-5 h-5" />
+      <span className="hidden sm:inline">Mis compras</span>
+    </Link>
   );
 };
+
 export default BuysRecordButton;

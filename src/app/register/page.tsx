@@ -1,51 +1,48 @@
-import clsx from "clsx";
+import Link from "next/link";
 
 export default function RegisterForm() {
   return (
-    <div className="w-full max-w-md px-4">
-      <form className="space-y-6 rounded-xl bg-white p-6 sm:p-10">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-800">Register</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Únete a nosotros! Por favor, completa los siguientes campos para
-            crear tu cuenta.
+    <div className="w-full max-w-md">
+      <form className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8 space-y-5">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Crear cuenta</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Completá los campos para unirte a IAW-commerce.
           </p>
         </div>
-        <div>
+
+        <div className="space-y-1">
           <label
             htmlFor="username"
-            className="text-sm font-medium text-gray-800"
+            className="text-sm font-medium text-gray-700"
           >
-            Nombre de Usuario
+            Nombre de usuario
           </label>
           <input
             type="text"
             id="username"
             required
-            className={clsx(
-              "mt-3 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-            )}
+            className="block w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition"
           />
         </div>
-        <div>
-          <label htmlFor="email" className="text-sm font-medium text-gray-800">
+
+        <div className="space-y-1">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">
             Email
           </label>
           <input
             type="email"
             id="email"
             required
-            className={clsx(
-              "mt-3 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-            )}
+            placeholder="tu@email.com"
+            className="block w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition"
           />
         </div>
-        <div>
+
+        <div className="space-y-1">
           <label
             htmlFor="password"
-            className="text-sm font-medium text-gray-800"
+            className="text-sm font-medium text-gray-700"
           >
             Contraseña
           </label>
@@ -53,37 +50,43 @@ export default function RegisterForm() {
             type="password"
             id="password"
             required
-            className={clsx(
-              "mt-3 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-            )}
+            placeholder="••••••••"
+            className="block w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition"
           />
         </div>
-        <div>
+
+        <div className="space-y-1">
           <label
             htmlFor="confirm-password"
-            className="text-sm font-medium text-gray-800"
+            className="text-sm font-medium text-gray-700"
           >
-            Repetir Contraseña
+            Repetir contraseña
           </label>
           <input
             type="password"
             id="confirm-password"
             required
-            className={clsx(
-              "mt-3 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-            )}
+            placeholder="••••••••"
+            className="block w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition"
           />
         </div>
-        <div className="text-center">
-          <button
-            type="submit"
-            className="mt-4 w-full rounded-lg bg-blue-600 py-2 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+
+        <button
+          type="submit"
+          className="w-full rounded-xl bg-[#004AAD] hover:bg-[#003d8f] py-2.5 text-sm font-semibold text-white transition-colors"
+        >
+          Crear cuenta
+        </button>
+
+        <p className="text-center text-sm text-gray-500">
+          ¿Ya tenés cuenta?{" "}
+          <Link
+            href="/login"
+            className="text-[#004AAD] font-semibold hover:underline"
           >
-            Register
-          </button>
-        </div>
+            Iniciá sesión
+          </Link>
+        </p>
       </form>
     </div>
   );
