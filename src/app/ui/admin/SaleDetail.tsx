@@ -3,13 +3,11 @@ import React from "react";
 import { Sale, SalesOrder } from "@/lib/Entities";
 
 interface SaleDetailProps {
-  saleId: string;
   sale: Sale;
   orders: SalesOrder[];
 }
 
-const SaleDetail = ({ saleId, sale, orders }: SaleDetailProps) => {
-
+const SaleDetail = ({ sale, orders }: SaleDetailProps) => {
   return (
     <div className="w-full rounded overflow-hidden shadow-lg bg-white m-4 p-6">
       <div className="flex justify-between items-center border-b pb-4 mb-4">

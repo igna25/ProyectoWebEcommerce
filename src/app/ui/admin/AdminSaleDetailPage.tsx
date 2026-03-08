@@ -63,7 +63,7 @@ export default function AdminSaleDetailPage() {
 
   return (
     <div className="container mx-auto px-4">
-      <SaleDetail saleId={saleId} sale={sale} orders={orders} />
+      <SaleDetail sale={sale} orders={orders} />
     </div>
   );
 }

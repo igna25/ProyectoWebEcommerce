@@ -1,3 +1,4 @@
+"use client";
 import { Fragment } from "react";
 import SideNav from "../ui/admin/sideBar/SideBar";
 import HeaderMobile from "../ui/admin/sideBar/HeaderMobile";
