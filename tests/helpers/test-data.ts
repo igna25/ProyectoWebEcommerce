@@ -1,11 +1,16 @@
 export const ADMIN_USER = {
-  email: process.env.TEST_ADMIN_EMAIL || "admin@test.com",
-  password: process.env.TEST_ADMIN_PASSWORD || "password123",
+  email: process.env.TEST_ADMIN_EMAIL || "bob.johnson@example.com",
+  password: process.env.TEST_ADMIN_PASSWORD || "password789",
 };
 
 export const REGULAR_USER = {
-  email: process.env.TEST_USER_EMAIL || "user@test.com",
+  email: process.env.TEST_USER_EMAIL || "john.doe@example.com",
   password: process.env.TEST_USER_PASSWORD || "password123",
+};
+
+export const REGULAR_USER_2 = {
+  email: process.env.TEST_USER_2_EMAIL || "jane.smith@example.com",
+  password: process.env.TEST_USER_2_PASSWORD || "password456",
 };
 
 export const INVALID_CREDENTIALS = {
