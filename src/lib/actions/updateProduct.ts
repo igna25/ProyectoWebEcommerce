@@ -1,7 +1,6 @@
 "use server";
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import ProductsRepository from "../Repositories/ProductsRepository";
-import { revalidatePath } from "next/cache";
 import { Product } from "../Entities";
 
 cloudinary.config({
@@ -114,8 +113,6 @@ export async function updateProduct(formData: FormData) {
     };
 
     await productsRepository.updateProduct(updatedProduct);
-
-    revalidatePath("/");
 
     return {
       success: true,
