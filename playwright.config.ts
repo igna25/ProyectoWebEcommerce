@@ -2,11 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
+  outputDir: "./tests/test-results",
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  reporter: "html",
+  reporter: [["html", { outputFolder: "./tests/playwright-report" }]],
   timeout: 30000,
   expect: {
     timeout: 10000,
