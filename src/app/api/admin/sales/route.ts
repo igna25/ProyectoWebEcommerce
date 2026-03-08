@@ -1,10 +1,12 @@
 import SalesRepository from "@/lib/Repositories/SalesRepository";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { unstable_noStore as noStore } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: any) {
+  noStore();
   try {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     if (!token || token.role !== "admin") {

@@ -2,12 +2,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Product, Sale } from "@/lib/Entities";
-import {
-  saveAdminSummaryToCache,
-  getAdminSummaryFromCache,
-  saveAdminProductsToCache,
-  saveAdminSalesToCache,
-} from "@/lib/cache/adminCache";
 import Link from "next/link";
 import { Button } from "@headlessui/react";
 
@@ -32,41 +26,21 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
     const loadAdminData = async () => {
       try {
         setError(null);
-        const cachedSummary = getAdminSummaryFromCache();
-
-        if (cachedSummary) {
-          setSummary(cachedSummary);
-          onDataLoaded?.(cachedSummary);
-          setIsLoading(false);
-        } else {
-          setIsLoading(true);
-        }
+        setIsLoading(true);
 
         const response = await fetch("/api/admin", {
           method: "GET",
           credentials: "include",
         });
 
-        if (!response.ok) {
-          throw new Error("Error al obtener datos del admin");
-        }
+        if (!response.ok) throw new Error("Error al obtener datos del admin");
 
         const data: AdminSummary = await response.json();
-        saveAdminSummaryToCache(data);
-        saveAdminProductsToCache(data.lowStockProducts);
-        saveAdminSalesToCache(data.recentSales);
         setSummary(data);
         onDataLoaded?.(data);
       } catch (err) {
         console.error("Error cargando datos del admin:", err);
-        const fallbackCache = getAdminSummaryFromCache();
-        if (fallbackCache) {
-          setSummary(fallbackCache);
-          onDataLoaded?.(fallbackCache);
-          setError(null);
-        } else {
-          setError("Error al cargar los datos del administrador");
-        }
+        setError("Error al cargar los datos del administrador");
       } finally {
         setIsLoading(false);
       }

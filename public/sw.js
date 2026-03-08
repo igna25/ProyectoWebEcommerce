@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v5";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
@@ -190,10 +190,12 @@ self.addEventListener("fetch", (event) => {
 
   if (isAdminApi(url)) {
     if (request.method === "GET") {
+      const isProductList = url.pathname === "/api/admin/products";
+
       event.respondWith(
         fetch(request)
           .then(async (res) => {
-            if (res.ok) {
+            if (res.ok && !isProductList) {
               const resClone = res.clone();
               const cache = await caches.open(ADMIN_API_CACHE);
               await cache.put(request, resClone);
@@ -202,15 +204,17 @@ self.addEventListener("fetch", (event) => {
             return res;
           })
           .catch(async () => {
-            const cached = await caches.match(request);
-            if (cached) {
-              const headers = new Headers(cached.headers);
-              headers.set("X-From-Cache", "true");
-              return new Response(cached.body, {
-                status: cached.status,
-                statusText: cached.statusText,
-                headers: headers,
-              });
+            if (!isProductList) {
+              const cached = await caches.match(request);
+              if (cached) {
+                const headers = new Headers(cached.headers);
+                headers.set("X-From-Cache", "true");
+                return new Response(cached.body, {
+                  status: cached.status,
+                  statusText: cached.statusText,
+                  headers: headers,
+                });
+              }
             }
             return new Response(
               JSON.stringify({ error: "No disponible offline" }),
@@ -222,20 +226,32 @@ self.addEventListener("fetch", (event) => {
           }),
       );
     } else {
-      // Para POST, PATCH, PUT - requiere conexión
       event.respondWith(
-        fetch(request).catch(
-          () =>
-            new Response(
-              JSON.stringify({
-                error: "Requiere conexión para actualizaciones",
-              }),
-              {
-                status: 503,
-                headers: { "Content-Type": "application/json" },
-              },
-            ),
-        ),
+        fetch(request)
+          .then(async (res) => {
+            if (res.ok && url.pathname === "/api/admin/products/status") {
+              const cache = await caches.open(ADMIN_API_CACHE);
+              const keys = await cache.keys();
+              await Promise.all(
+                keys
+                  .filter((k) => new URL(k.url).pathname === "/api/admin/products")
+                  .map((k) => cache.delete(k)),
+              );
+            }
+            return res;
+          })
+          .catch(
+            () =>
+              new Response(
+                JSON.stringify({
+                  error: "Requiere conexión para actualizaciones",
+                }),
+                {
+                  status: 503,
+                  headers: { "Content-Type": "application/json" },
+                },
+              ),
+          ),
       );
     }
     return;

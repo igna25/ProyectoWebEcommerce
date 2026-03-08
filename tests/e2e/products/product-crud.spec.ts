@@ -1,3 +1,3 @@
-import { test, expect } from "../../fixtures/auth.fixture";
+import { test, expect } from "@playwright/test";
 
 test.describe("CRUD de productos (admin)", () => {});
