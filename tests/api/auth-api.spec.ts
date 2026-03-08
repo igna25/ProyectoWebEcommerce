@@ -1,5 +1,5 @@
 import { test, expect, APIRequestContext } from "@playwright/test";
-import { ADMIN_USER, INVALID_CREDENTIALS } from "../../helpers/test-data";
+import { ADMIN_USER, INVALID_CREDENTIALS } from "../helpers/test-data";
 
 async function getCSRFToken(request: APIRequestContext): Promise<string> {
   const res = await request.get("/api/auth/csrf");

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { API } from "../../helpers/test-data";
+import { API } from "../helpers/test-data";
 
 test.describe("API — /api/products", () => {
   test.describe("GET /api/products", () => {
