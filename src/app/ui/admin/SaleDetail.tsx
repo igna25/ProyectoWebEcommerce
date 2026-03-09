@@ -1,22 +1,13 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { Sale, SalesOrder } from "@/lib/Entities";
-import { saveAdminSalesOrdersToCache } from "@/lib/cache/adminCache";
 
 interface SaleDetailProps {
-  saleId: string;
   sale: Sale;
   orders: SalesOrder[];
 }
 
-const SaleDetail = ({ saleId, sale, orders }: SaleDetailProps) => {
-  // Guardar los detalles en caché cuando el componente se monta
-  useEffect(() => {
-    if (sale && orders) {
-      saveAdminSalesOrdersToCache(saleId, orders);
-    }
-  }, [saleId, sale, orders]);
-
+const SaleDetail = ({ sale, orders }: SaleDetailProps) => {
   return (
     <div className="w-full rounded overflow-hidden shadow-lg bg-white m-4 p-6">
       <div className="flex justify-between items-center border-b pb-4 mb-4">

@@ -1,7 +1,6 @@
 "use server";
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import ProductsRepository from "../Repositories/ProductsRepository";
-import { revalidatePath } from "next/cache";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -80,7 +79,6 @@ export async function createProduct(formData: FormData) {
 
       await productsRepository.createProduct(product);
     }
-    revalidatePath("/");
     return {
       success: true,
     };

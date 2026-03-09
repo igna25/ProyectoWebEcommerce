@@ -1,3 +1,4 @@
+"use client";
 import { Suspense } from "react";
 import AdminSalesPage from "@/app/ui/admin/AdminSalesPage";
 

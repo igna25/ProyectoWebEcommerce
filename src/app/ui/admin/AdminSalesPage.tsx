@@ -2,10 +2,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Sale } from "@/lib/Entities";
-import {
-  saveAdminSalesToCache,
-  getAllAdminSalesFromCache,
-} from "@/lib/cache/adminCache";
 import SalesListAdmin from "@/app/ui/admin/SalesListAdmin";
 import Pagination from "@/app/ui/admin/Pagination";
 
@@ -18,17 +14,13 @@ export default function AdminSalesPage() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [fromCache, setFromCache] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
-
-      const cached = getAllAdminSalesFromCache();
-      if (cached.length > 0) {
-        setSales(cached);
-        setFromCache(true);
-      }
+      setSales([]);
+      setError(null);
 
       try {
         const params = new URLSearchParams({
@@ -43,16 +35,10 @@ export default function AdminSalesPage() {
         if (!res.ok) throw new Error("fetch failed");
 
         const data = await res.json();
-        saveAdminSalesToCache(data.sales);
         setSales(data.sales);
-        setTotalPages(Math.ceil(data.total / ITEMS_PER_PAGE));
-        setFromCache(false);
+        setTotalPages(Math.ceil(Number(data.total) / ITEMS_PER_PAGE));
       } catch {
-        const fallback = getAllAdminSalesFromCache();
-        if (fallback.length > 0) {
-          setSales(fallback);
-          setFromCache(true);
-        }
+        setError("No se pudieron cargar las ventas. Intenta de nuevo.");
       } finally {
         setIsLoading(false);
       }
@@ -63,12 +49,12 @@ export default function AdminSalesPage() {
 
   return (
     <div className="container mx-auto px-4">
-      {fromCache && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-2 rounded mb-4">
-          Sin conexión — mostrando datos guardados
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-2 rounded mb-4">
+          {error}
         </div>
       )}
-      {isLoading && sales.length === 0 ? (
+      {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
@@ -85,7 +71,7 @@ export default function AdminSalesPage() {
           <div className="w-full max-w-4xl mx-4">
             <SalesListAdmin sales={sales} />
           </div>
-          {!fromCache && (
+          {totalPages > 1 && (
             <Pagination totalPages={totalPages} currentPage={currentPage} />
           )}
         </div>

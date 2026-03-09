@@ -4,8 +4,7 @@ import clsx from "clsx";
 import { FileUploader } from "react-drag-drop-files";
 import { Button } from "@headlessui/react";
 import { updateProduct } from "@/lib/actions/updateProduct";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { Product } from "@/lib/Entities";
 
 const fileTypes = ["JPG", "PNG"];
@@ -88,7 +87,6 @@ const EditProductForm = ({ product }: { product: Product }) => {
 
   return (
     <div className="max-w-md mx-auto rounded overflow-hidden shadow-lg bg-white m-4 flex flex-col">
-      <ToastContainer />
       <div className="px-6 py-4 flex-1 flex flex-col justify-between">
         <div className="text-center mb-4">
           <h2 className="text-2xl font-bold text-gray-800">Editar Producto</h2>

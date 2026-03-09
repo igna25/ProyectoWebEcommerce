@@ -1,5 +1,6 @@
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v12";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
+const RSC_CACHE = `rsc-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
 const IMAGES_CACHE = `images-${CACHE_VERSION}`;
@@ -19,6 +20,7 @@ const OPTIONAL_ROUTES = [
   "/cart",
   "/buyProduct",
 ];
+const ADMIN_PAGES = ["/admin", "/admin/activos", "/admin/inactivos", "/admin/ventas"];
 
 async function cleanOldCaches(cacheName) {
   const cache = await caches.open(cacheName);
@@ -119,6 +121,7 @@ self.addEventListener("activate", (event) => {
               (key) =>
                 ![
                   APP_SHELL_CACHE,
+                  RSC_CACHE,
                   RUNTIME_API_CACHE,
                   ADMIN_API_CACHE,
                   IMAGES_CACHE,
@@ -169,11 +172,44 @@ function isCartApi(url) {
   return url.pathname.startsWith("/api/cart");
 }
 
+function isSessionApi(url) {
+  return url.pathname === "/api/auth/session";
+}
+
+let adminPagesPrecached = false;
+
+async function precacheAdminPages(currentPath) {
+  if (adminPagesPrecached) return;
+  adminPagesPrecached = true;
+  const cache = await caches.open(APP_SHELL_CACHE);
+  await Promise.all(
+    ADMIN_PAGES.filter((p) => p !== currentPath).map(async (page) => {
+      try {
+        const res = await fetch(page, { credentials: "include" });
+        if (res.ok) await cache.put(page, res);
+      } catch {}
+    }),
+  );
+}
+
+function isRscPayload(request, url) {
+  return (
+    !url.pathname.startsWith("/_next") &&
+    !url.pathname.startsWith("/api") &&
+    (url.searchParams.has("_rsc") ||
+      request.headers.get("RSC") === "1" ||
+      request.headers.get("Next-Router-State-Tree") !== null)
+  );
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
   if (isNavigationRequest(request)) {
+    if (url.pathname.startsWith("/admin")) {
+      event.waitUntil(precacheAdminPages(url.pathname));
+    }
     event.respondWith(
       fetch(request)
         .then(async (res) => {
@@ -185,9 +221,66 @@ self.addEventListener("fetch", (event) => {
           return res;
         })
         .catch(async () => {
-          const cached = await caches.match(request);
+          const cache = await caches.open(APP_SHELL_CACHE);
+          const cached = await cache.match(request);
+          if (cached) return cached;
+          if (url.pathname.startsWith("/admin")) {
+            for (const page of ADMIN_PAGES) {
+              const fallback = await cache.match(page);
+              if (fallback) return fallback;
+            }
+          }
+          const offlinePage = await caches.match(OFFLINE_URL);
+          return offlinePage || new Response("Offline", { status: 503 });
+        }),
+    );
+    return;
+  }
+
+  if (isRscPayload(request, url)) {
+    const normalizedUrl = new URL(request.url);
+    normalizedUrl.searchParams.delete("_rsc");
+    const cacheKey = normalizedUrl.toString();
+
+    event.respondWith(
+      fetch(request)
+        .then(async (res) => {
+          if (res.ok) {
+            const resClone = res.clone();
+            const cache = await caches.open(RSC_CACHE);
+            await cache.put(cacheKey, resClone);
+          }
+          return res;
+        })
+        .catch(async () => {
+          const rscCache = await caches.open(RSC_CACHE);
+          const cached =
+            (await rscCache.match(cacheKey, { ignoreVary: true })) ||
+            (await rscCache.match(request, { ignoreSearch: true, ignoreVary: true }));
           if (cached) return cached;
           return caches.match(OFFLINE_URL);
+        }),
+    );
+    return;
+  }
+
+  if (isSessionApi(url)) {
+    event.respondWith(
+      fetch(request)
+        .then(async (res) => {
+          if (res.ok) {
+            const cache = await caches.open(RUNTIME_API_CACHE);
+            await cache.put(request, res.clone());
+          }
+          return res;
+        })
+        .catch(async () => {
+          const cached = await caches.match(request);
+          if (cached) return cached;
+          return new Response(JSON.stringify({}), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
         }),
     );
     return;
@@ -244,20 +337,32 @@ self.addEventListener("fetch", (event) => {
           }),
       );
     } else {
-      // Para POST, PATCH, PUT - requiere conexión
       event.respondWith(
-        fetch(request).catch(
-          () =>
-            new Response(
-              JSON.stringify({
-                error: "Requiere conexión para actualizaciones",
-              }),
-              {
-                status: 503,
-                headers: { "Content-Type": "application/json" },
-              },
-            ),
-        ),
+        fetch(request)
+          .then(async (res) => {
+            if (res.ok && url.pathname === "/api/admin/products/status") {
+              const cache = await caches.open(ADMIN_API_CACHE);
+              const keys = await cache.keys();
+              await Promise.all(
+                keys
+                  .filter((k) => new URL(k.url).pathname === "/api/admin/products")
+                  .map((k) => cache.delete(k)),
+              );
+            }
+            return res;
+          })
+          .catch(
+            () =>
+              new Response(
+                JSON.stringify({
+                  error: "Requiere conexión para actualizaciones",
+                }),
+                {
+                  status: 503,
+                  headers: { "Content-Type": "application/json" },
+                },
+              ),
+          ),
       );
     }
     return;
