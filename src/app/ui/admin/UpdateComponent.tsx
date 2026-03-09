@@ -109,9 +109,9 @@ const EditProductForm = ({ product }: { product: Product }) => {
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
               className={clsx(
-                "mt-1 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-                "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-                errors.productName && "border-red-500",
+                "mt-1 block w-full rounded-xl border bg-gray-50 py-2 px-3 text-sm text-gray-800",
+                "focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition",
+                errors.productName ? "border-red-400" : "border-gray-200",
               )}
             />
             {errors.productName && (
@@ -130,9 +130,9 @@ const EditProductForm = ({ product }: { product: Product }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className={clsx(
-                "mt-1 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-                "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-                errors.description && "border-red-500",
+                "mt-1 block w-full rounded-xl border bg-gray-50 py-2 px-3 text-sm text-gray-800",
+                "focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition",
+                errors.description ? "border-red-400" : "border-gray-200",
               )}
             />
             {errors.description && (
@@ -152,9 +152,9 @@ const EditProductForm = ({ product }: { product: Product }) => {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className={clsx(
-                "mt-1 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-                "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-                errors.price && "border-red-500",
+                "mt-1 block w-full rounded-xl border bg-gray-50 py-2 px-3 text-sm text-gray-800",
+                "focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition",
+                errors.price ? "border-red-400" : "border-gray-200",
               )}
             />
             {errors.price && (
@@ -174,9 +174,9 @@ const EditProductForm = ({ product }: { product: Product }) => {
               value={stock}
               onChange={(e) => setStock(e.target.value)}
               className={clsx(
-                "mt-1 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-                "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-                errors.stock && "border-red-500",
+                "mt-1 block w-full rounded-xl border bg-gray-50 py-2 px-3 text-sm text-gray-800",
+                "focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition",
+                errors.stock ? "border-red-400" : "border-gray-200",
               )}
             />
             {errors.stock && (
@@ -210,10 +210,10 @@ const EditProductForm = ({ product }: { product: Product }) => {
               type="submit"
               disabled={isSubmitting}
               className={clsx(
-                "mt-4 w-full rounded-lg py-2 text-white font-bold focus:outline-none focus:ring-2 focus:ring-offset-2",
+                "mt-4 w-full rounded-xl py-2.5 text-white font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#004AAD]",
                 isSubmitting
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-700 focus:ring-blue-500",
+                  : "bg-[#004AAD] hover:bg-[#003d8f]",
               )}
             >
               {isSubmitting ? "Actualizando..." : "Actualizar Producto"}

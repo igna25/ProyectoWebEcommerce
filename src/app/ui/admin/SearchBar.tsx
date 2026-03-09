@@ -1,18 +1,17 @@
 "use client";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@headlessui/react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export default function SearchBar() {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
   const pathname = usePathname();
   const [search, setSearch] = useState<string>("");
+
   function handleSearch() {
     const params = new URLSearchParams(searchParams);
-
     params.set("page", "1");
-
     if (search) {
       params.set("query", search);
     } else {
@@ -23,22 +22,24 @@ export default function SearchBar() {
 
   return (
     <div className="flex justify-center py-4">
-      <div className="flex w-full sm:w-1/2">
-        <input
-          type="text"
-          className="flex-grow px-4 py-2 border-2 border-gray-300 rounded-l-lg focus:outline-none focus:border-blue-500"
-          placeholder="Buscar..."
-          defaultValue={searchParams.get("query")?.toString()}
-          onChange={(e) => {
-            setSearch(e.target.value);
-          }}
-        />
-        <Button
+      <div className="flex w-full sm:w-2/3 lg:w-1/2">
+        <div className="relative flex-grow">
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent bg-white"
+            placeholder="Buscar productos..."
+            defaultValue={searchParams.get("query")?.toString()}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+        </div>
+        <button
           onClick={handleSearch}
-          className="px-4 py-2 bg-blue-500 text-white border-2 border-blue-500 rounded-r-lg hover:bg-blue-600 focus:outline-none"
+          className="px-5 py-2.5 text-sm font-semibold text-white bg-[#004AAD] hover:bg-[#003d8f] rounded-r-xl transition-colors"
         >
           Buscar
-        </Button>
+        </button>
       </div>
     </div>
   );

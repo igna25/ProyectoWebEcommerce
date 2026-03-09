@@ -36,9 +36,9 @@ export default function ProductsListAdmin({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-2 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-2 rounded-xl">
           {error}
         </div>
       )}
@@ -46,41 +46,55 @@ export default function ProductsListAdmin({
       {products.map((product) => (
         <div
           key={product.id}
-          className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow"
+          className="bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm hover:shadow-md transition-shadow"
         >
-          <div className="flex justify-between items-center">
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-800">
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-gray-800 truncate">
                 {product.productname}
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Stock disponible: {product.stock}
-              </p>
-              {typeof product.price === "number" && (
-                <p className="text-sm text-gray-600">
-                  Precio: ${product.price}
-                </p>
-              )}
-            </div>
-            <div className="ml-4 flex items-center gap-3">
-              {product.stock <= 5 && (
-                <span className="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
-                  Bajo stock
+              <div className="flex flex-wrap gap-3 mt-1.5">
+                <span className="text-sm text-gray-500">
+                  Stock:{" "}
+                  <span className="font-medium text-gray-700">
+                    {product.stock}
+                  </span>
                 </span>
+                {typeof product.price === "number" && (
+                  <span className="text-sm text-gray-500">
+                    Precio:{" "}
+                    <span className="font-medium text-[#004AAD]">
+                      ${product.price}
+                    </span>
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="shrink-0 flex items-center gap-2">
+              {product.stock === 0 ? (
+                <span className="text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-medium">
+                  Sin stock
+                </span>
+              ) : (
+                product.stock <= 5 && (
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full font-medium">
+                    Bajo stock
+                  </span>
+                )
               )}
               <Link
                 href={`/admin/${product.active ? "activos" : "inactivos"}/${product.id}`}
-                className="text-sm font-medium px-3 py-1.5 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                className="text-sm font-medium px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 Editar
               </Link>
               <Button
                 onClick={() => handleToggleStatus(product.id, product.active)}
                 disabled={togglingId === product.id}
-                className={`text-sm font-medium px-3 py-1.5 rounded transition-colors focus:outline-none disabled:opacity-50 ${
+                className={`text-sm font-medium px-3 py-1.5 rounded-xl transition-colors focus:outline-none disabled:opacity-50 ${
                   product.active
-                    ? "bg-red-100 text-red-700 hover:bg-red-200 data-[hover]:bg-red-200"
-                    : "bg-green-100 text-green-700 hover:bg-green-200 data-[hover]:bg-green-200"
+                    ? "bg-red-100 text-red-700 hover:bg-red-200"
+                    : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                 }`}
               >
                 {togglingId === product.id
@@ -96,14 +110,14 @@ export default function ProductsListAdmin({
 
       {isLoading && (
         <div className="flex justify-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#004AAD]"></div>
         </div>
       )}
 
       {onLoadMore && products.length > 0 && (
         <Button
           onClick={onLoadMore}
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+          className="w-full bg-[#004AAD] hover:bg-[#003d8f] text-white font-semibold py-2.5 px-4 rounded-xl mt-2 transition-colors disabled:opacity-50"
           disabled={isLoading}
         >
           {isLoading ? "Cargando..." : "Cargar más productos"}

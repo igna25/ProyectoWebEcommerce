@@ -18,14 +18,16 @@ const SideNav = () => {
       <div className="flex flex-col justify-between h-full">
         <div className="flex flex-col space-y-6 w-full">
           <Link
-            href="/"
-            className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 border-b border-gray-700 h-12 w-full"
+            href="/admin"
+            className="flex flex-row space-x-2 items-center md:px-6 border-b border-gray-800 h-14 w-full"
           >
-            <span className="h-7 w-7 bg-gray-800 rounded-lg" />
-            <span className="font-bold text-xl hidden md:flex">Logo</span>
+            <span className="font-bold text-xl hidden md:flex">
+              IAW<span className="text-blue-400">.</span>
+            </span>
+            <span className="text-xs text-gray-400 hidden md:flex">Admin</span>
           </Link>
 
-          <div className="flex flex-col space-y-2 md:px-6">
+          <div className="flex flex-col space-y-1 md:px-3">
             {SIDENAV_ITEMS.map((item, idx) => {
               return <MenuItem key={idx} item={item} />;
             })}
@@ -35,10 +37,10 @@ const SideNav = () => {
           onClick={() => {
             signOut();
           }}
-          className="flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-gray-800 mb-4"
+          className="flex flex-row space-x-3 items-center px-3 py-2.5 mx-3 mb-4 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
         >
-          <Icon icon="lucide:log-out" width="24" height="24" />
-          <span className="font-semibold text-xl flex">Cerrar sesión</span>
+          <Icon icon="lucide:log-out" width="18" height="18" />
+          <span className="font-medium text-sm flex">Cerrar sesión</span>
         </Button>
       </div>
     </div>
@@ -60,32 +62,37 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
         <>
           <Button
             onClick={toggleSubMenu}
-            className={`flex flex-row items-center p-2 rounded-lg hover:bg-gray-800 w-full justify-between ${
-              pathname.includes(item.path) ? "bg-gray-800" : ""
+            className={`flex flex-row items-center px-3 py-2.5 rounded-xl hover:bg-gray-800 w-full justify-between transition-colors ${
+              pathname.includes(item.path)
+                ? "bg-blue-500/10 text-blue-400"
+                : "text-gray-300"
             }`}
           >
-            <div className="flex flex-row space-x-4 items-center">
+            <div className="flex flex-row space-x-3 items-center">
               {item.icon}
-              <span className="font-semibold text-xl flex">{item.title}</span>
+              <span className="font-medium text-sm">{item.title}</span>
             </div>
-
-            <div className={`${subMenuOpen ? "rotate-180" : ""} flex`}>
-              <Icon icon="lucide:chevron-down" width="24" height="24" />
+            <div
+              className={`${subMenuOpen ? "rotate-180" : ""} flex transition-transform`}
+            >
+              <Icon icon="lucide:chevron-down" width="16" height="16" />
             </div>
           </Button>
 
           {subMenuOpen && (
-            <div className="my-2 ml-12 flex flex-col space-y-4">
+            <div className="mt-1 ml-9 flex flex-col space-y-0.5">
               {item.subMenuItems?.map((subItem, idx) => {
                 return (
                   <Link
                     key={idx}
                     href={subItem.path}
-                    className={`${
-                      subItem.path === pathname ? "font-bold" : ""
+                    className={`text-sm py-1.5 px-3 rounded-lg transition-colors ${
+                      subItem.path === pathname
+                        ? "text-blue-400 font-semibold"
+                        : "text-gray-400 hover:text-white"
                     }`}
                   >
-                    <span>{subItem.title}</span>
+                    {subItem.title}
                   </Link>
                 );
               })}
@@ -95,12 +102,14 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
       ) : (
         <Link
           href={item.path}
-          className={`flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-gray-800 ${
-            item.path === pathname ? "bg-gray-800" : ""
+          className={`flex flex-row space-x-3 items-center px-3 py-2.5 rounded-xl hover:bg-gray-800 transition-colors ${
+            item.path === pathname
+              ? "bg-blue-500/10 text-blue-400"
+              : "text-gray-300"
           }`}
         >
           {item.icon}
-          <span className="font-semibold text-xl flex">{item.title}</span>
+          <span className="font-medium text-sm">{item.title}</span>
         </Link>
       )}
     </div>
