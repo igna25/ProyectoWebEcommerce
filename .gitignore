@@ -3,6 +3,8 @@
 # dependencies
 /node_modules
 /.pnp
+/tests/playwright-report
+/tests/test-results
 .pnp.js
 .yarn/install-state.gz
 

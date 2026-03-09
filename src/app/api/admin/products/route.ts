@@ -1,10 +1,12 @@
 import ProductsRepository from "@/lib/Repositories/ProductsRepository";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { unstable_noStore as noStore } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: any) {
+  noStore();
   try {
     // Verificar autenticación
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });

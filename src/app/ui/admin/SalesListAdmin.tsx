@@ -3,10 +3,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@headlessui/react";
 import { Sale } from "@/lib/Entities";
-import {
-  saveAdminSalesToCache,
-  getAllAdminSalesFromCache,
-} from "@/lib/cache/adminCache";
 
 interface SalesListAdminProps {
   sales: Sale[];
@@ -22,16 +18,7 @@ export default function SalesListAdmin({
   const [cachedSales, setCachedSales] = useState<Sale[]>(sales);
 
   useEffect(() => {
-    if (sales.length > 0) {
-      // Guardar ventas en caché
-      saveAdminSalesToCache(sales);
-      setCachedSales(sales);
-    } else {
-      const cached = getAllAdminSalesFromCache();
-      if (cached.length > 0) {
-        setCachedSales(cached);
-      }
-    }
+    setCachedSales(sales);
   }, [sales]);
 
   return (

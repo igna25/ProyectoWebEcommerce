@@ -1,6 +1,10 @@
+"use client";
 import { Fragment } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import SideNav from "../ui/admin/sideBar/SideBar";
 import HeaderMobile from "../ui/admin/sideBar/HeaderMobile";
+import PrefetchAdminPage from "./PrefetchAdminPage";
 
 export default function RootLayout({
   children,
@@ -9,6 +13,8 @@ export default function RootLayout({
 }>) {
   return (
     <Fragment>
+      <ToastContainer position="top-right" />
+      <PrefetchAdminPage />
       <SideNav></SideNav>
       <main className="flex-1">
         <div className="flex flex-col md:ml-60 sm:border-r sm:border-zinc-700 min-h-screen">
