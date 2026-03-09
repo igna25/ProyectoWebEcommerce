@@ -143,6 +143,15 @@ function isNavigationRequest(request) {
   return request.mode === "navigate";
 }
 
+function isDocumentPrefetchRequest(request, url) {
+  if (request.method !== "GET") return false;
+  if (url.origin !== self.location.origin) return false;
+  const path = url.pathname;
+  if (path.startsWith("/api") || path.startsWith("/_next/static")) return false;
+  const accept = request.headers.get("Accept") || "";
+  return accept.includes("text/html");
+}
+
 function isProductsApi(url) {
   return url.pathname.startsWith("/api/products");
 }
@@ -273,6 +282,23 @@ self.addEventListener("fetch", (event) => {
             headers: { "Content-Type": "application/json" },
           });
         }),
+    );
+    return;
+  }
+
+  if (isDocumentPrefetchRequest(request, url)) {
+    event.respondWith(
+      fetch(request)
+        .then(async (res) => {
+          if (res.ok && res.type !== "opaqueredirect") {
+            const resClone = res.clone();
+            const cache = await caches.open(APP_SHELL_CACHE);
+            await cache.put(request, resClone);
+            await cleanOldCaches(APP_SHELL_CACHE);
+          }
+          return res;
+        })
+        .catch(() => fetch(request)),
     );
     return;
   }
