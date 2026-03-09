@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@headlessui/react";
 import { Product } from "@/lib/Entities";
 
@@ -67,6 +68,12 @@ export default function ProductsListAdmin({
                   Bajo stock
                 </span>
               )}
+              <Link
+                href={`/admin/${product.active ? "activos" : "inactivos"}/${product.id}`}
+                className="text-sm font-medium px-3 py-1.5 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+              >
+                Editar
+              </Link>
               <Button
                 onClick={() => handleToggleStatus(product.id, product.active)}
                 disabled={togglingId === product.id}
