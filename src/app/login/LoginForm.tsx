@@ -2,8 +2,6 @@
 
 import { signIn } from "next-auth/react";
 import { FormEvent } from "react";
-
-import clsx from "clsx";
 import Link from "next/link";
 
 export default function LoginForm() {
@@ -18,70 +16,65 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md px-4">
+    <div className="w-full max-w-md">
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 rounded-xl bg-white p-6 sm:p-10"
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8 space-y-5"
       >
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-800">Login</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Bienvenido de nuevo! Por favor, ingresa tus datos para continuar
-            comprando.
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Bienvenido</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Ingresá tus datos para continuar comprando.
           </p>
         </div>
-        <div>
-          <label htmlFor="email" className="text-sm font-medium text-gray-800">
+
+        <div className="space-y-1">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">
             Email
           </label>
           <input
             type="email"
             id="email"
             name="email"
-            placeholder="Email"
+            placeholder="tu@email.com"
             required
-            className={clsx(
-              "mt-3 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-            )}
+            className="block w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition"
           />
         </div>
-        <div>
+
+        <div className="space-y-1">
           <label
             htmlFor="password"
-            className="text-sm font-medium text-gray-800"
+            className="text-sm font-medium text-gray-700"
           >
-            Password
+            Contraseña
           </label>
           <input
             type="password"
             id="password"
             name="password"
-            placeholder="contraseña"
+            placeholder="••••••••"
             required
-            className={clsx(
-              "mt-3 block w-full rounded-lg border border-gray-300 bg-white py-1.5 px-3 text-sm text-gray-800",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400",
-            )}
+            className="block w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition"
           />
         </div>
-        <div className="text-center">
-          <button
-            type="submit"
-            className="mt-4 w-full rounded-lg bg-blue-600 py-2 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Sign In
-          </button>
-        </div>
 
-        <div className="text-center mt-4">
-          <p className="text-sm text-gray-600">
-            ¿No tienes una cuenta?{" "}
-            <Link href="/register" className="text-blue-600 hover:underline">
-              Regístrate aquí
-            </Link>
-          </p>
-        </div>
+        <button
+          type="submit"
+          className="w-full rounded-xl bg-[#004AAD] hover:bg-[#003d8f] py-2.5 text-sm font-semibold text-white transition-colors"
+        >
+          Iniciar sesión
+        </button>
+
+        <p className="text-center text-sm text-gray-500">
+          ¿No tenés cuenta?{" "}
+          <Link
+            href="/register"
+            className="text-[#004AAD] font-semibold hover:underline"
+          >
+            Registrate aquí
+          </Link>
+        </p>
       </form>
     </div>
   );

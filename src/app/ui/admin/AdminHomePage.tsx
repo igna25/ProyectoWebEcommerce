@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Product, Sale } from "@/lib/Entities";
 import Link from "next/link";
-import { Button } from "@headlessui/react";
 
 type AdminSummary = {
   recentSales: Sale[];
@@ -57,14 +56,14 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004AAD]"></div>
       </div>
     );
   }
 
   if (error && !summary) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
         {error}
       </div>
     );
@@ -75,62 +74,98 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <div className="mb-6 border-t-2 border-gray-300 pt-4">
-        <h2 className="text-2xl font-bold mb-4">Resumen del Administrador</h2>
+    <div className="space-y-6">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Resumen</h2>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            Total Ganado
+          </p>
+          <p className="mt-2 text-2xl font-bold text-gray-900">
+            ${summary.totalEarnings.toFixed(2)}
+          </p>
+          <div className="mt-2 h-1 w-10 rounded-full bg-[#004AAD]" />
+        </div>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            Total de Ventas
+          </p>
+          <p className="mt-2 text-2xl font-bold text-gray-900">
+            {summary.totalSales}
+          </p>
+          <div className="mt-2 h-1 w-10 rounded-full bg-[#004AAD]" />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gray-100 rounded-lg p-4">
-          <h3 className="text-xl font-semibold">Total Ganado</h3>
-          <p className="mt-2">${summary.totalEarnings.toFixed(2)}</p>
+      {/* Últimas ventas */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-gray-800">
+            Últimas 3 Ventas
+          </h3>
+          <Link
+            href="/admin/ventas"
+            className="text-sm text-[#004AAD] hover:underline font-medium"
+          >
+            Ver todas →
+          </Link>
         </div>
-
-        <div className="bg-gray-100 rounded-lg p-4">
-          <h3 className="text-xl font-semibold">Total de Ventas</h3>
-          <p className="mt-2">{summary.totalSales}</p>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-4">Últimas 3 Ventas</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {summary.recentSales.map((sale) => (
-            <div key={sale.id} className="bg-gray-100 rounded-lg p-4">
-              <p className="text-lg font-semibold">{sale.username}</p>
-              <p className="text-sm text-gray-600">${sale.totalprice}</p>
-              <p className="text-xs text-gray-500">
+            <div
+              key={sale.id}
+              className="bg-gray-50 rounded-xl p-4 border border-gray-100"
+            >
+              <p className="font-semibold text-gray-800 truncate">
+                {sale.username}
+              </p>
+              <p className="text-sm font-medium text-[#004AAD] mt-1">
+                ${sale.totalprice}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
                 {new Date(sale.creationdate).toLocaleDateString()}
               </p>
             </div>
           ))}
         </div>
-        <Link href="/admin/ventas">
-          <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-            Ir a Ventas
-          </Button>
-        </Link>
       </div>
 
-      <div>
-        <h3 className="text-xl font-semibold mb-4">Productos sin Stock</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {summary.lowStockProducts.length > 0 ? (
-            summary.lowStockProducts.map((product) => (
-              <div key={product.id} className="bg-red-100 rounded-lg p-4">
-                <p className="text-lg font-semibold">{product.productname}</p>
-                <p className="text-sm text-gray-600">Stock: {product.stock}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">Todos los productos están al día</p>
-          )}
+      {/* Productos sin stock */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-gray-800">
+            Productos sin Stock
+          </h3>
+          <Link
+            href="/admin/activos"
+            className="text-sm text-[#004AAD] hover:underline font-medium"
+          >
+            Ver productos →
+          </Link>
         </div>
-        <Link href={"/admin/activos"}>
-          <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">
-            Ir a Productos
-          </Button>
-        </Link>
+        {summary.lowStockProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {summary.lowStockProducts.map((product) => (
+              <div
+                key={product.id}
+                className="bg-red-50 rounded-xl p-4 border border-red-100"
+              >
+                <p className="font-semibold text-gray-800 truncate">
+                  {product.productname}
+                </p>
+                <span className="inline-block mt-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
+                  Stock: {product.stock}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500">
+            ✓ Todos los productos están al día
+          </p>
+        )}
       </div>
     </div>
   );

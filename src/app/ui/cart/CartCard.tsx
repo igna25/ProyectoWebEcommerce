@@ -2,8 +2,9 @@
 
 import { OrderItem } from "@/lib/Entities/Order";
 import { Product } from "@/lib/Entities/Product";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import React, { Fragment } from "react";
+import React from "react";
 
 interface CartWrapperProps {
   product: Product & OrderItem;
@@ -20,49 +21,54 @@ const CartWrapper: React.FC<CartWrapperProps> = ({
   onRemove,
 }) => {
   return (
-    <Fragment>
-      <div className="bg-white rounded-lg shadow-lg p-4 m-4 flex flex-col md:flex-row items-center hover:shadow-xl transition-shadow">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+      <div className="relative w-20 h-20 shrink-0">
         <Image
           src={product.imageurl}
           alt={product.productname}
-          className="w-16 h-16 object-cover rounded-full"
-          width={64}
-          height={64}
+          fill
+          className="object-cover rounded-xl"
+          sizes="80px"
         />
-        <div className="flex-1 flex flex-col justify-between px-4 mt-2 md:mt-0">
-          <div>
-            <div className="font-bold text-xl mb-2">{product.productname}</div>
-            <p className="text-gray-700 text-base mb-2">
-              Precio unitario: ${product.productprice}
-            </p>
-            <p className="text-gray-700 text-base mb-2">
-              Total: ${(product.productprice * product.quantity).toFixed(2)}
-            </p>
-          </div>
-          <div className="flex items-center mt-2 md:mt-0">
-            <button
-              className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-gray-400"
-              onClick={() => onDecrease(product.id)}
-            >
-              -
-            </button>
-            <span className="mx-2">{product.quantity}</span>
-            <button
-              className="bg-gray-300 text-gray-700 px-2 py-1 rounded hover:bg-gray-400"
-              onClick={() => onIncrease(product.id)}
-            >
-              +
-            </button>
-            <button
-              className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400 ml-4"
-              onClick={() => onRemove(product.id)}
-            >
-              Quitar producto
-            </button>
-          </div>
-        </div>
       </div>
-    </Fragment>
+
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-gray-900 truncate">
+          {product.productname}
+        </p>
+        <p className="text-sm text-gray-500 mt-0.5">
+          ${product.productprice} c/u
+        </p>
+        <p className="text-sm font-bold text-[#004AAD] mt-0.5">
+          Total: ${(product.productprice * product.quantity).toFixed(2)}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          onClick={() => onDecrease(product.id)}
+          className="w-8 h-8 flex items-center justify-center text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors font-bold"
+        >
+          −
+        </button>
+        <span className="w-6 text-center text-sm font-semibold text-gray-900">
+          {product.quantity}
+        </span>
+        <button
+          onClick={() => onIncrease(product.id)}
+          className="w-8 h-8 flex items-center justify-center text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors font-bold"
+        >
+          +
+        </button>
+        <button
+          onClick={() => onRemove(product.id)}
+          className="w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-lg transition-colors ml-1"
+          aria-label="Quitar producto"
+        >
+          <TrashIcon className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
   );
 };
 

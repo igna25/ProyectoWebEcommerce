@@ -1,240 +1,169 @@
 "use client";
 
-import React, { ReactNode, useEffect, useRef, useState } from "react";
-
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@headlessui/react";
 
 import { SIDENAV_ITEMS } from "./Constants";
 import { SideNavItem } from "./Types";
 import { Icon } from "@iconify/react";
-import { motion, useCycle } from "framer-motion";
-
-type MenuItemWithSubMenuProps = {
-  item: SideNavItem;
-  toggleOpen: () => void;
-};
-
-const sidebar = {
-  open: (height = 1000) => ({
-    clipPath: `circle(${height * 2 + 200}px at 100% 0)`,
-    transition: {
-      type: "spring",
-      stiffness: 20,
-      restDelta: 2,
-    },
-  }),
-  closed: {
-    clipPath: "circle(0px at 100% 0)",
-    transition: {
-      type: "spring",
-      stiffness: 400,
-      damping: 40,
-    },
-  },
-};
+import { signOut } from "next-auth/react";
 
 const HeaderMobile = () => {
-  const pathname = usePathname();
-  const containerRef = useRef(null);
-  const { height } = useDimensions(containerRef);
-  const [isOpen, toggleOpen] = useCycle(false, true);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen((prev) => !prev);
+  const closeMenu = () => setIsOpen(false);
 
   return (
-    <motion.nav
-      initial={false}
-      animate={isOpen ? "open" : "closed"}
-      custom={height}
-      className={`fixed inset-0 z-50 w-full md:hidden ${
-        isOpen ? "" : "pointer-events-none"
-      }`}
-      ref={containerRef}
-    >
-      <motion.div
-        className="absolute inset-0 right-0 w-full bg-white"
-        variants={sidebar}
-      />
-      <motion.ul
-        variants={variants}
-        className="absolute grid w-full gap-3 px-10 py-16 max-h-screen overflow-y-auto"
+    <>
+      {/* Barra superior fija */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-gray-900 flex items-center justify-between px-4 border-b border-gray-700">
+        <Link
+          href="/admin"
+          onClick={closeMenu}
+          className="font-bold text-lg text-white"
+        >
+          IAW<span className="text-[#004AAD]">.</span>
+        </Link>
+        <button
+          onClick={toggleMenu}
+          className="text-gray-300 hover:text-white p-1 rounded"
+          aria-label="Abrir menú"
+        >
+          {isOpen ? (
+            <Icon icon="lucide:x" width="22" height="22" />
+          ) : (
+            <Icon icon="lucide:menu" width="22" height="22" />
+          )}
+        </button>
+      </header>
+
+      {/* Overlay oscuro */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/50"
+          onClick={closeMenu}
+        />
+      )}
+
+      {/* Drawer lateral desde la izquierda */}
+      <nav
+        className={`md:hidden fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        {SIDENAV_ITEMS.map((item, idx) => {
-          const isLastItem = idx === SIDENAV_ITEMS.length - 1;
+        {/* Encabezado del drawer */}
+        <div className="flex items-center justify-between px-5 h-12 border-b border-gray-700 flex-shrink-0">
+          <Link
+            href="/admin"
+            onClick={closeMenu}
+            className="font-bold text-lg text-white"
+          >
+            IAW<span className="text-[#004AAD]">.</span>
+          </Link>
+          <button
+            onClick={closeMenu}
+            className="text-gray-400 hover:text-white"
+            aria-label="Cerrar menú"
+          >
+            <Icon icon="lucide:x" width="20" height="20" />
+          </button>
+        </div>
 
-          return (
-            <div key={idx}>
-              {item.submenu ? (
-                <MenuItemWithSubMenu item={item} toggleOpen={toggleOpen} />
-              ) : (
-                <MenuItem>
-                  <Link
-                    href={item.path}
-                    onClick={() => toggleOpen()}
-                    className={`flex w-full text-2xl ${
-                      item.path === pathname ? "font-bold" : ""
-                    }`}
-                  >
-                    {item.title}
-                  </Link>
-                </MenuItem>
-              )}
+        {/* Ítems de navegación */}
+        <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
+          {SIDENAV_ITEMS.map((item, idx) => (
+            <NavItem key={idx} item={item} closeMenu={closeMenu} />
+          ))}
+        </div>
 
-              {!isLastItem && (
-                <MenuItem className="my-3 h-px w-full bg-gray-300" />
-              )}
-            </div>
-          );
-        })}
-      </motion.ul>
-      <MenuToggle toggle={toggleOpen} />
-    </motion.nav>
+        {/* Botón cerrar sesión */}
+        <div className="border-t border-gray-700 p-4">
+          <button
+            onClick={() => {
+              signOut();
+              closeMenu();
+            }}
+            className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+          >
+            <Icon icon="lucide:log-out" width="18" height="18" />
+            Cerrar sesión
+          </button>
+        </div>
+      </nav>
+    </>
   );
 };
 
 export default HeaderMobile;
 
-const MenuToggle = ({ toggle }: { toggle: any }) => (
-  <Button
-    onClick={toggle}
-    className="pointer-events-auto absolute right-4 top-[14px] z-30"
-  >
-    <svg width="23" height="23" viewBox="0 0 23 23">
-      <Path
-        variants={{
-          closed: { d: "M 2 2.5 L 20 2.5" },
-          open: { d: "M 3 16.5 L 17 2.5" },
-        }}
-      />
-      <Path
-        d="M 2 9.423 L 20 9.423"
-        variants={{
-          closed: { opacity: 1 },
-          open: { opacity: 0 },
-        }}
-        transition={{ duration: 0.1 }}
-      />
-      <Path
-        variants={{
-          closed: { d: "M 2 16.346 L 20 16.346" },
-          open: { d: "M 3 2.5 L 17 16.346" },
-        }}
-      />
-    </svg>
-  </Button>
-);
-
-const Path = (props: any) => (
-  <motion.path
-    fill="transparent"
-    strokeWidth="2"
-    stroke="hsl(0, 0%, 18%)"
-    strokeLinecap="round"
-    {...props}
-  />
-);
-
-const MenuItem = ({
-  className,
-  children,
-}: {
-  className?: string;
-  children?: ReactNode;
-}) => {
-  return (
-    <motion.li variants={MenuItemVariants} className={className}>
-      {children}
-    </motion.li>
-  );
-};
-
-const MenuItemWithSubMenu: React.FC<MenuItemWithSubMenuProps> = ({
+const NavItem = ({
   item,
-  toggleOpen,
+  closeMenu,
+}: {
+  item: SideNavItem;
+  closeMenu: () => void;
 }) => {
   const pathname = usePathname();
   const [subMenuOpen, setSubMenuOpen] = useState(false);
 
-  return (
-    <>
-      <MenuItem>
-        <Button
-          className="flex w-full text-2xl"
-          onClick={() => setSubMenuOpen(!subMenuOpen)}
+  if (item.submenu) {
+    return (
+      <div>
+        <button
+          onClick={() => setSubMenuOpen((prev) => !prev)}
+          className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-colors ${
+            pathname.includes(item.path)
+              ? "bg-[#004AAD]/20 text-[#60a5fa]"
+              : "text-gray-300 hover:bg-gray-800 hover:text-white"
+          }`}
         >
-          <div className="flex flex-row justify-between w-full items-center">
-            <span
-              className={`${pathname.includes(item.path) ? "font-bold" : ""}`}
-            >
-              {item.title}
-            </span>
-            <div className={`${subMenuOpen && "rotate-180"}`}>
-              <Icon icon="lucide:chevron-down" width="24" height="24" />
-            </div>
+          <div className="flex items-center gap-3">
+            {item.icon}
+            <span className="font-medium">{item.title}</span>
           </div>
-        </Button>
-      </MenuItem>
-      <div className="mt-2 ml-2 flex flex-col space-y-2">
+          <Icon
+            icon="lucide:chevron-down"
+            width="16"
+            height="16"
+            className={`transition-transform ${subMenuOpen ? "rotate-180" : ""}`}
+          />
+        </button>
         {subMenuOpen && (
-          <>
-            {item.subMenuItems?.map((subItem, subIdx) => {
-              return (
-                <MenuItem key={subIdx}>
-                  <Link
-                    href={subItem.path}
-                    onClick={() => toggleOpen()}
-                    className={` ${
-                      subItem.path === pathname ? "font-bold" : ""
-                    }`}
-                  >
-                    {subItem.title}
-                  </Link>
-                </MenuItem>
-              );
-            })}
-          </>
+          <div className="ml-8 mt-1 space-y-1">
+            {item.subMenuItems?.map((subItem, idx) => (
+              <Link
+                key={idx}
+                href={subItem.path}
+                onClick={closeMenu}
+                className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
+                  subItem.path === pathname
+                    ? "bg-[#004AAD]/20 text-[#60a5fa]"
+                    : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                }`}
+              >
+                {subItem.title}
+              </Link>
+            ))}
+          </div>
         )}
       </div>
-    </>
+    );
+  }
+
+  return (
+    <Link
+      href={item.path}
+      onClick={closeMenu}
+      className={`flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors ${
+        item.path === pathname
+          ? "bg-[#004AAD]/20 text-[#60a5fa]"
+          : "text-gray-300 hover:bg-gray-800 hover:text-white"
+      }`}
+    >
+      {item.icon}
+      <span className="font-medium">{item.title}</span>
+    </Link>
   );
-};
-
-const MenuItemVariants = {
-  open: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      y: { stiffness: 1000, velocity: -100 },
-    },
-  },
-  closed: {
-    y: 50,
-    opacity: 0,
-    transition: {
-      y: { stiffness: 1000 },
-      duration: 0.02,
-    },
-  },
-};
-
-const variants = {
-  open: {
-    transition: { staggerChildren: 0.02, delayChildren: 0.15 },
-  },
-  closed: {
-    transition: { staggerChildren: 0.01, staggerDirection: -1 },
-  },
-};
-
-const useDimensions = (ref: any) => {
-  const dimensions = useRef({ width: 0, height: 0 });
-
-  useEffect(() => {
-    if (ref.current) {
-      dimensions.current.width = ref.current.offsetWidth;
-      dimensions.current.height = ref.current.offsetHeight;
-    }
-  }, [ref]);
-
-  return dimensions.current;
 };
