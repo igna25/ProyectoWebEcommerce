@@ -40,7 +40,7 @@ async function fillForm(
   }
 }
 
-test.describe("Admin — Crear Producto (/admin/nuevo)", () => {
+test.describe("Admin — Crear y Editar un Producto (/admin/nuevo)", () => {
   test.describe("Control de acceso", () => {
     test("usuario no autenticado es redirigido a /login", async ({ page }) => {
       await page.goto(ROUTES.adminNuevo);
@@ -251,5 +251,37 @@ test.describe("Admin — Crear Producto (/admin/nuevo)", () => {
       await expect(page.locator("#price")).toHaveValue("");
       await expect(page.locator("#stock")).toHaveValue("");
     });
+  });
+
+  test.describe("Editar un producto", ()=>{
+    test.beforeEach(async ({page})=>{
+      await loginAs(page, ADMIN_USER.email, ADMIN_USER.password);
+      await page.goto(ROUTES.adminActivos);
+      await page.locator("text=Editar").first().click();
+      await expect(page).toHaveURL(/\/admin\/activos\/.*/);
+    });
+
+    test("muestra el formulario de edición con los datos del producto", async ({page})=>{
+      await expect(page.locator("#productName")).toBeVisible();
+      await expect(page.locator("#description")).toBeVisible();
+      await expect(page.locator("#price")).toBeVisible();
+      await expect(page.locator("#stock")).toBeVisible();
+      await expect(page.locator('input[type="file"]')).toBeAttached();
+    });
+
+    test("Edición exitosa del producto", async ({page})=>{
+      await fillForm(page, {
+        name: "Test edición playwrgiht",
+        description: "Descripción generada automáticamente por Playwright para pruebas E2E",
+        price: "99.99",
+        stock: "10",
+        withImage: true,
+      });
+      await page.click('button[type="submit"]');
+      await expect(
+        page.getByText("Producto actualizado exitosamente"),
+      ).toBeVisible({ timeout: 20000 });
+    });
+
   });
 });
