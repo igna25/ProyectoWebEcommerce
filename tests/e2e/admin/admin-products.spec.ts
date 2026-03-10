@@ -20,6 +20,13 @@ async function goToNuevo(page: Page) {
   await expect(page.locator("#productName")).toBeVisible();
 }
 
+async function logoutViaUI(page: Page) {
+  await page.click("text=Cerrar sesión");
+  await page.waitForURL((url) => !url.toString().includes("/admin"), {
+    timeout: 10000,
+  });
+}
+
 async function fillForm(
   page: Page,
   fields: {
@@ -253,6 +260,43 @@ test.describe("Admin — Crear y Editar un Producto (/admin/nuevo)", () => {
     });
   });
 
+  test.describe("Verificación pública — producto creado", () => {
+    test("el producto creado es visible en la página pública del dashboard", async ({
+      page,
+    }) => {
+      const uniqueName = `Playwright Creación ${Date.now()}`;
+      const description =
+        "Descripción generada automáticamente por Playwright para pruebas E2E";
+      const price = "99.99";
+
+      await goToNuevo(page);
+      await fillForm(page, {
+        name: uniqueName,
+        description,
+        price,
+        stock: "10",
+        withImage: true,
+      });
+      await page.click('button[type="submit"]');
+      await expect(
+        page.getByText("Producto creado exitosamente"),
+      ).toBeVisible({ timeout: 20000 });
+
+      const res = await page.request.get("/api/admin/products?pageSize=100");
+      const data = await res.json();
+      const created = data.products.find(
+        (p: { productname: string }) => p.productname === uniqueName,
+      );
+      expect(created).toBeDefined();
+
+      await logoutViaUI(page);
+      await page.goto(`/dashboard/${created.id}`);
+      await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(`$${price}`)).toBeVisible();
+      await expect(page.getByText(description)).toBeVisible();
+    });
+  });
+
   test.describe("Editar un producto", ()=>{
     test.beforeEach(async ({page})=>{
       await loginAs(page, ADMIN_USER.email, ADMIN_USER.password);
@@ -269,10 +313,11 @@ test.describe("Admin — Crear y Editar un Producto (/admin/nuevo)", () => {
       await expect(page.locator('input[type="file"]')).toBeAttached();
     });
 
-    test("Edición exitosa del producto", async ({page})=>{
+    test("Edición exitosa del producto", async ({ page }) => {
       await fillForm(page, {
-        name: "Test edición playwrgiht",
-        description: "Descripción generada automáticamente por Playwright para pruebas E2E",
+        name: "Test edición playwright",
+        description:
+          "Descripción generada automáticamente por Playwright para pruebas E2E",
         price: "99.99",
         stock: "10",
         withImage: true,
@@ -283,5 +328,35 @@ test.describe("Admin — Crear y Editar un Producto (/admin/nuevo)", () => {
       ).toBeVisible({ timeout: 20000 });
     });
 
+    test("el producto editado refleja los cambios en la página pública", async ({
+      page,
+    }) => {
+      const uniqueName = `Playwright Edición ${Date.now()}`;
+      const description =
+        "Descripción editada automáticamente por Playwright para pruebas E2E";
+      const price = "149.99";
+
+      await fillForm(page, {
+        name: uniqueName,
+        description,
+        price,
+        stock: "5",
+        withImage: true,
+      });
+      await page.click('button[type="submit"]');
+      await expect(
+        page.getByText("Producto actualizado exitosamente"),
+      ).toBeVisible({ timeout: 20000 });
+
+      const url = page.url();
+      const productId = url.split("/").pop();
+      expect(productId).toMatch(/\d+/);
+
+      await logoutViaUI(page);
+      await page.goto(`/dashboard/${productId}`);
+      await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(`$${price}`)).toBeVisible();
+      await expect(page.getByText(description)).toBeVisible();
+    });
   });
 });
