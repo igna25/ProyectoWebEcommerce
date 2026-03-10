@@ -2,16 +2,14 @@
 import { signOut } from "next-auth/react";
 
 const LogoutButton = () => {
-  const authButtonHandler = () => {
-    signOut();
-  };
   return (
     <button
-      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none"
-      onClick={authButtonHandler}
+      onClick={() => signOut()}
+      className="px-4 py-1.5 text-sm font-semibold text-white bg-[#004AAD] hover:bg-[#003d8f] rounded-lg transition-colors"
     >
-      Logout
+      Cerrar sesión
     </button>
   );
 };
+
 export default LogoutButton;
