@@ -30,6 +30,8 @@ export default function ProductList({
 }) {
   const router = useRouter();
   const [products, setProducts] = useState<EnrichedCartItem[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
 
   const enrichCartItems = (): EnrichedCartItem[] => {
     const cartItems = getLocalCart();
@@ -80,19 +82,27 @@ export default function ProductList({
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
+    setPurchaseError(null);
     try {
-      if (userId && navigator.onLine) {
-        await syncCartToServer(userId);
-        const result = await buyProducts(userId);
-        if (result.success && result.redirectUrl)
-          router.push(result.redirectUrl);
+      let result;
+      if (userId) {
+        if (navigator.onLine) {
+          await syncCartToServer(userId);
+        }
+        result = await buyProducts(userId);
       } else {
-        const result = await buyProductsLocal(products);
-        if (result.success && result.redirectUrl)
-          router.push(result.redirectUrl);
+        result = await buyProductsLocal(products);
       }
-    } catch (error) {
-      console.error("Error al enviar datos:", error);
+      if (result.success && result.redirectUrl) {
+        router.push(result.redirectUrl);
+      } else {
+        setPurchaseError("No se pudo completar la compra. Intenta de nuevo.");
+      }
+    } catch {
+      setPurchaseError("Ocurrió un error al procesar la compra.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -162,11 +172,15 @@ export default function ProductList({
           </span>
         </div>
 
+        {purchaseError && (
+          <p className="text-sm text-red-600 text-center">{purchaseError}</p>
+        )}
         <button
           onClick={handleSubmit}
-          className="w-full py-3 bg-[#004AAD] hover:bg-[#003d8f] text-white text-sm font-semibold rounded-xl transition-colors"
+          disabled={submitting}
+          className="w-full py-3 bg-[#004AAD] hover:bg-[#003d8f] text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Confirmar compra
+          {submitting ? "Procesando..." : "Confirmar compra"}
         </button>
       </div>
     </div>
