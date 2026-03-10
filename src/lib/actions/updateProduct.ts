@@ -95,7 +95,7 @@ export async function updateProduct(formData: FormData) {
       });
 
       if (result) {
-        imageURL = result.url;
+        imageURL = result.secure_url;
         imageKey = result.public_id;
       }
     }

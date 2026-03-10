@@ -71,7 +71,7 @@ export async function createProduct(formData: FormData) {
       const product = {
         productName: String(productName),
         description: String(description),
-        imageURL: result.url,
+        imageURL: result.secure_url,
         imageKey: result.public_id,
         price: Number(price),
         stock: Number(stock),
