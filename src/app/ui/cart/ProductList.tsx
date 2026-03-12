@@ -7,7 +7,7 @@ import { Product } from "@/lib/Entities/Product";
 import { OrderItem } from "@/lib/Entities/Order";
 import { buyProducts } from "@/lib/actions/buyProducts";
 import { buyProductsLocal } from "@/lib/actions/buyProductsLocal";
-import { useRouter } from "next/navigation";
+
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 import {
   getLocalCart,
@@ -28,7 +28,6 @@ export default function ProductList({
 }: {
   userId: string | undefined;
 }) {
-  const router = useRouter();
   const [products, setProducts] = useState<EnrichedCartItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
@@ -95,7 +94,7 @@ export default function ProductList({
         result = await buyProductsLocal(products);
       }
       if (result.success && result.redirectUrl) {
-        router.push(result.redirectUrl);
+        window.location.href = result.redirectUrl;
       } else {
         setPurchaseError("No se pudo completar la compra. Intenta de nuevo.");
       }

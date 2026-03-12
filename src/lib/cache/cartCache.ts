@@ -126,8 +126,15 @@ export async function syncCartToServer(userId: string): Promise<boolean> {
       productprice: item.productprice,
     }));
 
-    saveProductsToLocalCache(serverItems);
-    saveLocalCart(simplifiedItems);
+    const productCacheItems = serverItems.map((item: any) => ({
+      ...item,
+      id: item.productid,
+    }));
+    saveProductsToLocalCache(productCacheItems);
+
+    if (simplifiedItems.length > 0 || localItems.length === 0) {
+      saveLocalCart(simplifiedItems);
+    }
     window.dispatchEvent(new Event("cartUpdated"));
     return true;
   } catch {
