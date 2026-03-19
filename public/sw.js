@@ -1,6 +1,5 @@
-const CACHE_VERSION = "v12";
+const CACHE_VERSION = "v13";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
-const RSC_CACHE = `rsc-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
 const IMAGES_CACHE = `images-${CACHE_VERSION}`;
@@ -121,7 +120,6 @@ self.addEventListener("activate", (event) => {
               (key) =>
                 ![
                   APP_SHELL_CACHE,
-                  RSC_CACHE,
                   RUNTIME_API_CACHE,
                   ADMIN_API_CACHE,
                   IMAGES_CACHE,
@@ -192,15 +190,6 @@ async function precacheAdminPages(currentPath) {
   );
 }
 
-function isRscPayload(request, url) {
-  return (
-    !url.pathname.startsWith("/_next") &&
-    !url.pathname.startsWith("/api") &&
-    (url.searchParams.has("_rsc") ||
-      request.headers.get("RSC") === "1" ||
-      request.headers.get("Next-Router-State-Tree") !== null)
-  );
-}
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
@@ -237,32 +226,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (isRscPayload(request, url)) {
-    const normalizedUrl = new URL(request.url);
-    normalizedUrl.searchParams.delete("_rsc");
-    const cacheKey = normalizedUrl.toString();
-
-    event.respondWith(
-      fetch(request)
-        .then(async (res) => {
-          if (res.ok) {
-            const resClone = res.clone();
-            const cache = await caches.open(RSC_CACHE);
-            await cache.put(cacheKey, resClone);
-          }
-          return res;
-        })
-        .catch(async () => {
-          const rscCache = await caches.open(RSC_CACHE);
-          const cached =
-            (await rscCache.match(cacheKey, { ignoreVary: true })) ||
-            (await rscCache.match(request, { ignoreSearch: true, ignoreVary: true }));
-          if (cached) return cached;
-          return caches.match(OFFLINE_URL);
-        }),
-    );
-    return;
-  }
 
   if (isSessionApi(url)) {
     event.respondWith(
