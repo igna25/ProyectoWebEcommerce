@@ -10,7 +10,7 @@ const cartsRepository = new CartsRepository();
 const orderItemsRepository = new OrderItemsRepository();
 export async function buyProducts(
   userID: string,
-): Promise<{ success: boolean; redirectUrl: string | undefined }> {
+): Promise<{ success: boolean; redirectUrl: string | undefined; outOfStock?: string[] }> {
   try {
     const cart = await cartsRepository.getCartByUserId(userID);
     if (!cart) {
@@ -21,6 +21,15 @@ export async function buyProducts(
       if (orderItems.length === 0) {
         throw new Error(`No order items found for cart ID ${cart.id}.`);
       }
+
+      const outOfStock = orderItems
+        .filter((item) => item.stock < item.quantity)
+        .map((item) => item.productname);
+
+      if (outOfStock.length > 0) {
+        return { success: false, redirectUrl: undefined, outOfStock };
+      }
+
       const items = orderItems.map((orderItem) => {
         return {
           id: orderItem.productid,
@@ -49,12 +58,7 @@ export async function buyProducts(
       };
     }
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Failed to complete purchase:", error);
-      return { success: false, redirectUrl: undefined };
-    } else {
-      console.error("Failed to complete purchase:", error);
-      return { success: false, redirectUrl: undefined };
-    }
+    console.error("Failed to complete purchase:", error);
+    return { success: false, redirectUrl: undefined };
   }
 }

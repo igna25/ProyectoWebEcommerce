@@ -80,6 +80,8 @@ export default function ProductList({
     if (userId && navigator.onLine) syncCartToServer(userId).catch(() => {});
   };
 
+  const outOfStockProducts = products.filter((p) => p.stock === 0);
+
   const handleSubmit = async () => {
     setSubmitting(true);
     setPurchaseError(null);
@@ -95,6 +97,10 @@ export default function ProductList({
       }
       if (result.success && result.redirectUrl) {
         window.location.href = result.redirectUrl;
+      } else if (result.outOfStock && result.outOfStock.length > 0) {
+        setPurchaseError(
+          `Sin stock: ${result.outOfStock.join(", ")}`,
+        );
       } else {
         setPurchaseError("No se pudo completar la compra. Intenta de nuevo.");
       }
@@ -169,12 +175,27 @@ export default function ProductList({
           <p className="text-2xl font-extrabold text-[#004AAD]">${total}</p>
         </div>
 
+        {outOfStockProducts.length > 0 && (
+          <div className="rounded-xl bg-red-50 border border-red-100 p-3 flex flex-col gap-1">
+            <p className="text-xs font-semibold text-red-700">
+              Los siguientes productos no tienen stock:
+            </p>
+            <ul className="list-disc list-inside">
+              {outOfStockProducts.map((p) => (
+                <li key={p.id} className="text-xs text-red-600">
+                  {p.productname}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {purchaseError && (
           <p className="text-sm text-red-600 text-center">{purchaseError}</p>
         )}
         <button
           onClick={handleSubmit}
-          disabled={submitting}
+          disabled={submitting || outOfStockProducts.length > 0}
           className="w-full py-3 bg-[#004AAD] hover:bg-[#003d8f] text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {submitting ? "Procesando..." : "Confirmar compra"}

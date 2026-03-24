@@ -17,8 +17,16 @@ const ordersItemsRepository = new OrderItemsRepository();
 
 export async function buyProductsLocal(
   cartProducts: (OrderItem & Product)[],
-): Promise<{ success: boolean; redirectUrl: string | undefined }> {
+): Promise<{ success: boolean; redirectUrl: string | undefined; outOfStock?: string[] }> {
   try {
+    const outOfStock = cartProducts
+      .filter((item) => item.stock < item.quantity)
+      .map((item) => item.productname);
+
+    if (outOfStock.length > 0) {
+      return { success: false, redirectUrl: undefined, outOfStock };
+    }
+
     const usersRepository = new UsersRepository();
     const user = await usersRepository.getUsersByName("Guest User");
 
