@@ -8,9 +8,11 @@ const client = new MercadoPagoConfig({
 });
 const cartsRepository = new CartsRepository();
 const orderItemsRepository = new OrderItemsRepository();
-export async function buyProducts(
-  userID: string,
-): Promise<{ success: boolean; redirectUrl: string | undefined; outOfStock?: string[] }> {
+export async function buyProducts(userID: string): Promise<{
+  success: boolean;
+  redirectUrl: string | undefined;
+  outOfStock?: string[];
+}> {
   try {
     const cart = await cartsRepository.getCartByUserId(userID);
     if (!cart) {
@@ -27,7 +29,11 @@ export async function buyProducts(
         .map((item) => item.productname);
 
       if (outOfStock.length > 0) {
-        return { success: false, redirectUrl: undefined, outOfStock };
+        return {
+          success: false,
+          redirectUrl: undefined,
+          outOfStock,
+        };
       }
 
       const items = orderItems.map((orderItem) => {

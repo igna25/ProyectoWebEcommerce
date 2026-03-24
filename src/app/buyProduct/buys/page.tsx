@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import SaleSummary from "@/app/ui/buyProduct/SaleSummary";
 import Pagination from "@/app/ui/dashboard/Pagination";
+import Link from "next/link";
 
-export default function BuysPage() {
+function BuysPageContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [sales, setSales] = useState<any[]>([]);
@@ -29,18 +30,28 @@ export default function BuysPage() {
   }, [session?.user?.id, currentPage]);
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+          Mis compras
+        </h1>
+        <Link
+          href="/dashboard"
+          className="self-start sm:self-auto px-5 py-2 bg-[#004AAD] hover:bg-[#003d8f] text-white text-sm font-semibold rounded-xl transition-colors"
+        >
+          Seguir comprando
+        </Link>
+      </div>
+
       {sales.length === 0 ? (
-        <div className="h-screen flex items-center justify-center bg-gray-100">
-          <div className="text-center text-gray-700">
-            <p className="text-xl">
-              Parece que no encontramos resultados para su búsqueda...
-            </p>
+        <div className="flex items-center justify-center py-24">
+          <div className="text-center text-gray-500">
+            <p className="text-lg">Todavía no realizaste ninguna compra.</p>
           </div>
         </div>
       ) : (
         <div className="flex flex-col items-center">
-          <div className="w-full max-w-4xl mx-4 ">
+          <div className="w-full max-w-4xl">
             {sales.map((sale) => (
               <div key={sale.id} className="w-full items-center">
                 <SaleSummary sale={sale} />
@@ -51,5 +62,13 @@ export default function BuysPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BuysPage() {
+  return (
+    <Suspense>
+      <BuysPageContent />
+    </Suspense>
   );
 }

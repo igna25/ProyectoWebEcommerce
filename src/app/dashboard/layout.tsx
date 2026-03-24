@@ -10,9 +10,7 @@ export default function RootLayout({
       <NavBar></NavBar>
       <main className="flex-1">
         <div className="flex flex-col pt-2 px-2 space-y-2 bg-zinc-100 flex-grow pb-4">
-          <Suspense>
-            {children}
-          </Suspense>
+          <Suspense>{children}</Suspense>
         </div>
       </main>
     </Fragment>

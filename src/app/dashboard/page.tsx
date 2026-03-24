@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Product } from "@/lib/Entities/Product";
@@ -9,7 +9,7 @@ import SearchBar from "../ui/dashboard/SearchBar";
 
 const ITEMS_PER_PAGE = 6;
 
-export default function DashboardPage() {
+function DashboardContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
 
@@ -33,7 +33,9 @@ export default function DashboardPage() {
       });
       if (query) params.set("query", query);
 
-      const res = await fetch(`/api/products?${params}`, { credentials: "include" });
+      const res = await fetch(`/api/products?${params}`, {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("fetch failed");
 
       const data = await res.json();
@@ -83,11 +85,26 @@ export default function DashboardPage() {
           </div>
         ) : (
           <section>
-            <ProductListDashboard products={products} userId={session?.user.id} />
-            <Pagination totalPages={totalPages} currentPage={currentPage} query={query} />
+            <ProductListDashboard
+              products={products}
+              userId={session?.user.id}
+            />
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              query={query}
+            />
           </section>
         )}
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }

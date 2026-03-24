@@ -53,7 +53,10 @@ export default async function processPayment(
 
     await Promise.all(
       orderItems.map((orderItem) =>
-        productsRepository.decreaseStock(orderItem.productid, orderItem.quantity),
+        productsRepository.decreaseStock(
+          orderItem.productid,
+          orderItem.quantity,
+        ),
       ),
     );
 

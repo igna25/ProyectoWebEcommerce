@@ -98,9 +98,7 @@ export default function ProductList({
       if (result.success && result.redirectUrl) {
         window.location.href = result.redirectUrl;
       } else if (result.outOfStock && result.outOfStock.length > 0) {
-        setPurchaseError(
-          `Sin stock: ${result.outOfStock.join(", ")}`,
-        );
+        setPurchaseError(`Sin stock: ${result.outOfStock.join(", ")}`);
       } else {
         setPurchaseError("No se pudo completar la compra. Intenta de nuevo.");
       }

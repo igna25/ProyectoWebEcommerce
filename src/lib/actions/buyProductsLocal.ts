@@ -17,7 +17,11 @@ const ordersItemsRepository = new OrderItemsRepository();
 
 export async function buyProductsLocal(
   cartProducts: (OrderItem & Product)[],
-): Promise<{ success: boolean; redirectUrl: string | undefined; outOfStock?: string[] }> {
+): Promise<{
+  success: boolean;
+  redirectUrl: string | undefined;
+  outOfStock?: string[];
+}> {
   try {
     const outOfStock = cartProducts
       .filter((item) => item.stock < item.quantity)
