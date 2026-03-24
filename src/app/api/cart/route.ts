@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from "next/cache";
 
 export async function GET(request: Request) {
-  noStore()
+  noStore();
   try {
     const { searchParams: searchParameters } = new URL(request.url || "");
     const userId = (searchParameters.get("userId") || "").trim();

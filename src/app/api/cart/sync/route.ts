@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       }>;
     };
 
-    console.log(rawItems)
+    console.log(rawItems);
 
     const userId = (rawUserId || "").trim();
     const requestedItems = Array.isArray(rawItems) ? rawItems : [];

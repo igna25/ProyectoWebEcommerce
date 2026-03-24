@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import { unstable_noStore as noStore } from "next/cache";
 
 export async function GET(req: any) {
-  noStore()
+  noStore();
   try {
     const productsRepository = new ProductsRepository();
     const { searchParams } = new URL(req.url || "");

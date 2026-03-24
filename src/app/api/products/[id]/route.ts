@@ -5,7 +5,7 @@ import { unstable_noStore as noStore } from "next/cache";
 export const dynamic = "force-dynamic";
 
 export async function GET(_req: any, context: { params: { id: string } }) {
-  noStore()
+  noStore();
   try {
     const { id } = context.params;
     const productsRepository = new ProductsRepository();
