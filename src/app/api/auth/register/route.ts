@@ -1,21 +1,22 @@
 import { NextResponse } from "next/server";
-import { hash } from "bcrypt";
-import { sql } from "@vercel/postgres";
+import UsersRepository from "@/lib/Repositories/UsersRepository";
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
-    // validate email and password
+    const { email, username, password } = await request.json();
 
-    const hashedPassword = await hash(password, 10);
+    if (!email || !username || !password) {
+      return NextResponse.json({ message: "Faltan campos" }, { status: 400 });
+    }
 
-    await sql`
-      INSERT INTO users (email, password)
-      VALUES (${email}, ${hashedPassword})
-    `;
+    const usersRepository = new UsersRepository();
+    await usersRepository.registerUser(email, username, password);
+
+    return NextResponse.json({ message: "success" }, { status: 201 });
   } catch (e) {
-    console.log({ e });
+    return NextResponse.json(
+      { message: "El email ya está registrado" },
+      { status: 409 },
+    );
   }
-
-  return NextResponse.json({ message: "success" });
 }

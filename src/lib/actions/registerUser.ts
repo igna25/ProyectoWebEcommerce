@@ -1,3 +1,5 @@
+"use server";
+
 import UsersRepository from "../Repositories/UsersRepository";
 
 export async function registerUser(

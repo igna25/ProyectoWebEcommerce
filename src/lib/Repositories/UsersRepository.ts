@@ -22,8 +22,8 @@ class UsersRepository {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       await sql`
-        INSERT INTO users (email, username, password)
-        VALUES (${email}, ${username}, ${hashedPassword})
+        INSERT INTO users (email, name, password, role)
+        VALUES (${email}, ${username}, ${hashedPassword}, 'user')
       `;
       return true;
     } catch (error) {
