@@ -1,18 +1,31 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
     const formData = new FormData(e.currentTarget);
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
-      redirect: true,
+      redirect: false,
     });
+    setLoading(false);
+    if (result?.error) {
+      setError("Email o contraseña incorrectos.");
+    } else {
+      router.push("/");
+    }
   };
 
   return (
@@ -59,11 +72,16 @@ export default function LoginForm() {
           />
         </div>
 
+        {error && (
+          <p className="text-sm text-red-600 text-center">{error}</p>
+        )}
+
         <button
           type="submit"
-          className="w-full rounded-xl bg-[#004AAD] hover:bg-[#003d8f] py-2.5 text-sm font-semibold text-white transition-colors"
+          disabled={loading}
+          className="w-full rounded-xl bg-[#004AAD] hover:bg-[#003d8f] py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Iniciar sesión
+          {loading ? "Verificando..." : "Iniciar sesión"}
         </button>
 
         <p className="text-center text-sm text-gray-500">
