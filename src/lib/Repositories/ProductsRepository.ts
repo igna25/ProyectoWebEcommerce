@@ -1,6 +1,5 @@
 import { pooler as sql } from "@/lib/db/db";
 import { Product } from "../Entities/Product";
-export const fetchCache = "force-no-store";
 
 class ProductsRepository {
   async getProductById(productId: string): Promise<Product | undefined> {
