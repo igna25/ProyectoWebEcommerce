@@ -14,7 +14,6 @@ import {
   increaseItemQuantity,
   decreaseItemQuantity,
   removeItemFromLocalCart,
-  clearLocalCart,
   syncCartToServer,
   CartItem,
 } from "@/lib/cache/cartCache";
@@ -71,12 +70,6 @@ export default function ProductList({
   const handleDecreaseQuantity = (productId: string) => {
     decreaseItemQuantity(productId);
     setProducts(enrichCartItems());
-    if (userId && navigator.onLine) syncCartToServer(userId).catch(() => {});
-  };
-
-  const handleClearCart = () => {
-    clearLocalCart();
-    setProducts([]);
     if (userId && navigator.onLine) syncCartToServer(userId).catch(() => {});
   };
 
@@ -146,12 +139,12 @@ export default function ProductList({
             onRemove={() => handleRemoveProduct(product.productid)}
           />
         ))}
-        <button
-          onClick={handleClearCart}
-          className="self-start text-sm font-medium text-red-500 hover:text-red-700 transition-colors mt-1"
+        <Link
+          href="/dashboard"
+          className="self-start text-sm font-medium text-[#004AAD] hover:text-[#003d8f] transition-colors mt-1"
         >
-          Vaciar carrito
-        </button>
+          ← Seguir comprando
+        </Link>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 flex flex-col gap-4 h-fit lg:sticky lg:top-20">
