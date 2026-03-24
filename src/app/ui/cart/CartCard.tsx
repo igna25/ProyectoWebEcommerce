@@ -40,7 +40,7 @@ const CartWrapper: React.FC<CartWrapperProps> = ({
           ${product.productprice} c/u
         </p>
         <p className="text-sm font-bold text-[#004AAD] mt-0.5">
-          Total: ${(product.productprice * product.quantity).toFixed(2)}
+          Subtotal: ${(product.productprice * product.quantity).toFixed(2)}
         </p>
       </div>
 

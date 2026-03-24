@@ -165,10 +165,8 @@ export default function ProductList({
         </div>
 
         <div className="border-t pt-4 flex justify-between items-center">
-          <span className="text-sm font-semibold text-gray-700">Total</span>
-          <span className="text-2xl font-extrabold text-[#004AAD]">
-            ${total}
-          </span>
+          <p className="text-sm font-semibold text-gray-700">Total</p>
+          <p className="text-2xl font-extrabold text-[#004AAD]">${total}</p>
         </div>
 
         {purchaseError && (
