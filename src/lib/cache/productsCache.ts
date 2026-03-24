@@ -11,8 +11,11 @@ export function saveProductsToLocalCache(products: Product[]): void {
       : {};
 
     for (const product of products || []) {
-      if (product && typeof product.id === "string") {
-        productsById[product.id] = product;
+      if (product && product.id != null) {
+        productsById[String(product.id)] = {
+          ...product,
+          id: String(product.id),
+        };
       }
     }
 

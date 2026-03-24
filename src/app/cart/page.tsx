@@ -1,7 +1,11 @@
 "use client";
 import { Fragment, useEffect, useState } from "react";
 import ProductList from "../ui/cart/ProductList";
-import { syncCartToServer, getLocalCart } from "@/lib/cache/cartCache";
+import {
+  syncCartToServer,
+  loadCartFromServer,
+  getLocalCart,
+} from "@/lib/cache/cartCache";
 
 export default function CartPage() {
   const [userId, setUserId] = useState<string | undefined>(undefined);
@@ -20,8 +24,10 @@ export default function CartPage() {
       try {
         if (userId && navigator.onLine) {
           const localItems = getLocalCart();
-          if (localItems.length === 0) {
+          if (localItems.length > 0) {
             await syncCartToServer(userId);
+          } else {
+            await loadCartFromServer(userId);
           }
         }
       } finally {

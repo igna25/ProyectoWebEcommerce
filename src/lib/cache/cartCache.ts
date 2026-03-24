@@ -33,15 +33,16 @@ export function addItemToLocalCart(product: Product): void {
   saveProductsToLocalCache([product]);
 
   const currentCart = getLocalCart();
+  const productId = String(product.id);
   const existingItemIndex = currentCart.findIndex(
-    (item) => item.productid === product.id,
+    (item) => item.productid === productId,
   );
 
   if (existingItemIndex !== -1) {
     currentCart[existingItemIndex].quantity++;
   } else {
     currentCart.push({
-      productid: product.id,
+      productid: productId,
       quantity: 1,
       productprice: product.price,
     });
@@ -92,6 +93,32 @@ export function clearLocalCart(): void {
   } catch {}
 }
 
+export async function loadCartFromServer(userId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`/api/cart?userId=${userId}`);
+    if (!response.ok) return false;
+    const json = await response.json();
+    const serverItems = json.items || [];
+
+    const simplifiedItems: CartItem[] = serverItems.map((item: any) => ({
+      productid: String(item.productid),
+      quantity: item.quantity,
+      productprice: item.productprice,
+    }));
+
+    const productCacheItems = serverItems.map((item: any) => ({
+      ...item,
+      id: String(item.productid),
+    }));
+    saveProductsToLocalCache(productCacheItems);
+    saveLocalCart(simplifiedItems);
+    window.dispatchEvent(new Event("cartUpdated"));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function syncCartToServer(userId: string): Promise<boolean> {
   try {
     const localItems = getLocalCart();
@@ -109,11 +136,23 @@ export async function syncCartToServer(userId: string): Promise<boolean> {
       return false;
     }
 
-    await fetch("/api/cart/sync", {
+    const syncResponse = await fetch("/api/cart/sync", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
+    if (!syncResponse.ok) {
+      throw new Error(`Cart sync failed with status ${syncResponse.status}`);
+    }
+
+    const syncJson = await syncResponse.json();
+    if (syncJson.staleProductIds?.length > 0) {
+      const current = getLocalCart().filter(
+        (item) => !syncJson.staleProductIds.includes(item.productid),
+      );
+      saveLocalCart(current);
+    }
 
     const response = await fetch(`/api/cart?userId=${userId}`);
     if (!response.ok) return false;
@@ -121,14 +160,14 @@ export async function syncCartToServer(userId: string): Promise<boolean> {
     const serverItems = json.items || [];
 
     const simplifiedItems: CartItem[] = serverItems.map((item: any) => ({
-      productid: item.productid,
+      productid: String(item.productid),
       quantity: item.quantity,
       productprice: item.productprice,
     }));
 
     const productCacheItems = serverItems.map((item: any) => ({
       ...item,
-      id: item.productid,
+      id: String(item.productid),
     }));
     saveProductsToLocalCache(productCacheItems);
 

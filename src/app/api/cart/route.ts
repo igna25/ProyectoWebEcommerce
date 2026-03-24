@@ -1,10 +1,10 @@
 import CartsRepository from "@/lib/Repositories/CartsRepository";
 import OrderItemsRepository from "@/lib/Repositories/OrdersRepository";
 import { NextResponse } from "next/server";
-
-export const dynamic = "force-dynamic";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function GET(request: Request) {
+  noStore()
   try {
     const { searchParams: searchParameters } = new URL(request.url || "");
     const userId = (searchParameters.get("userId") || "").trim();

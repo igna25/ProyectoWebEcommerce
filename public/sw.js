@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v13";
+const CACHE_VERSION = "v14";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
@@ -332,6 +332,9 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (isProductsApi(url) || isSalesApi(url) || isCartApi(url)) {
+    if (request.method !== "GET") {
+      return;
+    }
     event.respondWith(
       fetch(request)
         .then(async (res) => {

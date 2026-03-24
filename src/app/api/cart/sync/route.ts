@@ -16,6 +16,8 @@ export async function POST(request: Request) {
       }>;
     };
 
+    console.log(rawItems)
+
     const userId = (rawUserId || "").trim();
     const requestedItems = Array.isArray(rawItems) ? rawItems : [];
 
@@ -25,18 +27,29 @@ export async function POST(request: Request) {
 
     let userCart = await cartsRepository.getCartByUserId(userId);
 
-    const itemsWithServerPrices = await Promise.all(
+    const resolved = await Promise.all(
       requestedItems.map(async (requestedItem) => {
         const product = await productsRepository.getProductById(
           requestedItem.productid,
         );
+        if (!product) return { item: null, staleId: requestedItem.productid };
         return {
-          productid: requestedItem.productid,
-          quantity: requestedItem.quantity,
-          price: product ? Number(product.price) : 0,
+          item: {
+            productid: product.id,
+            quantity: requestedItem.quantity,
+            price: Number(product.price),
+          },
+          staleId: null,
         };
       }),
     );
+
+    const itemsWithServerPrices = resolved
+      .filter((r) => r.item !== null)
+      .map((r) => r.item!);
+    const staleProductIds = resolved
+      .filter((r) => r.staleId !== null)
+      .map((r) => r.staleId!);
 
     const newCartTotal = itemsWithServerPrices.reduce(
       (sum, item) => sum + item.price * item.quantity,
@@ -66,8 +79,9 @@ export async function POST(request: Request) {
       await cartsRepository.updateCart(userCart.id, newCartTotal, "sync");
     }
 
-    return NextResponse.json({ ok: true }, { status: 200 });
-  } catch {
+    return NextResponse.json({ ok: true, staleProductIds }, { status: 200 });
+  } catch (error) {
+    console.error("Error trying to sync cart:", error);
     return NextResponse.json(
       { msg: "Error trying to sync cart" },
       { status: 500 },

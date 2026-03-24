@@ -82,7 +82,13 @@ export default function ProductList({
       let result;
       if (userId) {
         if (navigator.onLine) {
-          await syncCartToServer(userId);
+          const synced = await syncCartToServer(userId);
+          if (!synced) {
+            setPurchaseError(
+              "No se pudo sincronizar el carrito. Intentá de nuevo.",
+            );
+            return;
+          }
         }
         result = await buyProducts(userId);
       } else {
