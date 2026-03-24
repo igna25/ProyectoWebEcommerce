@@ -30,6 +30,22 @@ function AddCartButton({
     setIsOpen(true);
   };
 
+  if (product.stock === 0) {
+    return (
+      <div className="flex flex-col gap-2">
+        <button
+          disabled
+          className="w-full py-2 px-4 rounded-xl text-sm font-semibold text-white bg-gray-300 cursor-not-allowed"
+        >
+          Sin stock
+        </button>
+        <p className="text-xs text-gray-500 text-center">
+          Próximamente obtendremos más unidades de este producto.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Fragment>
       <button

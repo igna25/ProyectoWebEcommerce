@@ -182,6 +182,30 @@ class ProductsRepository {
     }
   }
 
+  async decreaseStock(
+    productId: string,
+    quantity: number,
+  ): Promise<{ updatedRows: number }> {
+    try {
+      const result = await sql`
+        UPDATE products
+        SET stock = GREATEST(stock - ${quantity}, 0)
+        WHERE id = ${productId}
+      `;
+      return {
+        updatedRows: result.rowCount,
+      };
+    } catch (error) {
+      console.error(
+        `Failed to decrease stock for product with ID ${productId}:`,
+        error,
+      );
+      throw new Error(
+        `Failed to decrease stock for product with ID ${productId}.`,
+      );
+    }
+  }
+
   async getOutOfStockProducts(): Promise<Product[]> {
     try {
       const query = await sql<Product>`
