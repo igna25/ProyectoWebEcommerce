@@ -1,5 +1,6 @@
 import { getServerSession, Session } from "next-auth";
 import Link from "next/link";
+import Image from "next/image";
 import { authOptions } from "../../api/auth/[...nextauth]/auth-config";
 import BuysRecordButton from "./BuysRecordButton";
 import CartButton from "./CartButton";
@@ -15,11 +16,14 @@ const NavBar = async () => {
       className="bg-gray-900 sticky top-0 z-50 h-14 border-b border-gray-800"
     >
       <div className="container mx-auto h-full flex justify-between items-center px-4">
-        <Link
-          href="/"
-          className="text-lg font-bold text-white tracking-tight hover:text-blue-400 transition-colors"
-        >
-          IAW<span className="text-blue-400">.</span>
+        <Link href="/" className="hover:opacity-80 transition-opacity">
+          <Image
+            src="/icons/iaw-navbar.svg"
+            alt="IAW Commerce"
+            width={40}
+            height={40}
+            priority
+          />
         </Link>
 
         <div className="flex items-center gap-2">

@@ -1,88 +1,93 @@
-import { getServerSession, Session } from "next-auth";
-import { unstable_noStore as noStore } from "next/cache";
-import { Fragment } from "react";
-import { authOptions } from "../api/auth/[...nextauth]/auth-config";
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Product } from "@/lib/Entities/Product";
-import ProductsRepository from "@/lib/Repositories/ProductsRepository";
+import ProductListDashboard from "../ui/dashboard/ProductListDashboard";
 import Pagination from "../ui/dashboard/Pagination";
 import SearchBar from "../ui/dashboard/SearchBar";
-import ProductListDashboard from "../ui/dashboard/ProductListDashboard";
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
-}) {
-  noStore();
+const ITEMS_PER_PAGE = 6;
 
-  const productsRepository = new ProductsRepository();
-  const session: Session | null = await getServerSession(authOptions);
+export default function DashboardPage() {
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
 
-  const ITEMS_PER_PAGE = 6;
+  const query = searchParams.get("query") || "";
+  const currentPage = Number(searchParams.get("page")) || 1;
 
-  const query = searchParams?.query || "";
-  const currentPage = Number(searchParams?.page) || 1;
-  let products: Product[] = [];
-  let totalPages = 1;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (query.length > 0) {
-    const result = await productsRepository.searchProductsByName(
-      query,
-      currentPage,
-      ITEMS_PER_PAGE,
-    );
-    products = result.products;
-    totalPages = Math.ceil(result.total / ITEMS_PER_PAGE);
-  } else {
-    const result = await productsRepository.getAllProductsPaginated(
-      currentPage,
-      ITEMS_PER_PAGE,
-    );
-    products = result.products;
-    totalPages = Math.ceil(result.total / ITEMS_PER_PAGE);
-  }
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setProducts([]);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        page: String(currentPage),
+        pageSize: String(ITEMS_PER_PAGE),
+      });
+      if (query) params.set("query", query);
+
+      const res = await fetch(`/api/products?${params}`, { credentials: "include" });
+      if (!res.ok) throw new Error("fetch failed");
+
+      const data = await res.json();
+      setProducts(data.products);
+      setTotalPages(Math.ceil(Number(data.total) / ITEMS_PER_PAGE));
+    } catch {
+      setError("No se pudieron cargar los productos. Intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, query]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return (
-    <Fragment>
-      <div className="mx-auto max-w-7xl px-4" id="discover">
-        <div className="text-start mb-2">
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-center">
-            Nuestros productos
-          </h1>
-          <p className="text-center">
-            Explora y encuentra los mejores productos de tu gusto
-          </p>
-        </div>
-        <div className="flex justify-center mb-4">
-          <SearchBar />
-        </div>
-        <div className="container mx-auto py-2">
-          {products.length === 0 ? (
-            <div className="h-screen flex items-center justify-center bg-gray-100">
-              <div className="text-center text-gray-700">
-                <p className="text-xl">
-                  Parece que no encontramos resultados para su búsqueda...
-                </p>
-              </div>
-            </div>
-          ) : (
-            <section>
-              <ProductListDashboard
-                products={products}
-                userId={session?.user.id}
-              ></ProductListDashboard>
-              <Pagination
-                totalPages={totalPages}
-                currentPage={currentPage}
-                query={query}
-              />
-            </section>
-          )}
-        </div>
+    <div className="mx-auto max-w-7xl px-4" id="discover">
+      <div className="text-start mb-2">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-center">
+          Nuestros productos
+        </h1>
+        <p className="text-center">
+          Explora y encuentra los mejores productos de tu gusto
+        </p>
       </div>
-    </Fragment>
+      <div className="flex justify-center mb-4">
+        <SearchBar />
+      </div>
+      <div className="container mx-auto py-2">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-2 rounded mb-4">
+            {error}
+          </div>
+        )}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+          </div>
+        ) : products.length === 0 ? (
+          <div className="h-screen flex items-center justify-center bg-gray-100">
+            <div className="text-center text-gray-700">
+              <p className="text-xl">
+                Parece que no encontramos resultados para su búsqueda...
+              </p>
+            </div>
+          </div>
+        ) : (
+          <section>
+            <ProductListDashboard products={products} userId={session?.user.id} />
+            <Pagination totalPages={totalPages} currentPage={currentPage} query={query} />
+          </section>
+        )}
+      </div>
+    </div>
   );
 }

@@ -1,0 +1,1143 @@
+================================================================================
+  INFORME TÉCNICO — REFACTOR DE INTERFAZ DE USUARIO
+  IAW-Commerce · Next.js 14 + Tailwind CSS v3 + App Router
+  Guía de Estudio Completa: UI Usuario + UI Admin
+================================================================================
+
+Fecha: Marzo 2026
+Stack: Next.js 14 · React 18 · Tailwind CSS v3 · Headless UI · Heroicons
+       Iconify · Framer Motion (eliminado de admin) · NextAuth.js
+
+
+================================================================================
+  ÍNDICE
+================================================================================
+
+  PARTE 1 — REFACTOR DE INTERFAZ PÚBLICA (USUARIO)
+    1.1  Motivación y criterios de diseño
+    1.2  Sistema de colores y tokens de marca
+    1.3  NavBar — barra de navegación principal
+    1.4  Landing Page (página raíz)
+    1.5  Dashboard — listado de productos
+    1.6  ProductDetails — detalle de producto
+    1.7  SearchBar — barra de búsqueda del dashboard
+    1.8  Pagination — paginación del dashboard
+    1.9  AddToCartButton — agregar al carrito
+    1.10 CartCard y ProductList — carrito de compras
+    1.11 Login y Register — formularios de autenticación
+
+  PARTE 2 — DISEÑO RESPONSIVE (MOBILE FIRST)
+    2.1  Overflow horizontal — diagnóstico y solución
+    2.2  NavBar responsive
+    2.3  Cards responsive
+    2.4  Formularios responsive
+    2.5  Carrito responsive
+    2.6  Tipografía fluida
+
+  PARTE 3 — REFACTOR DE INTERFAZ ADMIN
+    3.1  Motivación y enfoque del refactor admin
+    3.2  Sistema de colores y tokens (admin)
+    3.3  SideBar (desktop) — barra lateral
+    3.4  HeaderMobile (mobile) — header + drawer lateral
+    3.5  AdminHomePage — panel de resumen (KPIs)
+    3.6  ProductsListAdmin — listado de productos
+    3.7  SalesListAdmin — listado de ventas
+    3.8  SaleDetail — detalle de una venta
+    3.9  SearchBar admin — búsqueda
+    3.10 Pagination admin — paginación
+    3.11 UpdateComponent (EditProductForm) — editar producto
+
+  PARTE 4 — CONCEPTOS TÉCNICOS CLAVE
+    4.1  Semántica HTML y accesibilidad
+    4.2  Link-as-button vs button nativo
+    4.3  Tokens de diseño vs clases Tailwind directas
+    4.4  Tailwind: clases utilitarias avanzadas
+    4.5  Headless UI — Button y sus diferencias con <button>
+    4.6  Animaciones con CSS vs Framer Motion
+    4.7  Patron "Client Component Shell" en Next.js App Router
+    4.8  clsx — composición condicional de clases
+
+  PARTE 5 — RESUMEN DE ARCHIVOS MODIFICADOS
+    5.1  UI Pública
+    5.2  UI Admin
+
+  APÉNDICE
+    A.1  Tabla de tokens de colores
+    A.2  Reglas de accesibilidad aplicadas
+    A.3  Glosario de clases Tailwind clave
+    A.4  Anti-patrones detectados y su corrección
+
+
+================================================================================
+  PARTE 1 — REFACTOR DE INTERFAZ PÚBLICA (USUARIO)
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+1.1  Motivación y criterios de diseño
+────────────────────────────────────────────────────────────────────────────────
+
+El objetivo fue modernizar la interfaz partiendo de una base funcional pero
+visualmente inconsistente. Problemas detectados antes del refactor:
+
+  • Elementos HTML inválidos: <Button> de Headless UI conteniendo <Link>,
+    y <Link> conteniendo <Button>. Esto genera nodos interactivos anidados,
+    viola la especificación HTML5 y produce comportamiento impredecible en
+    lectores de pantalla y eventos de click.
+
+  • Paleta de colores mezclada: botones con bg-blue-500, bg-blue-600,
+    bg-blue-400 sin un color de marca definido.
+
+  • Falta de jerarquía visual: cards sin sombra, formularios sin card
+    contenedora, navbar sin height fija.
+
+  • Inconsistencia en bordes: algunos elementos con rounded, otros con
+    rounded-lg, otros sin borde.
+
+  • Scroll horizontal en mobile por falta de padding lateral.
+
+NOTA TÉCNICA — Nodos interactivos anidados:
+  Los nodos interactivos anidados (<button> dentro de <a> o viceversa)
+  son ilegales según la especificación HTML5. El navegador los intenta
+  corregir automáticamente, pero el resultado es impredecible: el click
+  puede dispararse dos veces o no propagarse correctamente. Además, los
+  lectores de pantalla (NVDA, VoiceOver) reportan ambos roles, generando
+  confusión en usuarios con discapacidad visual.
+
+Criterios adoptados para el refactor:
+
+  • Color de marca único: #004AAD (hover: #003d8f).
+  • Elementos interactivos limpios: todos son <Link> o <button> directos,
+    sin anidamiento.
+  • Bordes redondeados consistentes: rounded-xl para inputs y botones
+    primarios, rounded-2xl para cards y paneles.
+  • Sombra coherente: shadow-sm en cards en reposo, shadow-md en hover.
+  • Fondo de la aplicación: gray-50 o gray-100 (nunca blanco puro en el
+    contenedor raíz).
+
+────────────────────────────────────────────────────────────────────────────────
+1.2  Sistema de colores y tokens de marca
+────────────────────────────────────────────────────────────────────────────────
+
+  Token semántico          Valor Tailwind / HEX     Uso
+  ─────────────────────────────────────────────────────────────────────────────
+  Color primario           bg-[#004AAD]             CTA principal, botones
+  Color primario hover     bg-[#003d8f]             Estado :hover del primario
+  Acento / logo            text-blue-400            Logo IAW., highlights
+  Fondo de página          bg-gray-50 / bg-gray-100 Contenedor raíz
+  Fondo card / panel       bg-white                 Cards, modales, formularios
+  Texto principal          text-gray-900            Títulos, cuerpo primario
+  Texto secundario         text-gray-600/500        Subtítulos, metadata
+  Texto deshabilitado      text-gray-400            Placeholders, inactivos
+  Borde estándar           border-gray-100/200      Cards, inputs
+  NavBar fondo             bg-gray-900              Barra de navegación
+  Hero degradado           from-gray-900 via-       Sección hero de landing
+                           [#003580] to-[#004AAD]
+  ─────────────────────────────────────────────────────────────────────────────
+
+NOTA: El color #004AAD no fue elegido arbitrariamente — ya existía como
+themeColor en el manifest PWA (src/app/layout.tsx → viewport.themeColor).
+El refactor simplemente alineó la UI con la identidad ya definida para
+la app instalable.
+
+BEST PRACTICE — Tokens en tailwind.config.ts:
+  Usar clases arbitrarias como bg-[#004AAD] es funcional pero es un
+  anti-patrón para proyectos grandes. La forma correcta es definirlos en
+  tailwind.config.ts:
+
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            DEFAULT: '#004AAD',
+            dark:    '#003d8f',
+          }
+        }
+      }
+    }
+
+  Con esto se puede escribir bg-brand y hover:bg-brand-dark, que son más
+  legibles, fáciles de mantener y soportan el motor de purga de Tailwind.
+
+────────────────────────────────────────────────────────────────────────────────
+1.3  NavBar — barra de navegación principal
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/shared/NavBar.tsx
+
+Problema original:
+  • La raíz era un <div>, no semánticamente correcto para una barra de
+    navegación.
+  • <HomeButton> internamente tenía <Button><Link>, nodo interactivo anidado.
+  • Sin height fija: el navbar crecía según su contenido.
+  • Botones de carrito mostraban siempre el texto completo en mobile.
+
+Solución aplicada:
+  • Se cambió el <div> raíz por <nav aria-label="Navegación principal">.
+    Esto expone el landmark de navegación a tecnologías de asistencia.
+  • Se eliminó la importación de HomeButton y se reemplazó por un <Link>
+    inline dentro del nav.
+  • Se fijó height con h-14 (56px). Se usó sticky top-0 z-50 para que
+    el navbar acompañe el scroll.
+  • Los botones de carrito y historial ahora muestran solo el icono en
+    mobile y el texto completo en sm+: <span className="hidden sm:inline">.
+
+────────────────────────────────────────────────────────────────────────────────
+1.4  Landing Page (página raíz)
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/page.tsx
+
+  • Se eliminó el patrón incorrecto <Button><Link>.
+  • Hero section con degradado:
+    bg-gradient-to-br from-gray-900 via-[#003580] to-[#004AAD]
+  • CTA principal: <Link> con estilos de botón blanco (bg-white text-[#004AAD])
+    para contraste alto sobre fondo oscuro.
+  • Sección de cierre con fondo bg-[#004AAD] y texto blanco.
+  • Botón "Ir al catálogo": styled como link-as-button (ver sección 4.2).
+
+────────────────────────────────────────────────────────────────────────────────
+1.5  Dashboard — listado de productos
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/dashboard/Cards.tsx
+
+  • Cards con bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow.
+  • Imagen con Next.js Image usando fill + object-cover dentro de un
+    contenedor con aspect-[4/3] relative overflow-hidden rounded-t-2xl.
+  • Precio con text-[#004AAD] font-bold.
+  • Nombre truncado con truncate para evitar overflow en cards angostas.
+
+NOTA TÉCNICA — next/image con fill:
+  La prop fill de Next.js Image requiere que el contenedor padre tenga
+  position: relative y dimensiones definidas. Sin esto, la imagen no
+  se renderiza o desborda. El patrón correcto es:
+
+    <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
+      <Image src={...} alt={...} fill className="object-cover" />
+    </div>
+
+  El uso de aspect-[4/3] (Tailwind v3+) garantiza que el contenedor
+  siempre mantenga la proporción 4:3 independientemente del ancho.
+
+────────────────────────────────────────────────────────────────────────────────
+1.6  ProductDetails — detalle de producto
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/dashboard/ProductDetails.tsx
+
+  • Imagen con fill + object-contain (no object-cover para mostrar el
+    producto completo sin recorte).
+  • Tipografía responsive: text-xl sm:text-2xl para el título,
+    text-2xl sm:text-3xl para el precio.
+  • Botón "Volver al catálogo" como <Link> con icono ChevronLeft.
+  • Layout en dos columnas en desktop (lg:grid-cols-2), apilado en mobile.
+
+────────────────────────────────────────────────────────────────────────────────
+1.7  SearchBar — barra de búsqueda del dashboard
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/dashboard/SearchBar.tsx
+
+  • Icono MagnifyingGlassIcon de @heroicons/react/24/outline embebido
+    dentro del input con posicionamiento absoluto.
+  • Técnica focus-within: el borde del contenedor se activa cuando el
+    input interno tiene foco, dando mejor feedback visual.
+  • Ancho responsive: w-full sm:w-2/3 lg:w-1/2.
+
+NOTA TÉCNICA — focus-within vs focus:
+  focus aplica estilos cuando el elemento MISMO tiene el foco.
+  focus-within aplica estilos cuando el elemento O CUALQUIER DESCENDIENTE
+  tiene el foco. Útil para inputs decorados con iconos donde el icono es
+  un hermano del input, no el input mismo.
+
+  Ejemplo:
+    <div className="focus-within:ring-2 focus-within:ring-[#004AAD]">
+      <MagnifyingGlassIcon /> {/* no tiene foco */}
+      <input />               {/* cuando este tiene foco, el div reacciona */}
+    </div>
+
+────────────────────────────────────────────────────────────────────────────────
+1.8  Pagination — paginación del dashboard
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/dashboard/Pagination.tsx
+
+  • Botones de página como <Link> para que puedan abrirse en nueva pestaña
+    y el historial del navegador los registre.
+  • Página activa: bg-[#004AAD] text-white border-[#004AAD].
+  • Iconos ChevronLeftIcon / ChevronRightIcon en lugar de texto "Prev/Next".
+  • Texto en español: "Anterior" y "Siguiente".
+
+────────────────────────────────────────────────────────────────────────────────
+1.9  AddToCartButton — agregar al carrito
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/dashboard/AddToCartButton.tsx
+
+  • Dialog de Headless UI con Transition para la animación de apertura.
+  • Backdrop semitransparente bg-black/50 con blur: backdrop-blur-sm.
+  • Estado de éxito con CheckCircleIcon de Heroicons.
+  • Gestión de estados: idle → loading → success/error.
+  • El botón principal usa <button> nativo (correcto: la acción no navega).
+
+────────────────────────────────────────────────────────────────────────────────
+1.10 CartCard y ProductList — carrito de compras
+────────────────────────────────────────────────────────────────────────────────
+
+Archivos: src/app/ui/cart/CartCard.tsx
+          src/app/ui/cart/ProductList.tsx
+
+CartCard:
+  • Imagen con rounded-xl overflow-hidden shrink-0.
+  • Botones +/- con rounded-lg border border-gray-200.
+  • Botón eliminar con XMarkIcon y rounded-full.
+  • Layout flex con gap-4 para separación consistente.
+
+ProductList (carrito completo):
+  • Layout en grid: grid-cols-1 lg:grid-cols-3
+    - Mobile: ítems y resumen apilados verticalmente.
+    - Desktop: ítems en 2/3 del ancho, resumen en 1/3 con sticky.
+  • Resumen con sticky top-20 (debajo del navbar de 56px).
+  • Empty state con icono ShoppingCartIcon y mensaje centrado.
+
+────────────────────────────────────────────────────────────────────────────────
+1.11 Login y Register — formularios de autenticación
+────────────────────────────────────────────────────────────────────────────────
+
+Archivos: src/app/login/LoginForm.tsx
+          src/app/register/page.tsx
+          src/app/login/layout.tsx
+          src/app/register/layout.tsx
+
+Layout split-screen:
+  • Desktop: mitad izquierda con degradado de marca, mitad derecha con
+    el formulario. Patrón muy común en apps SaaS modernas.
+  • Mobile: solo se muestra el formulario (la mitad decorativa se oculta
+    con hidden lg:flex).
+
+Inputs:
+  • bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4
+  • focus:ring-2 focus:ring-[#004AAD] focus:border-transparent
+  • Mensajes de error en text-red-500 text-xs mt-1.5
+
+Submit button:
+  • bg-[#004AAD] hover:bg-[#003d8f] rounded-xl text-white font-semibold
+  • Estado disabled con bg-gray-400 cursor-not-allowed.
+
+
+================================================================================
+  PARTE 2 — DISEÑO RESPONSIVE (MOBILE FIRST)
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+2.1  Overflow horizontal — diagnóstico y solución
+────────────────────────────────────────────────────────────────────────────────
+
+Síntoma: scroll horizontal en mobile en las páginas dashboard y landing.
+
+Diagnóstico:
+  Las páginas tenían divs con max-w-7xl mx-auto SIN px-4:
+
+    // Sin padding: puede causar overflow en mobile
+    <div className="mx-auto max-w-7xl">
+    <div className="mx-auto max-w-7xl py-4">
+
+  max-w-7xl (1280px) en mobile actúa como width: 100% del viewport.
+  Sin px-4, el contenido hijo se renderizaba desde el pixel 0, llegando
+  exactamente al borde del viewport. Elementos con min-width implícito
+  (inputs, imágenes) podían exceder el viewport por pocos píxeles.
+
+Solución A — Corrección estructural:
+
+    // Con padding horizontal seguro
+    <div className="mx-auto max-w-7xl px-4">
+    <div className="mx-auto max-w-7xl px-4 py-4">
+
+  px-4 = 16px cada lado → 32px totales de margen horizontal seguro.
+
+Solución B — Barrera de seguridad en globals.css:
+
+    /* globals.css */
+    html, body {
+      overflow-x: hidden;
+    }
+
+ADVERTENCIA: overflow-x: hidden en el body puede interferir con
+position: sticky en algunos navegadores (específicamente Safari).
+En este proyecto no hay sticky en el body directo, sino en el nav
+y en el panel del carrito, que están dentro del flujo normal y
+no se ven afectados.
+
+────────────────────────────────────────────────────────────────────────────────
+2.2  NavBar responsive
+────────────────────────────────────────────────────────────────────────────────
+
+  • En mobile (<640px): solo se muestran iconos en los botones de carrito
+    e historial. El texto se oculta con hidden sm:inline.
+  • El logo siempre visible a cualquier ancho.
+  • El navbar es sticky top-0 para acompañar el scroll en todas las vistas.
+
+────────────────────────────────────────────────────────────────────────────────
+2.3  Cards responsive
+────────────────────────────────────────────────────────────────────────────────
+
+  • En mobile: una columna (grid-cols-1 sm:grid-cols-2 lg:grid-cols-3).
+  • La imagen mantiene su ratio con aspect-[4/3], evitando que se estire.
+  • El nombre del producto usa truncate para no romper el layout en
+    títulos muy largos.
+
+────────────────────────────────────────────────────────────────────────────────
+2.4  Formularios responsive
+────────────────────────────────────────────────────────────────────────────────
+
+  • Padding responsivo en los campos: py-2.5 px-4.
+  • Máximo ancho del contenedor de formulario: max-w-md mx-auto.
+  • Labels siempre encima del input (nunca inline en mobile).
+  • El layout split-screen del login/register se aplica solo en lg+.
+
+────────────────────────────────────────────────────────────────────────────────
+2.5  Carrito responsive
+────────────────────────────────────────────────────────────────────────────────
+
+  • grid-cols-1 lg:grid-cols-3
+    - Mobile (<1024px): ítems y resumen apilados verticalmente.
+    - Desktop (lg+): ítems en 2/3 del ancho, resumen en 1/3 con sticky.
+  • El resumen NO hace sticky en mobile: el usuario necesita ver todos
+    los ítems antes de confirmar. Es una decisión de UX deliberada.
+
+────────────────────────────────────────────────────────────────────────────────
+2.6  Tipografía fluida
+────────────────────────────────────────────────────────────────────────────────
+
+  Componente / Elemento      Mobile       Desktop (sm+)
+  ─────────────────────────────────────────────────────
+  dashboard/page.tsx — h1    text-2xl     sm:text-4xl
+  HomePage.tsx — h2          text-xl      sm:text-3xl
+  ProductDetails — h1        text-xl      sm:text-2xl
+  ProductDetails — precio    text-2xl     sm:text-3xl
+
+Patrón general: text-{tamaño-mobile} sm:text-{tamaño-desktop}
+El tamaño mobile es siempre un escalón por debajo del desktop.
+
+AVANZADO — Tipografía fluida con clamp():
+  Tailwind no tiene tipografía fluida nativa. Para escalado continuo
+  entre breakpoints se puede usar CSS puro:
+
+    /* Escala de 20px (mobile) a 36px (desktop) entre 320px y 1280px */
+    font-size: clamp(1.25rem, 1.25rem + 1.5vw, 2.25rem);
+
+  Para usar en Tailwind: extender el tema con un plugin o usar clase
+  arbitrary [font-size:clamp(1.25rem,1.25rem+1.5vw,2.25rem)]. El patrón
+  de breakpoints es suficiente para la mayoría de proyectos.
+
+
+================================================================================
+  PARTE 3 — REFACTOR DE INTERFAZ ADMIN
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+3.1  Motivación y enfoque del refactor admin
+────────────────────────────────────────────────────────────────────────────────
+
+La interfaz de admin original tenía una identidad visual diferente a la
+parte pública: bordes rectos, sin sombras, colores desconectados del
+sistema de la marca, y sin diseño responsive real en mobile.
+
+Objetivos del refactor admin:
+  • Alinear visualmente admin con la UI pública: mismos tokens de color,
+    mismo sistema de cards (rounded-2xl shadow-sm border-gray-100),
+    mismos patrones de inputs y botones.
+  • No cambiar la lógica ni la estructura de datos. Solo estilos y
+    pequeños ajustes de layout.
+  • Hacer la interfaz mobile-friendly: el sidebar desktop se oculta en
+    mobile y se reemplaza por un header fijo + drawer lateral simple.
+  • Reemplazar la animación de apertura del menú mobile (clip-path
+    circular con Framer Motion) por una transición CSS estándar (slide
+    desde la izquierda), más familiar para el usuario y menos costosa
+    en rendimiento.
+
+────────────────────────────────────────────────────────────────────────────────
+3.2  Sistema de colores y tokens (admin)
+────────────────────────────────────────────────────────────────────────────────
+
+La paleta del admin es la misma que la UI pública, con ajustes propios
+del contexto administrativo:
+
+  Token                    Valor                     Uso en Admin
+  ─────────────────────────────────────────────────────────────────────────────
+  Sidebar fondo            bg-gray-900               SideBar y HeaderMobile
+  Sidebar borde            border-gray-700/800       Divisores del sidebar
+  Sidebar texto activo     text-blue-400             Item de nav activo
+  Sidebar fondo activo     bg-blue-500/10            Fondo del item activo
+  Sidebar texto inactivo   text-gray-300/400         Items no seleccionados
+  Card fondo               bg-white                  Cards de KPIs, listas
+  Card borde               border-gray-100           Cards de KPIs, listas
+  Barra KPI                bg-[#004AAD]              Acento inferior en KPI
+  Error / sin stock        bg-red-50 text-red-700    Badges de stock bajo
+  Éxito / disponible       bg-emerald-50/100         Badges de stock OK
+  Advertencia / bajo stock bg-amber-100 text-amber-700 Badges stock < 5
+  ─────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+3.3  SideBar (desktop) — barra lateral
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/sideBar/SideBar.tsx
+
+  • Fondo bg-gray-900 text-white, borde derecho border-gray-700.
+  • Ancho fijo w-60, visible solo en md+: hidden md:flex.
+  • Logo "IAW" con punto azul: <span className="text-blue-400">.</span>
+  • Ítem activo: bg-blue-500/10 text-blue-400 con rounded-xl.
+  • Ítem inactivo: text-gray-300 hover:bg-gray-800 hover:text-white.
+  • Botón "Cerrar sesión" en el pie, con icono lucide:log-out de Iconify.
+  • Submenús con animación de chevron rotate-180 al abrirse.
+  • La separación entre ítems se redujo a space-y-1 (antes space-y-2) para
+    mayor densidad de información en pantallas pequeñas.
+
+NOTA TÉCNICA — Iconify vs Heroicons:
+  El SideBar usa @iconify/react porque las constantes de navegación
+  (SIDENAV_ITEMS) ya usaban iconos Iconify. Los nuevos componentes admin
+  (SearchBar, Pagination) usan Heroicons (ya presente en el proyecto) para
+  no agregar dependencia extra.
+
+────────────────────────────────────────────────────────────────────────────────
+3.4  HeaderMobile — header fijo + drawer lateral
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/sideBar/HeaderMobile.tsx
+
+Este fue el cambio más significativo del refactor admin.
+
+ANTES (Framer Motion — clip-path circular):
+  • El menú era un overlay de pantalla completa (fixed inset-0) con una
+    animación de apertura en forma de círculo que se expandía desde la
+    esquina superior derecha.
+  • Técnica: clipPath: `circle(${height * 2 + 200}px at 100% 0)`.
+  • Cada ítem de navegación tenía su propia animación de entrada
+    (staggerChildren con opacity y translateY).
+  • La dependencia era framer-motion (ya instalada en el proyecto).
+  • PROBLEMA: el componente era fixed pero NO renderizaba una barra
+    visible en estado cerrado. El botón hamburguesa flotaba sobre el
+    contenido sin ningún fondo de respaldo, provocando que el logo del
+    menú se superpusiera visualmente sobre las cards del dashboard.
+
+DESPUÉS (CSS transition — slide desde la izquierda):
+  • Se separan dos responsabilidades en dos elementos distintos:
+
+    1. HEADER BAR (siempre visible en mobile):
+       <header className="md:hidden fixed top-0 left-0 right-0 z-40 h-12
+         bg-gray-900 flex items-center justify-between px-4 border-b border-gray-700">
+
+       - z-40 (por debajo del drawer z-50 cuando está abierto).
+       - h-12 = 48px de altura fija.
+       - Logo a la izquierda, botón hamburguesa/X a la derecha.
+       - El ícono cambia dinámicamente: Menu cuando cerrado, X cuando abierto.
+
+    2. DRAWER (panel lateral deslizante):
+       <nav className="md:hidden fixed top-0 left-0 z-50 h-full w-64
+         bg-gray-900 transform transition-transform duration-300 ease-in-out
+         translate-x-0 / -translate-x-full">
+
+       - z-50 para estar por encima del header bar y el contenido.
+       - w-64 = 256px de ancho.
+       - transform + transition-transform: la transición CSS es más
+         performante que la animación JS de Framer Motion.
+       - translate-x-0 cuando open=true, -translate-x-full cuando closed.
+
+    3. OVERLAY (fondo oscuro al abrir):
+       {isOpen && (
+         <div className="md:hidden fixed inset-0 z-40 bg-black/50"
+           onClick={closeMenu} />
+       )}
+
+       - Se renderiza solo cuando el menú está abierto (conditional render).
+       - Al hacer click en el overlay se cierra el menú.
+       - bg-black/50 = negro con 50% de opacidad (Tailwind v3 sintaxis).
+
+  • Estado del menú: useState simple en lugar de useCycle de Framer Motion.
+  • Se eliminó framer-motion del componente.
+    (framer-motion sigue en el proyecto, usada en otras partes)
+
+LAYOUT FIX — padding top en el contenido:
+  El admin layout fue actualizado para agregar padding-top en mobile
+  que compense la barra header fija:
+
+  Antes:  <div className="flex flex-col pt-2 px-4 ...">
+  Después: <div className="flex flex-col pt-14 md:pt-2 px-4 ...">
+
+  pt-14 = 56px > h-12 (48px) del header → margen de seguridad de 8px.
+  md:pt-2 → en desktop (con sidebar) vuelve al padding original.
+
+  Archivo: src/app/admin/layout.tsx
+
+────────────────────────────────────────────────────────────────────────────────
+3.5  AdminHomePage — panel de resumen (KPIs)
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/AdminHomePage.tsx
+
+Estructura de la página:
+
+  1. KPI Cards (2 columnas en sm+, 1 en mobile):
+     • "Total Ganado" y "Total de Ventas".
+     • bg-white rounded-2xl border border-gray-100 shadow-sm p-5.
+     • Etiqueta: text-xs font-medium text-gray-500 uppercase tracking-wide.
+     • Valor: text-2xl font-bold text-gray-900.
+     • Acento visual: barra horizontal h-1 w-10 bg-[#004AAD] rounded-full.
+
+  2. Últimas 3 Ventas (sección):
+     • Panel blanco con rounded-2xl shadow-sm.
+     • Encabezado con flex justify-between: título + link "Ver todas →".
+     • Subcards de ventas en grid responsive (1 → 2 → 3 columnas).
+     • Cada subcard: bg-gray-50 rounded-xl p-4 border border-gray-100.
+     • Precio en text-[#004AAD].
+     • Nombre truncado con truncate para evitar overflow.
+
+  3. Productos sin Stock:
+     • Subcards en bg-red-50 border border-red-100.
+     • Badge de stock: bg-red-100 text-red-700 rounded-full.
+     • Estado vacío: texto con "✓ Todos los productos están al día".
+
+  4. Estados de carga y error:
+     • Spinner: animate-spin rounded-full border-b-2 border-[#004AAD].
+     • Error: bg-red-50 border border-red-200 rounded-xl text-red-700.
+
+────────────────────────────────────────────────────────────────────────────────
+3.6  ProductsListAdmin — listado de productos
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/ProductsListAdmin.tsx
+
+Cada fila de producto es una card:
+  bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm
+  hover:shadow-md transition-shadow
+
+Layout interno: flex justify-between items-center gap-4
+  • Izquierda (flex-1 min-w-0): nombre truncado + stock + precio.
+  • Derecha (shrink-0): badge de estado + botón Editar + botón toggle.
+
+Badges de estado:
+  • Sin stock (stock === 0): bg-red-100 text-red-700 rounded-full.
+  • Bajo stock (stock <= 5): bg-amber-100 text-amber-700 rounded-full.
+  • Sin badge si stock > 5 (estado normal implícito).
+
+Botón "Editar": <Link> styled como botón (link-as-button):
+  bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-xl text-sm
+
+Botón toggle (Activar/Desactivar): <Button> de Headless UI:
+  • Activo → Desactivar: bg-red-100 text-red-700 hover:bg-red-200
+  • Inactivo → Activar: bg-emerald-100 text-emerald-700 hover:bg-emerald-200
+  • disabled:opacity-50 cuando está en proceso.
+
+NOTA TÉCNICA — shrink-0:
+  flex-shrink: 0 evita que el contenedor de botones se encoja cuando el
+  nombre del producto es muy largo. Sin esto, los botones podrían quedar
+  aplastados. min-w-0 en el contenedor del nombre habilita el truncate
+  del texto (por defecto los flex children no permiten que su texto
+  sea más corto que el contenido mínimo).
+
+────────────────────────────────────────────────────────────────────────────────
+3.7  SalesListAdmin — listado de ventas
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/SalesListAdmin.tsx
+
+Misma estructura de card que ProductsListAdmin:
+  bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm
+  hover:shadow-md transition-shadow
+
+  • Nombre del comprador: text-base font-semibold text-gray-800 truncate.
+  • Monto: text-sm font-medium text-[#004AAD].
+  • Fecha: text-xs text-gray-400.
+  • Botón "Ver detalle": <Link> styled como botón primario:
+    bg-[#004AAD] hover:bg-[#003d8f] text-white rounded-xl py-2 px-4
+
+  Observación: el botón de acción de ventas usa el color primario completo
+  (no la variante soft como en productos) porque es la ÚNICA acción de esa
+  fila y debe destacarse. En productos hay 2 acciones y el contraste se
+  logra por color semántico (gris neutro para editar, rojo/verde para toggle).
+
+────────────────────────────────────────────────────────────────────────────────
+3.8  SaleDetail — detalle de una venta
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/SaleDetail.tsx
+
+Dos cards separadas:
+
+  1. Card de encabezado:
+     • Layout flex-col sm:flex-row sm:justify-between sm:items-start.
+     • Izquierda: título, fecha, nombre del comprador.
+     • Derecha (sm:text-right): etiqueta "Total" + monto en text-[#004AAD].
+     • Monto como "héroe visual" de la página: text-2xl font-bold.
+
+  2. Card de líneas de pedido:
+     • Lista con divide-y divide-gray-100 para separadores sutiles.
+     • Cada línea: flex justify-between py-3 gap-4.
+     • Izquierda: nombre del producto (truncate) + "Cantidad × Precio".
+     • Derecha (shrink-0): subtotal en font-bold.
+
+  Técnica divide-y:
+    Aplica un borde superior a todos los hijos excepto el primero.
+    Equivale a: border-t border-gray-100 en cada elemento menos el first-child.
+    Más limpio que agregar la clase manualmente a cada elemento.
+
+────────────────────────────────────────────────────────────────────────────────
+3.9  SearchBar admin — búsqueda
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/SearchBar.tsx
+
+  • Input redondeado a la izquierda (rounded-l-xl) y botón a la derecha
+    (rounded-r-xl) conforman una unidad visual.
+  • Icono MagnifyingGlassIcon posicionado absolutamente dentro del input
+    con left-3 top-1/2 -translate-y-1/2 (centrado vertical).
+  • pl-9 en el input para dejar espacio al icono.
+  • Soporte de tecla Enter con onKeyDown handler.
+  • Ancho responsive: w-full sm:w-2/3 lg:w-1/2.
+  • Focus ring: focus:ring-2 focus:ring-[#004AAD] focus:border-transparent.
+
+────────────────────────────────────────────────────────────────────────────────
+3.10 Pagination admin — paginación
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/Pagination.tsx
+
+  • Misma implementación que la paginación del dashboard.
+  • Botones de página como <Link> (no <button>): la paginación navega a
+    una URL, por lo tanto debe ser un enlace.
+  • Página activa: bg-[#004AAD] text-white border-[#004AAD].
+  • Iconos ChevronLeftIcon / ChevronRightIcon con texto "Anterior/Siguiente".
+  • Tamaño fijo de botones de número: w-9 h-9 (cuadrado perfecto).
+
+────────────────────────────────────────────────────────────────────────────────
+3.11 UpdateComponent (EditProductForm) — editar producto
+────────────────────────────────────────────────────────────────────────────────
+
+Archivo: src/app/ui/admin/UpdateComponent.tsx
+
+  • Contenedor: max-w-md mx-auto rounded overflow-hidden shadow-lg bg-white.
+  • Inputs: rounded-xl border bg-gray-50 py-2 px-3 text-sm.
+  • Focus: focus:ring-2 focus:ring-[#004AAD] focus:border-transparent.
+  • Validación inline: errores en text-red-500 text-xs mt-1.
+  • Submit: bg-[#004AAD] hover:bg-[#003d8f] rounded-xl text-white.
+  • Estado loading: bg-gray-400 cursor-not-allowed (no el color primario).
+
+  Patrón de validación cliente:
+    La función validate() retorna un objeto { [campo]: "mensaje" }.
+    Si tiene keys, los errores se setean en el estado y el submit
+    se interrumpe. Esta validación es solo frontend — la validación
+    real debe hacerse también en el servidor (Server Action updateProduct).
+
+
+================================================================================
+  PARTE 4 — CONCEPTOS TÉCNICOS CLAVE
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+4.1  Semántica HTML y accesibilidad
+────────────────────────────────────────────────────────────────────────────────
+
+La semántica HTML correcta beneficia:
+  a) SEO: los crawlers entienden mejor la estructura del contenido.
+  b) Accesibilidad: lectores de pantalla anuncian los roles correctamente.
+  c) Mantenibilidad: el código es más fácil de entender.
+
+Etiquetas semánticas usadas:
+  • <nav aria-label="...">    → Landmark de navegación.
+  • <header>                   → Encabezado de sección.
+  • <main>                     → Contenido principal (ya existía).
+  • <h1>/<h2>/<h3>             → Jerarquía de encabezados respetada.
+  • <section>                  → Agrupación temática de contenido.
+
+Regla: los elementos interactivos (<a>, <button>) no deben anidarse
+entre sí. La especificación HTML5 lo prohíbe explícitamente.
+
+────────────────────────────────────────────────────────────────────────────────
+4.2  Link-as-button vs button nativo
+────────────────────────────────────────────────────────────────────────────────
+
+Regla de decisión:
+
+  Usar <Link>  cuando: la acción navega a una URL.
+  Usar <button> cuando: la acción no navega (muta estado, llama API, abre modal).
+
+  // CORRECTO: link que parece botón
+  <Link href="/admin/ventas"
+    className="px-4 py-2 bg-[#004AAD] text-white rounded-xl">
+    Ver ventas
+  </Link>
+
+  // CORRECTO: botón de acción
+  <button onClick={() => signOut()}
+    className="px-4 py-2 ...">
+    Cerrar sesión
+  </button>
+
+  // INCORRECTO: nodo interactivo anidado
+  <Button> {/* renderiza como <button> */}
+    <Link href="/ventas">Ver ventas</Link>
+  </Button>
+
+La técnica link-as-button consiste en aplicar estilos visuales de botón
+(padding, background, border-radius, font-weight) a un elemento <Link>
+o <a>. El elemento sigue siendo semánticamente un enlace.
+
+────────────────────────────────────────────────────────────────────────────────
+4.3  Tokens de diseño vs clases Tailwind directas
+────────────────────────────────────────────────────────────────────────────────
+
+Nivel 1 — Clases directas (actual, funcional pero no ideal):
+  bg-[#004AAD] hover:bg-[#003d8f]
+
+Nivel 2 — Tokens en tailwind.config.ts (recomendado):
+  theme.extend.colors.brand.DEFAULT = '#004AAD'
+  theme.extend.colors.brand.dark    = '#003d8f'
+  → Se usa como: bg-brand hover:bg-brand-dark
+
+Nivel 3 — CSS Variables (para theming dinámico):
+  :root { --color-brand: #004AAD; }
+  → Se usa como: bg-[var(--color-brand)]
+  → Permite cambiar el tema en runtime (dark mode, temas de cliente).
+
+El proyecto actual usa Nivel 1. Para una evolución, Nivel 2 es el
+siguiente paso natural.
+
+────────────────────────────────────────────────────────────────────────────────
+4.4  Tailwind: clases utilitarias avanzadas usadas en el proyecto
+────────────────────────────────────────────────────────────────────────────────
+
+  Clase                  Efecto
+  ─────────────────────────────────────────────────────────────────────────
+  overflow-hidden        Recorta el contenido que desborda (necesario con
+                         border-radius para que las esquinas recorten img).
+  transition-shadow      Anima SOLO box-shadow (más performante que all).
+  truncate               overflow:hidden + text-overflow:ellipsis +
+                         white-space:nowrap. El elemento DEBE tener ancho
+                         definido o min-w-0 en contexto flex.
+  shrink-0               flex-shrink: 0. El elemento no se encoge.
+  min-w-0                Permite que un flex child se encoja por debajo de
+                         su contenido mínimo (habilita truncate en flex).
+  inset-0                top:0 right:0 bottom:0 left:0 (cubre el padre).
+  aspect-[4/3]           Ratio de aspecto arbitrario 4:3 (Tailwind v3+).
+  bg-black/50            Negro con 50% de opacidad (sintaxis Tailwind v3).
+  divide-y               Border-top en todos los hijos excepto el primero.
+  tracking-wide          letter-spacing: 0.05em (útil en etiquetas ALL CAPS).
+  uppercase              text-transform: uppercase.
+  -translate-y-1/2       Centrado vertical: translateY(-50%) con top:50%.
+  pointer-events-none    El elemento no responde a eventos de mouse/touch.
+  pointer-events-auto    Restaura los eventos (útil dentro de un padre con
+                         pointer-events-none).
+  ─────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+4.5  Headless UI — Button y sus diferencias con <button>
+────────────────────────────────────────────────────────────────────────────────
+
+Headless UI es una librería de componentes accesibles sin estilos.
+Su componente <Button> renderiza un <button> nativo, pero agrega:
+
+  • Gestión automática de data-active, data-hover, data-focus attributes.
+  • Soporte para disabled con manejo de ARIA correcto.
+  • Compatibilidad con grupos (ButtonGroup).
+
+En este proyecto, <Button> de Headless UI se usa cuando se necesitan
+los data-attributes para estilos condicionales:
+
+  className="... data-[hover]:bg-red-100 data-[active]:scale-95"
+
+Si no se necesitan los data-attributes, un <button> nativo es igualmente
+válido y no agrega peso de dependencia.
+
+IMPORTANTE: <Button> de Headless UI NO debe contener elementos interactivos
+(<Link>, <a>, otro <button>). Esto generaría el anti-patrón de nodos
+interactivos anidados discutido en 4.1.
+
+────────────────────────────────────────────────────────────────────────────────
+4.6  Animaciones CSS vs Framer Motion
+────────────────────────────────────────────────────────────────────────────────
+
+Framer Motion:
+  PROs: animaciones complejas (drag, layout animations, spring physics),
+        orquestación (staggerChildren), animaciones de salida (exit).
+  CONs: bundle size (~50KB gzipped), overhead de JS en cada frame,
+        más complejo de mantener para animaciones simples.
+
+CSS Transitions (transform + transition):
+  PROs: ejecutan en el compositor del browser (GPU), no bloquean el JS
+        thread, zero bundle size adicional, simples de entender.
+  CONs: limitadas a propiedades animables con CSS, sin spring physics,
+        sin animaciones de salida sin JS adicional.
+
+Decisión tomada en el refactor admin:
+  La animación de apertura del menú mobile (clip-path circular) fue
+  reemplazada por una transición CSS (translate-x) porque:
+  1. Es una animación simple: slide desde la izquierda.
+  2. CSS transitions tienen mejor rendimiento en mobile (compositor thread).
+  3. Elimina la dependencia de framer-motion de este componente.
+  4. La animación es más predecible y familiar para el usuario.
+
+────────────────────────────────────────────────────────────────────────────────
+4.7  Patron "Client Component Shell" en Next.js App Router
+────────────────────────────────────────────────────────────────────────────────
+
+Next.js App Router tiene Server Components por defecto. Para manejar
+interactividad con hooks (useState, useEffect) se necesitan Client Components
+marcados con "use client".
+
+El problema original en las páginas admin era que todo el componente de
+página era un Server Component, lo que impedía:
+  • Manejo de estado offline (navigator.onLine).
+  • Fetch de datos desde el cliente con manejo de errores.
+  • Mostrar spinners de carga.
+
+Solución: patrón "Client Component Shell":
+
+  // src/app/admin/activos/page.tsx (Server Component — ligero)
+  import { Suspense } from "react";
+  import AdminProductsPage from "@/app/ui/admin/AdminProductsPage";
+
+  export default function Page() {
+    return (
+      <Suspense fallback={<div>Cargando...</div>}>
+        <AdminProductsPage active={true} />
+      </Suspense>
+    );
+  }
+
+  // src/app/ui/admin/AdminProductsPage.tsx (Client Component — lógica)
+  "use client";
+  export default function AdminProductsPage({ active }) {
+    const [products, setProducts] = useState([]);
+    useEffect(() => { /* fetch con manejo offline */ }, []);
+    return <ProductsListAdmin products={products} />;
+  }
+
+Ventajas:
+  • El Server Component (page.tsx) puede exportar metadata, hacer auth
+    server-side, y es más rápido de renderizar.
+  • El Client Component (AdminProductsPage) maneja toda la interactividad.
+  • Suspense en el Server Component provee el fallback de carga.
+
+────────────────────────────────────────────────────────────────────────────────
+4.8  clsx — composición condicional de clases
+────────────────────────────────────────────────────────────────────────────────
+
+clsx es una utilidad para componer strings de clases CSS condicionalmente.
+Se usa en el proyecto en UpdateComponent.tsx y otros formularios.
+
+  import clsx from "clsx";
+
+  // Ejemplo básico
+  clsx("base-class", isActive && "active-class", isError && "error-class")
+  // → "base-class active-class" si isActive=true, isError=false
+
+  // Con objetos (sintaxis alternativa)
+  clsx({ "bg-red-100": isError, "bg-green-100": isSuccess })
+
+  // En el proyecto (input de formulario):
+  clsx(
+    "block w-full rounded-xl border bg-gray-50 py-2 px-3 text-sm",
+    "focus:outline-none focus:ring-2 focus:ring-[#004AAD]",
+    errors.productName ? "border-red-400" : "border-gray-200",
+  )
+
+ALTERNATIVA: cn() con tailwind-merge.
+  tailwind-merge resuelve conflictos entre clases Tailwind del mismo tipo
+  (ej: "p-2 p-4" → "p-4"). Es más robusto que clsx solo cuando se
+  combinan clases de diferentes orígenes (props + base).
+
+  import { clsx } from "clsx";
+  import { twMerge } from "tailwind-merge";
+  export function cn(...inputs) { return twMerge(clsx(inputs)); }
+
+
+================================================================================
+  PARTE 5 — RESUMEN DE ARCHIVOS MODIFICADOS
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+5.1  UI Pública
+────────────────────────────────────────────────────────────────────────────────
+
+  Archivo                                  Cambio principal
+  ─────────────────────────────────────────────────────────────────────────────
+  src/app/globals.css                      overflow-x: hidden en html y body
+  src/app/layout.tsx                       metadata, lang='es', viewport
+  src/app/page.tsx                         Hero section, CTAs, semántica
+  src/app/dashboard/page.tsx              px-4 al max-w-7xl, tipografía
+  src/app/login/layout.tsx                Split layout con gradiente de marca
+  src/app/register/layout.tsx             Ídem login layout
+  src/app/login/LoginForm.tsx             Inputs styled, padding responsive
+  src/app/register/page.tsx              Ídem LoginForm
+  src/app/ui/shared/NavBar.tsx            <nav>, sticky, responsive
+  src/app/ui/shared/CartButton.tsx        Icono + texto hidden sm:inline
+  src/app/ui/shared/BuysRecordButton.tsx  Ídem CartButton
+  src/app/ui/shared/LoginButton.tsx       Link-as-button
+  src/app/ui/shared/LogoutButton.tsx      button nativo con signOut
+  src/app/ui/shared/HomePage.tsx          px-4, tipografía responsive
+  src/app/ui/dashboard/Cards.tsx          Card con shadow, Image fill
+  src/app/ui/dashboard/SearchBar.tsx      focus-within, MagnifyingGlassIcon
+  src/app/ui/dashboard/Pagination.tsx     Estilos de botón, iconos, español
+  src/app/ui/dashboard/AddToCartButton.tsx Backdrop, animación, CheckCircleIcon
+  src/app/ui/dashboard/ProductDetails.tsx Link volver, fill image, responsive
+  src/app/ui/cart/CartCard.tsx            Iconos, rounded-xl imagen
+  src/app/ui/cart/ProductList.tsx         Grid responsive, empty state, resumen
+  ─────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+5.2  UI Admin
+────────────────────────────────────────────────────────────────────────────────
+
+  Archivo                                  Cambio principal
+  ─────────────────────────────────────────────────────────────────────────────
+  src/app/admin/layout.tsx                pt-14 md:pt-2 para compensar header
+  src/app/ui/admin/sideBar/SideBar.tsx    Tokens de color, rounded-xl items,
+                                          logo IAW., separación compacta
+  src/app/ui/admin/sideBar/HeaderMobile.tsx Reemplaza Framer Motion por CSS
+                                          transition. Separa header bar fija
+                                          del drawer lateral. Fix superposi-
+                                          ción de logo en mobile.
+  src/app/ui/admin/AdminHomePage.tsx      Cards KPI con barra de acento,
+                                          grid responsive, link "Ver todas"
+  src/app/ui/admin/ProductsListAdmin.tsx  Cards rounded-2xl, badges de stock
+                                          semánticos (rojo/ámbar), botones
+                                          soft (sin color primario sólido)
+  src/app/ui/admin/SalesListAdmin.tsx     Cards rounded-2xl, botón "Ver
+                                          detalle" con color primario sólido
+  src/app/ui/admin/SaleDetail.tsx         Dos cards separadas (encabezado +
+                                          líneas), divide-y, monto destacado
+  src/app/ui/admin/SearchBar.tsx          Icono integrado, rounded split,
+                                          color primario en botón buscar
+  src/app/ui/admin/Pagination.tsx         Link-as-button, iconos chevron,
+                                          color primario en página activa
+  src/app/ui/admin/UpdateComponent.tsx    Inputs rounded-xl bg-gray-50,
+                                          validación inline, focus ring
+  ─────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+  APÉNDICE
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+A.1  Tabla de tokens de colores (completa)
+────────────────────────────────────────────────────────────────────────────────
+
+  Token                    HEX / Tailwind           Dónde se usa
+  ─────────────────────────────────────────────────────────────────────────────
+  Primario                 #004AAD                  Botones CTA, links activos,
+                                                    barras KPI, page activa
+  Primario hover           #003d8f                  Hover de todos los anteriores
+  Acento (logo, nav active)text-blue-400 (#60a5fa)  Logo "IAW.", ítem activo del
+                                                    sidebar en desktop y mobile
+  Fondo sidebar            bg-gray-900 (#111827)    SideBar y HeaderMobile
+  Fondo app/page           bg-zinc-100 / bg-gray-50 Layout admin, dashboard
+  Card blanca              bg-white                 Todas las cards de contenido
+  Error / alerta           bg-red-50, text-red-700  Badges sin stock, mensajes
+  Éxito                    bg-emerald-50/100         Botón Activar
+  Advertencia              bg-amber-100, text-amber-700 Badge bajo stock
+  Texto principal          text-gray-900 / text-gray-800 Títulos
+  Texto secundario         text-gray-600 / text-gray-500 Metadata, subtítulos
+  Texto deshabilitado      text-gray-400            Fechas, placeholders
+  Borde card               border-gray-100          Cards, inputs en reposo
+  ─────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+A.2  Reglas de accesibilidad aplicadas
+────────────────────────────────────────────────────────────────────────────────
+
+  1. Todo botón que solo muestra un icono debe tener aria-label con
+     descripción textual de la ACCIÓN (ej: aria-label="Cerrar menú").
+
+  2. La barra de navegación debe usar la etiqueta semántica <nav> con
+     aria-label descriptivo.
+
+  3. Los elementos interactivos (<a>, <button>) no deben anidarse entre sí.
+
+  4. Los colores de texto sobre fondo deben cumplir ratio de contraste
+     mínimo de 4.5:1 (WCAG AA) para texto normal, 3:1 para texto grande.
+
+  5. Los modales deben tener un backdrop oscuro para comunicar el estado
+     de bloqueo del fondo.
+
+  6. Los inputs de formulario deben tener labels asociados explícitamente
+     con htmlFor={id} / id={id}.
+
+  7. Los estados de error deben comunicarse con texto visible, no solo
+     con color (no depender solo de "el borde se pone rojo").
+
+────────────────────────────────────────────────────────────────────────────────
+A.3  Glosario de clases Tailwind clave
+────────────────────────────────────────────────────────────────────────────────
+
+  overflow-hidden       Recorta el contenido que desborda el contenedor.
+                        Necesario con border-radius para que las esquinas
+                        funcionen en imágenes.
+
+  transition-shadow     Anima solo la propiedad box-shadow. Más performante
+                        que transition-all que anima TODAS las propiedades.
+
+  truncate              overflow:hidden + text-overflow:ellipsis +
+                        white-space:nowrap. Requiere width definido o min-w-0
+                        en contexto flex.
+
+  shrink-0              flex-shrink: 0. El elemento no se encoge aunque
+                        el contenedor flex no tenga espacio.
+
+  min-w-0               Permite que un flex child se encoja por debajo de su
+                        tamaño de contenido mínimo. Habilita el uso de
+                        truncate dentro de flex containers.
+
+  inset-0               top:0 right:0 bottom:0 left:0 en una sola clase.
+                        Cubre completamente el contenedor posicionado padre.
+
+  aspect-[4/3]          Ratio de aspecto arbitrario 4:3 (Tailwind v3+).
+                        Mantiene proporciones al escalar con CSS puro.
+
+  ring-offset-1         Espacio blanco entre el elemento y el anillo de foco.
+                        Mejora la visibilidad del focus ring.
+
+  bg-black/50           Negro con 50% de opacidad. Sintaxis de opacidad de
+                        color en Tailwind v3: color/opacidad.
+
+  divide-y              Aplica border-top a todos los hijos excepto el
+                        primero. Equivale a :not(:first-child) { border-top }.
+
+  tracking-wide         letter-spacing: 0.05em. Útil para etiquetas en
+                        mayúsculas (uppercase tracking-wide).
+
+  -translate-y-1/2      translateY(-50%). Combinado con top-1/2 centra
+                        verticalmente un elemento absoluto.
+
+  pointer-events-none   El elemento no responde a eventos de mouse/touch/click.
+                        El evento "atraviesa" hacia el elemento de abajo.
+
+  pointer-events-auto   Restaura los eventos del puntero. Útil para
+                        re-habilitar hijos específicos dentro de un padre
+                        con pointer-events-none.
+
+────────────────────────────────────────────────────────────────────────────────
+A.4  Anti-patrones detectados y su corrección
+────────────────────────────────────────────────────────────────────────────────
+
+  Anti-patrón                          Corrección aplicada
+  ─────────────────────────────────────────────────────────────────────────────
+  <Button><Link href="..."></Link></Button>  → <Link href="..." className="...px-4 py-2...">
+  <Link href="..."><Button>...</Button></Link> → <Link href="..." className="...px-4 py-2...">
+  div como contenedor de nav           → <nav aria-label="...">
+  Paleta de colores inconsistente      → Token único #004AAD
+  max-w-7xl sin px-4 en mobile         → Agregar px-4 al contenedor
+  Header mobile sin espacio reservado  → pt-14 md:pt-2 en el contenido
+  Animación compleja con Framer Motion → CSS transition (translate-x)
+  para un simple slide de menú
+  Icono de búsqueda sin texto aria     → El input tiene placeholder descriptivo
+  Texto en mobile siempre visible      → hidden sm:inline para texto de botones
+  Spinner de carga sin color de marca  → border-[#004AAD] en el spinner
+  ─────────────────────────────────────────────────────────────────────────────
+
+
+================================================================================
+  FIN DEL INFORME
+  IAW-Commerce — Next.js 14 + Tailwind CSS v3
+================================================================================
