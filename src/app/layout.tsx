@@ -16,7 +16,10 @@ export const metadata: Metadata = {
     "IAW Commerce es una aplicación web progresiva desarrollada en el marco de la materia Ingeniería de Aplicaciones Web. Permite gestionar un bazar online con funcionalidades de catálogo, carrito de compras y administración, ofreciendo una experiencia fluida tanto en modo online como offline.",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icons/iaw-favicon-32.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/iaw-favicon-32.svg", type: "image/svg+xml" },
+    ],
     apple: "/icons/iaw-96.svg",
   },
   robots: {
