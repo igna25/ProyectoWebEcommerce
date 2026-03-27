@@ -13,6 +13,10 @@ export default function LoginForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    if (!navigator.onLine) {
+      setError("Sin conexión. No podés iniciar sesión offline.");
+      return;
+    }
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     const result = await signIn("credentials", {
