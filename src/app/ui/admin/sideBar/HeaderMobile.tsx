@@ -8,6 +8,7 @@ import { SIDENAV_ITEMS } from "./Constants";
 import { SideNavItem } from "./Types";
 import { Icon } from "@iconify/react";
 import { signOut } from "next-auth/react";
+import { clearLocalCart } from "@/lib/cache/cartCache";
 
 const HeaderMobile = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -82,6 +83,7 @@ const HeaderMobile = () => {
         <div className="border-t border-gray-700 p-4">
           <button
             onClick={() => {
+              clearLocalCart();
               signOut();
               closeMenu();
             }}

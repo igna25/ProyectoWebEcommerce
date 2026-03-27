@@ -10,6 +10,7 @@ import { SideNavItem } from "./Types";
 import { Icon } from "@iconify/react";
 
 import { signOut } from "next-auth/react";
+import { clearLocalCart } from "@/lib/cache/cartCache";
 import { Button } from "@headlessui/react";
 
 const SideNav = () => {
@@ -35,6 +36,7 @@ const SideNav = () => {
         </div>
         <Button
           onClick={() => {
+            clearLocalCart();
             signOut();
           }}
           className="flex flex-row space-x-3 items-center px-3 py-2.5 mx-3 mb-4 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"

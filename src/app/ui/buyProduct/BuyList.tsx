@@ -3,6 +3,7 @@
 import { OrderItem } from "@/lib/Entities/Order";
 import { Product } from "@/lib/Entities/Product";
 import { buyProducts } from "@/lib/actions/buyProducts";
+import { clearLocalCart } from "@/lib/cache/cartCache";
 import clsx from "clsx";
 import Image from "next/image";
 import React, { Fragment, useState } from "react";
@@ -73,6 +74,7 @@ export const BuyList: React.FC<BuyListProps> = ({ products, userId }) => {
       }
 
       if (result.success) {
+        clearLocalCart();
         toast.success("Compra exitosa", { position: "top-right" });
       } else {
         toast.error("Error al comprar", { position: "top-right" });
