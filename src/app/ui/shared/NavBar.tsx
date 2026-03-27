@@ -1,15 +1,9 @@
-import { getServerSession, Session } from "next-auth";
 import Link from "next/link";
 import Image from "next/image";
-import { authOptions } from "../../api/auth/[...nextauth]/auth-config";
-import BuysRecordButton from "./BuysRecordButton";
 import CartButton from "./CartButton";
-import LoginButton from "./LoginButton";
-import LogoutButton from "./LogoutButton";
+import NavbarAuthSection from "./NavbarAuthSection";
 
-const NavBar = async () => {
-  const session: Session | null = await getServerSession(authOptions);
-
+const NavBar = () => {
   return (
     <nav
       aria-label="Navegación principal"
@@ -34,14 +28,7 @@ const NavBar = async () => {
             Productos
           </Link>
           <CartButton />
-          {session ? (
-            <>
-              <BuysRecordButton />
-              <LogoutButton />
-            </>
-          ) : (
-            <LoginButton />
-          )}
+          <NavbarAuthSection />
         </div>
       </div>
     </nav>
