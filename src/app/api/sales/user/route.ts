@@ -1,9 +1,11 @@
 import SalesRepository from "@/lib/Repositories/SalesRepository";
 import { NextResponse } from "next/server";
+import { unstable_noStore as noStore } from "next/cache";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: any) {
+  noStore();
   try {
     const { searchParams } = new URL(req.url || "");
     const userId = (searchParams.get("userId") || "").trim();
@@ -20,7 +22,7 @@ export async function GET(req: any) {
     );
     return NextResponse.json(
       { sales: result.sales, total: result.total, page, pageSize, userId },
-      { status: 200 },
+      { status: 200, headers: { "Cache-Control": "no-cache" } },
     );
   } catch (err) {
     return NextResponse.json(

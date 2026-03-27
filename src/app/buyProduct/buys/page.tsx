@@ -21,9 +21,7 @@ function BuysPageContent() {
         `/api/sales/user?userId=${session.user.id}&page=${currentPage}&pageSize=${ITEMS_PER_PAGE}`,
       );
       const json = await res.json();
-      setSales(
-        (json.sales || []).filter((s: any) => s.userid === session.user.id),
-      );
+      setSales(json.sales || []);
       setTotalPages(Math.max(1, Math.ceil((json.total || 0) / ITEMS_PER_PAGE)));
     };
     load();
