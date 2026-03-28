@@ -25,6 +25,10 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/login',
+        headers: [{ key: 'Cache-Control', value: 'no-store' }],
+      },
+      {
         source: '/:path*',
         headers: [
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
