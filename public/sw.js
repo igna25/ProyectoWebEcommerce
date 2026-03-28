@@ -217,6 +217,55 @@ self.addEventListener("fetch", (event) => {
   }
 
 
+  if (url.pathname === "/api/auth/csrf") {
+    event.respondWith(
+      fetch(request)
+        .then(async (res) => {
+          if (res.ok) {
+            const cache = await caches.open(RUNTIME_API_CACHE);
+            await cache.put(request, res.clone());
+          }
+          return res;
+        })
+        .catch(async () => {
+          const cached = await caches.match(request);
+          if (cached) return cached;
+          return new Response(JSON.stringify({ csrfToken: "" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }),
+    );
+    return;
+  }
+
+  if (url.pathname === "/api/auth/signout" && request.method === "POST") {
+    const clearSessionCache = async () => {
+      const cache = await caches.open(RUNTIME_API_CACHE);
+      const keys = await cache.keys();
+      await Promise.all(
+        keys
+          .filter((k) => new URL(k.url).pathname === "/api/auth/session")
+          .map((k) => cache.delete(k)),
+      );
+    };
+    event.respondWith(
+      fetch(request)
+        .then(async (res) => {
+          await clearSessionCache();
+          return res;
+        })
+        .catch(async () => {
+          await clearSessionCache();
+          return new Response(JSON.stringify({ url: "/login" }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }),
+    );
+    return;
+  }
+
   if (isSessionApi(url)) {
     event.respondWith(
       fetch(request)

@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import BuysRecordButton from "./BuysRecordButton";
-import LogoutButton from "./LogoutButton";
+import UserMenu from "./UserMenu";
 import LoginButton from "./LoginButton";
 
 const NavbarAuthSection = () => {
@@ -12,7 +12,7 @@ const NavbarAuthSection = () => {
   return session ? (
     <>
       <BuysRecordButton />
-      <LogoutButton />
+      <UserMenu />
     </>
   ) : (
     <LoginButton />

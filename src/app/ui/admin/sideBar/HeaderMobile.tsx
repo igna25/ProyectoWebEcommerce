@@ -82,10 +82,15 @@ const HeaderMobile = () => {
         {/* Botón cerrar sesión */}
         <div className="border-t border-gray-700 p-4">
           <button
-            onClick={() => {
+            onClick={async () => {
               clearLocalCart();
-              signOut();
+              localStorage.removeItem("userId");
+              localStorage.removeItem("isAdmin");
               closeMenu();
+              try {
+                await signOut({ redirect: false });
+              } catch {}
+              window.location.href = "/login";
             }}
             className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
           >

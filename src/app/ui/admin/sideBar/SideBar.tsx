@@ -35,9 +35,14 @@ const SideNav = () => {
           </div>
         </div>
         <Button
-          onClick={() => {
+          onClick={async () => {
             clearLocalCart();
-            signOut();
+            localStorage.removeItem("userId");
+            localStorage.removeItem("isAdmin");
+            try {
+              await signOut({ redirect: false });
+            } catch {}
+            window.location.href = "/login";
           }}
           className="flex flex-row space-x-3 items-center px-3 py-2.5 mx-3 mb-4 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
         >
