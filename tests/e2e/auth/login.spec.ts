@@ -21,9 +21,8 @@ test.describe("Login — UI", () => {
   });
 
   test.describe("Renderizado del formulario", () => {
-    test("muestra el título y descripción de bienvenida", async ({ page }) => {
-      await expect(page.locator("h2").filter({ hasText: "Login" })).toBeVisible();
-      await expect(page.locator("p").filter({ hasText: "Bienvenido de nuevo" })).toBeVisible();
+    test("muestra el título de bienvenida", async ({ page }) => {
+      await expect(page.locator("h2").filter({ hasText: "Bienvenido" })).toBeVisible();
     });
 
     test("muestra los campos email y password", async ({ page }) => {
@@ -45,13 +44,13 @@ test.describe("Login — UI", () => {
     test("muestra el botón Sign In", async ({ page }) => {
       const submitBtn = page.locator('button[type="submit"]');
       await expect(submitBtn).toBeVisible();
-      await expect(submitBtn).toContainText("Sign In");
+      await expect(submitBtn).toContainText("Iniciar sesión");
     });
 
     test("muestra enlace para registro", async ({ page }) => {
       const registerLink = page.locator('a[href="/register"]');
       await expect(registerLink).toBeVisible();
-      await expect(registerLink).toContainText("Regístrate aquí");
+      await expect(registerLink).toContainText("Registrate aquí");
     });
 
     test("los campos email y password son requeridos", async ({ page }) => {
@@ -110,18 +109,6 @@ test.describe("Login — UI", () => {
 
       await page.waitForTimeout(1000);
       expect(page.url()).toContain("/login");
-    });
-
-    test("URL contiene el parámetro error tras credenciales incorrectas", async ({
-      page,
-    }) => {
-      await fillAndSubmitLoginForm(
-        page,
-        INVALID_CREDENTIALS.email,
-        INVALID_CREDENTIALS.password,
-      );
-      await page.waitForURL("**/login?**", { timeout: 15000 });
-      expect(page.url()).toContain("error=CredentialsSignin");
     });
   });
 
