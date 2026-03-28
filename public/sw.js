@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v14";
+const CACHE_VERSION = "v15";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
@@ -12,13 +12,6 @@ const OFFLINE_QUEUE_STORE = "pendingOps";
 const SYNC_TAG = "pending-ops";
 
 const CORE_ROUTES = ["/", OFFLINE_URL, "/manifest.webmanifest"];
-const OPTIONAL_ROUTES = [
-  "/login",
-  "/register",
-  "/dashboard",
-  "/cart",
-  "/buyProduct",
-];
 const ADMIN_PAGES = ["/admin", "/admin/activos", "/admin/inactivos", "/admin/ventas"];
 
 async function cleanOldCaches(cacheName) {
@@ -35,9 +28,6 @@ self.addEventListener("install", (event) => {
       .open(APP_SHELL_CACHE)
       .then(async (cache) => {
         await cache.addAll(CORE_ROUTES);
-        await Promise.allSettled(
-          OPTIONAL_ROUTES.map((route) => cache.add(route)),
-        );
       })
       .then(() => self.skipWaiting()),
   );
