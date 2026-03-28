@@ -1,5 +1,7 @@
 import { Sale } from "@/lib/Entities/Sale";
 import { SalesOrder } from "@/lib/Entities/SalesOrder";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 import React from "react";
 
 interface SaleDetailProps {
@@ -10,6 +12,13 @@ interface SaleDetailProps {
 const SaleDetail = ({ sale, orders }: SaleDetailProps) => {
   return (
     <div className="w-full rounded overflow-hidden shadow-lg bg-white m-4 p-6">
+      <Link
+        href="/buyProduct/buys"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors mb-6"
+      >
+        <ChevronLeftIcon className="w-4 h-4" />
+        Mis compras
+      </Link>
       <div className="flex justify-between items-center border-b pb-4 mb-4">
         <div>
           <h2 className="font-bold text-2xl">Detalle de Compra</h2>
