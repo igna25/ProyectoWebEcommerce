@@ -40,7 +40,6 @@ export default function ProductList({
         return {
           ...item,
           ...product,
-          productprice: product.price,
           id: item.productid,
           cartid: "",
           dateadded: new Date(),
