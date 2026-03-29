@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -58,7 +58,10 @@ export default SideNav;
 
 const MenuItem = ({ item }: { item: SideNavItem }) => {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
   const [subMenuOpen, setSubMenuOpen] = useState(false);
+
+  useEffect(() => setMounted(true), []);
   const toggleSubMenu = () => {
     setSubMenuOpen(!subMenuOpen);
   };
@@ -70,7 +73,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
           <Button
             onClick={toggleSubMenu}
             className={`flex flex-row items-center px-3 py-2.5 rounded-xl hover:bg-gray-800 w-full justify-between transition-colors ${
-              pathname.includes(item.path)
+              mounted && pathname.includes(item.path)
                 ? "bg-blue-500/10 text-blue-400"
                 : "text-gray-300"
             }`}
@@ -94,7 +97,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
                     key={idx}
                     href={subItem.path}
                     className={`text-sm py-1.5 px-3 rounded-lg transition-colors ${
-                      subItem.path === pathname
+                      mounted && subItem.path === pathname
                         ? "text-blue-400 font-semibold"
                         : "text-gray-400 hover:text-white"
                     }`}
@@ -110,7 +113,7 @@ const MenuItem = ({ item }: { item: SideNavItem }) => {
         <Link
           href={item.path}
           className={`flex flex-row space-x-3 items-center px-3 py-2.5 rounded-xl hover:bg-gray-800 transition-colors ${
-            item.path === pathname
+            mounted && item.path === pathname
               ? "bg-blue-500/10 text-blue-400"
               : "text-gray-300"
           }`}
