@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { clearLocalCart } from "@/lib/cache/cartCache";
+import { isOfflineSyncSupported, queueLogout } from "@/lib/offlineQueue";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -43,6 +44,18 @@ export default function UserMenu() {
     clearLocalCart();
     localStorage.removeItem("userId");
     localStorage.removeItem("isAdmin");
+    if (!navigator.onLine) {
+      if (isOfflineSyncSupported()) {
+        await queueLogout();
+      } else {
+        localStorage.setItem("pendingLogout", "true");
+      }
+      try {
+        await signOut({ redirect: false });
+      } catch {}
+      window.location.href = "/login";
+      return;
+    }
     try {
       await signOut({ redirect: false });
     } catch {}

@@ -85,3 +85,16 @@ export function isOfflineSyncSupported(): boolean {
   if (typeof window === "undefined") return false;
   return hasSyncSupport() && "indexedDB" in window;
 }
+
+export async function queueLogout(): Promise<void> {
+  try {
+    const csrfRes = await fetch("/api/auth/csrf");
+    const { csrfToken } = await csrfRes.json();
+    await queueOfflineOp({
+      url: "/api/auth/signout",
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `csrfToken=${csrfToken}&callbackUrl=%2Flogin&json=true`,
+    });
+  } catch {}
+}

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { signOut } from "next-auth/react";
 
 export default function ConnectionStatus() {
   const [isOnline, setIsOnline] = useState(true);
@@ -8,10 +9,25 @@ export default function ConnectionStatus() {
   useEffect(() => {
     setIsOnline(navigator.onLine);
 
+    const completePendingLogout = async () => {
+      localStorage.removeItem("pendingLogout");
+      try {
+        await signOut({ redirect: false });
+      } catch {}
+      window.location.href = "/login";
+    };
+
+    if (navigator.onLine && localStorage.getItem("pendingLogout") === "true") {
+      completePendingLogout();
+    }
+
     const handleOnline = () => {
       setIsOnline(true);
       setVisible(true);
       const timer = setTimeout(() => setVisible(false), 3000);
+      if (localStorage.getItem("pendingLogout") === "true") {
+        completePendingLogout();
+      }
       return () => clearTimeout(timer);
     };
 

@@ -9,6 +9,7 @@ import { SideNavItem } from "./Types";
 import { Icon } from "@iconify/react";
 import { signOut } from "next-auth/react";
 import { clearLocalCart } from "@/lib/cache/cartCache";
+import { isOfflineSyncSupported, queueLogout } from "@/lib/offlineQueue";
 
 const HeaderMobile = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,6 +87,19 @@ const HeaderMobile = () => {
               clearLocalCart();
               localStorage.removeItem("userId");
               localStorage.removeItem("isAdmin");
+              if (!navigator.onLine) {
+                if (isOfflineSyncSupported()) {
+                  await queueLogout();
+                } else {
+                  localStorage.setItem("pendingLogout", "true");
+                }
+                closeMenu();
+                try {
+                  await signOut({ redirect: false });
+                } catch {}
+                window.location.href = "/login";
+                return;
+              }
               closeMenu();
               try {
                 await signOut({ redirect: false });

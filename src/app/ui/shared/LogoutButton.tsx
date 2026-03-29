@@ -1,12 +1,25 @@
 "use client";
 import { signOut } from "next-auth/react";
 import { clearLocalCart } from "@/lib/cache/cartCache";
+import { isOfflineSyncSupported, queueLogout } from "@/lib/offlineQueue";
 
 const LogoutButton = () => {
   const handleLogout = async () => {
     clearLocalCart();
     localStorage.removeItem("userId");
     localStorage.removeItem("isAdmin");
+    if (!navigator.onLine) {
+      if (isOfflineSyncSupported()) {
+        await queueLogout();
+      } else {
+        localStorage.setItem("pendingLogout", "true");
+      }
+      try {
+        await signOut({ redirect: false });
+      } catch {}
+      window.location.href = "/login";
+      return;
+    }
     try {
       await signOut({ redirect: false });
     } catch {}
