@@ -45,6 +45,14 @@ const NewProductForm: React.FC<NewProductFormProps> = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!navigator.onLine) {
+      toast.error(
+        "Sin conexión. Esta acción requiere internet para poder realizarse.",
+        { position: "top-right" },
+      );
+      return;
+    }
+
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);

@@ -24,6 +24,12 @@ export default function ProductsListAdmin({
     productId: string,
     currentActive: boolean,
   ) => {
+    if (!navigator.onLine) {
+      setError(
+        "Sin conexión. Esta acción requiere internet para poder realizarse.",
+      );
+      return;
+    }
     setTogglingId(productId);
     setError(null);
     try {

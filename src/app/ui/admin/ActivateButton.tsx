@@ -2,24 +2,26 @@
 import React, { Fragment, useState } from "react";
 import Modal from "react-modal";
 import { Button } from "@headlessui/react";
-import { queueOfflineOp, isOfflineSyncSupported } from "@/lib/offlineQueue";
-
 const ActivateButton = ({ data }: { data: { id: string } }) => {
   const { id } = data;
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [queued, setQueued] = useState(false);
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => {
     setModalIsOpen(false);
     setError(null);
-    setQueued(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!navigator.onLine) {
+      setError(
+        "Sin conexión. Esta acción requiere internet para poder realizarse.",
+      );
+      return;
+    }
     try {
       setIsLoading(true);
       setError(null);
@@ -37,32 +39,12 @@ const ActivateButton = ({ data }: { data: { id: string } }) => {
       });
 
       if (!response.ok) {
-        if (response.status === 503 && isOfflineSyncSupported()) {
-          await queueOfflineOp({
-            url: "/api/admin/products/status",
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId: id, active: true }),
-          });
-          setQueued(true);
-          return;
-        }
         throw new Error("Failed to activate product");
       }
 
       closeModal();
       window.location.reload();
-    } catch (err) {
-      if (isOfflineSyncSupported()) {
-        await queueOfflineOp({
-          url: "/api/admin/products/status",
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId: id, active: true }),
-        });
-        setQueued(true);
-        return;
-      }
+    } catch {
       setError("Error al activar el producto");
     } finally {
       setIsLoading(false);
@@ -92,11 +74,6 @@ const ActivateButton = ({ data }: { data: { id: string } }) => {
             ¿Estás seguro de que deseas volver a activar este producto?
           </p>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          {queued && (
-            <p className="text-amber-600 text-sm mb-4">
-              Sin conexión. Se activará cuando vuelva la conexión.
-            </p>
-          )}
           <div className="flex justify-end space-x-4">
             <Button
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
