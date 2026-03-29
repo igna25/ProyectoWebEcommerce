@@ -224,7 +224,7 @@ class ProductsRepository {
       const query = await sql<Product>`
         SELECT * FROM products
         ORDER BY publicationdate DESC
-        LIMIT 3
+        LIMIT 12
       `;
       return query.rows;
     } catch (error) {
@@ -241,7 +241,7 @@ class ProductsRepository {
         JOIN sales_orders so ON p.id = so.productID
         GROUP BY p.id
         ORDER BY total_sold DESC
-        LIMIT 3
+        LIMIT 12
       `;
       return query.rows;
     } catch (error) {
