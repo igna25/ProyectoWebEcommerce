@@ -65,23 +65,29 @@ class ProductsRepository {
     page: number,
     pageSize: number,
     active: boolean = true,
+    sort: string = "name_asc",
   ): Promise<{ products: Product[]; total: number }> {
     try {
       const offset = (page - 1) * pageSize;
 
-      const query = await sql<Product>`SELECT * FROM products 
-        WHERE active = ${active}
-        ORDER BY productName
-        LIMIT ${pageSize} OFFSET ${offset}`;
-
       const totalQuery = await sql<{ count: number }>`
-      SELECT COUNT(*) as count FROM products WHERE active = ${active}`;
+        SELECT COUNT(*) as count FROM products WHERE active = ${active}`;
       const total = totalQuery.rows[0].count;
 
-      return {
-        products: query.rows,
-        total,
-      };
+      let query;
+      if (sort === "price_asc") {
+        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY price ASC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else if (sort === "price_desc") {
+        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY price DESC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else if (sort === "newest") {
+        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY publicationdate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else if (sort === "oldest") {
+        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY publicationdate ASC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else {
+        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY productname ASC LIMIT ${pageSize} OFFSET ${offset}`;
+      }
+
+      return { products: query.rows, total };
     } catch (error) {
       console.error("Failed to fetch products:", error);
       throw new Error("Failed to fetch products.");
@@ -93,29 +99,34 @@ class ProductsRepository {
     page: number,
     pageSize: number,
     active: boolean = true,
+    sort: string = "name_asc",
   ): Promise<{ products: Product[]; total: number }> {
     try {
       const offset = (page - 1) * pageSize;
+      const pattern = "%" + productName + "%";
 
       const totalQuery = await sql<{ count: number }>`
-        SELECT COUNT(*) as count 
-        FROM products 
-        WHERE productName ILIKE ${"%" + productName + "%"} 
+        SELECT COUNT(*) as count
+        FROM products
+        WHERE productname ILIKE ${pattern}
         AND active = ${active}
       `;
       const total = totalQuery.rows[0].count;
 
-      const query = await sql<Product>`
-        SELECT * FROM products
-        WHERE productName ILIKE ${"%" + productName + "%"}
-        AND active = ${active}
-        ORDER BY productName
-        LIMIT ${pageSize} OFFSET ${offset}
-      `;
-      return {
-        products: query.rows,
-        total: total,
-      };
+      let query;
+      if (sort === "price_asc") {
+        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY price ASC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else if (sort === "price_desc") {
+        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY price DESC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else if (sort === "newest") {
+        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY publicationdate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else if (sort === "oldest") {
+        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY publicationdate ASC LIMIT ${pageSize} OFFSET ${offset}`;
+      } else {
+        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY productname ASC LIMIT ${pageSize} OFFSET ${offset}`;
+      }
+
+      return { products: query.rows, total };
     } catch (error) {
       console.error(
         `Failed to fetch products with name matching "${productName}":`,

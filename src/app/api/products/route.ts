@@ -15,6 +15,7 @@ export async function GET(req: any) {
       searchParams.get("q") ??
       ""
     ).trim();
+    const sortParam = searchParams.get("sort") ?? "name_asc";
 
     const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
     const pageSize =
@@ -25,6 +26,7 @@ export async function GET(req: any) {
         page,
         pageSize,
         true,
+        sortParam,
       );
       return NextResponse.json(
         {
@@ -44,6 +46,7 @@ export async function GET(req: any) {
       page,
       pageSize,
       true,
+      sortParam,
     );
     return NextResponse.json(
       { products: result.products, total: result.total, page, pageSize },

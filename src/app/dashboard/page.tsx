@@ -20,6 +20,7 @@ function DashboardContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState("name_asc");
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -30,6 +31,7 @@ function DashboardContent() {
       const params = new URLSearchParams({
         page: String(currentPage),
         pageSize: String(ITEMS_PER_PAGE),
+        sort,
       });
       if (query) params.set("query", query);
 
@@ -46,7 +48,7 @@ function DashboardContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, query]);
+  }, [currentPage, query, sort]);
 
   useEffect(() => {
     load();
@@ -62,8 +64,19 @@ function DashboardContent() {
           Explora y encuentra los mejores productos de tu gusto
         </p>
       </div>
-      <div className="flex justify-center mb-4">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
         <SearchBar />
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#004AAD] focus:border-transparent transition"
+        >
+          <option value="name_asc">Nombre A–Z</option>
+          <option value="price_asc">Menor precio</option>
+          <option value="price_desc">Mayor precio</option>
+          <option value="newest">Más reciente</option>
+          <option value="oldest">Más antiguo</option>
+        </select>
       </div>
       <div className="container mx-auto py-2">
         {error && (
