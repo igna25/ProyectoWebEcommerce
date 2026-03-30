@@ -76,15 +76,25 @@ class ProductsRepository {
 
       let query;
       if (sort === "price_asc") {
-        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY price ASC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE active = ${active}
+          ORDER BY price ASC LIMIT ${pageSize} OFFSET ${offset}`;
       } else if (sort === "price_desc") {
-        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY price DESC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE active = ${active}
+          ORDER BY price DESC LIMIT ${pageSize} OFFSET ${offset}`;
       } else if (sort === "newest") {
-        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY publicationdate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE active = ${active}
+          ORDER BY publicationdate DESC LIMIT ${pageSize} OFFSET ${offset}`;
       } else if (sort === "oldest") {
-        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY publicationdate ASC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE active = ${active}
+          ORDER BY publicationdate ASC LIMIT ${pageSize} OFFSET ${offset}`;
       } else {
-        query = await sql<Product>`SELECT * FROM products WHERE active = ${active} ORDER BY productname ASC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE active = ${active}
+          ORDER BY productname ASC LIMIT ${pageSize} OFFSET ${offset}`;
       }
 
       return { products: query.rows, total };
@@ -115,15 +125,25 @@ class ProductsRepository {
 
       let query;
       if (sort === "price_asc") {
-        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY price ASC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active}
+          ORDER BY price ASC LIMIT ${pageSize} OFFSET ${offset}`;
       } else if (sort === "price_desc") {
-        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY price DESC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active}
+          ORDER BY price DESC LIMIT ${pageSize} OFFSET ${offset}`;
       } else if (sort === "newest") {
-        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY publicationdate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active}
+          ORDER BY publicationdate DESC LIMIT ${pageSize} OFFSET ${offset}`;
       } else if (sort === "oldest") {
-        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY publicationdate ASC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active}
+          ORDER BY publicationdate ASC LIMIT ${pageSize} OFFSET ${offset}`;
       } else {
-        query = await sql<Product>`SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active} ORDER BY productname ASC LIMIT ${pageSize} OFFSET ${offset}`;
+        query = await sql<Product>`
+          SELECT * FROM products WHERE productname ILIKE ${pattern} AND active = ${active}
+          ORDER BY productname ASC LIMIT ${pageSize} OFFSET ${offset}`;
       }
 
       return { products: query.rows, total };

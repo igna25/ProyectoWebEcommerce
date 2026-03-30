@@ -79,7 +79,9 @@ export default function HeroCarousel() {
       </div>
 
       <button
-        onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)}
+        onClick={() =>
+          setCurrent((prev) => (prev - 1 + slides.length) % slides.length)
+        }
         className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors"
         aria-label="Anterior"
       >

@@ -15,7 +15,10 @@ export default function ProductCarousel({
 
   const scroll = (dir: "left" | "right") => {
     if (!ref.current) return;
-    ref.current.scrollBy({ left: dir === "left" ? -320 : 320, behavior: "smooth" });
+    ref.current.scrollBy({
+      left: dir === "left" ? -320 : 320,
+      behavior: "smooth",
+    });
   };
 
   return (
