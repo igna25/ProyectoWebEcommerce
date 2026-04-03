@@ -90,7 +90,7 @@ export default function AdminHomePage({ onDataLoaded }: AdminHomePageProps) {
         </div>
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-            Total de Ventas
+            Ventas este mes
           </p>
           <p className="mt-2 text-2xl font-bold text-gray-900">
             {summary.totalSales}
