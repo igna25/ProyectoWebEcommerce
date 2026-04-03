@@ -25,9 +25,12 @@ export default async function processPayment(
       0,
     );
     if (!cart || !orderItems) {
-      return {
-        success: false,
-      };
+      return { success: false };
+    }
+
+    const hasInactive = orderItems.some((item) => item.active === false);
+    if (hasInactive) {
+      return { success: false };
     }
 
     const user = await usersRepository.getUserById(cart.userid);

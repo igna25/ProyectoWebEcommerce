@@ -65,7 +65,10 @@ export const BuyList: React.FC<BuyListProps> = ({ products, userId }) => {
         formData.append("productStock", String(product.stock));
       });
 
-      let result = { success: false };
+      let result: Awaited<ReturnType<typeof buyProducts>> = {
+        success: false,
+        redirectUrl: undefined,
+      };
       if (!userId) {
         //TODO agregar la compra local
         //result = await buyProductsLocal(formData);
@@ -73,7 +76,15 @@ export const BuyList: React.FC<BuyListProps> = ({ products, userId }) => {
         result = await buyProducts(userId);
       }
 
-      if (result.success) {
+      if (result.inactive && result.inactive.length > 0) {
+        toast.error(`Productos no disponibles: ${result.inactive.join(", ")}`, {
+          position: "top-right",
+        });
+      } else if (result.outOfStock && result.outOfStock.length > 0) {
+        toast.error(`Sin stock: ${result.outOfStock.join(", ")}`, {
+          position: "top-right",
+        });
+      } else if (result.success) {
         clearLocalCart();
         toast.success("Compra exitosa", { position: "top-right" });
       } else {

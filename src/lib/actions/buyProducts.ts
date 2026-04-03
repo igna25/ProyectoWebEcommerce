@@ -12,6 +12,7 @@ export async function buyProducts(userID: string): Promise<{
   success: boolean;
   redirectUrl: string | undefined;
   outOfStock?: string[];
+  inactive?: string[];
 }> {
   try {
     const cart = await cartsRepository.getCartByUserId(userID);
@@ -22,6 +23,18 @@ export async function buyProducts(userID: string): Promise<{
 
       if (orderItems.length === 0) {
         throw new Error(`No order items found for cart ID ${cart.id}.`);
+      }
+
+      const inactive = orderItems
+        .filter((item) => !item.active)
+        .map((item) => item.productname);
+
+      if (inactive.length > 0) {
+        return {
+          success: false,
+          redirectUrl: undefined,
+          inactive,
+        };
       }
 
       const outOfStock = orderItems

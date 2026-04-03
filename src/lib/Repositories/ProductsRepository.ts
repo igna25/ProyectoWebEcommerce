@@ -254,6 +254,7 @@ class ProductsRepository {
     try {
       const query = await sql<Product>`
         SELECT * FROM products
+        WHERE active = true
         ORDER BY publicationdate DESC
         LIMIT 12
       `;

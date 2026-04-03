@@ -120,7 +120,8 @@ class OrderItemsRepository {
           products.imageKey,
           products.price AS productPriceOriginal,
           products.publicationDate,
-          products.stock
+          products.stock,
+          products.active
         FROM orderItems
         INNER JOIN products ON orderItems.productID = products.id
         WHERE orderItems.cartID = ${cartId}`;
@@ -136,10 +137,12 @@ class OrderItemsRepository {
 
   async getOrderItemsByCartId(
     cartId: string,
-  ): Promise<(OrderItem & { productname: string })[]> {
+  ): Promise<(OrderItem & { productname: string; active: boolean })[]> {
     try {
-      const query = await sql<OrderItem & { productname: string }>`
-        SELECT orderItems.*, products.productName
+      const query = await sql<
+        OrderItem & { productname: string; active: boolean }
+      >`
+        SELECT orderItems.*, products.productName, products.active
         FROM orderItems
         JOIN products ON orderItems.productID = products.id
         WHERE orderItems.cartID = ${cartId}`;
