@@ -100,6 +100,13 @@ export default function LoginForm() {
             Registrate aquí
           </Link>
         </p>
+
+        <Link
+          href="/"
+          className="block w-full rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 text-center hover:bg-gray-50 transition-colors"
+        >
+          Volver al inicio
+        </Link>
       </form>
     </div>
   );
