@@ -11,7 +11,8 @@ const ITEMS_PER_PAGE = 6;
 export default function AdminProductsPage({ active }: { active: boolean }) {
   const searchParams = useSearchParams();
   const query = searchParams.get("query") || "";
-  const currentPage = Number(searchParams.get("page")) || 1;
+  const pageParam = Number(searchParams.get("page"));
+  const currentPage = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [totalPages, setTotalPages] = useState(1);
