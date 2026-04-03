@@ -12,6 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 export default function UserMenu() {
   const [open, setOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
@@ -41,6 +42,7 @@ export default function UserMenu() {
 
   const handleLogout = async () => {
     setOpen(false);
+    setIsLoggingOut(true);
     clearLocalCart();
     localStorage.removeItem("userId");
     localStorage.removeItem("isAdmin");
@@ -71,6 +73,14 @@ export default function UserMenu() {
   };
 
   const showInstall = !isStandalone && !!deferredPrompt;
+
+  if (isLoggingOut) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+      </div>
+    );
+  }
 
   return (
     <div ref={menuRef} className="relative">
