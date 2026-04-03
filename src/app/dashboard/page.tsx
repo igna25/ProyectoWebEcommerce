@@ -15,7 +15,8 @@ function DashboardContent() {
 
   const query = searchParams.get("query") || "";
   const pageParam = Number(searchParams.get("page"));
-  const currentPage = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+  const currentPage =
+    Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [totalPages, setTotalPages] = useState(1);
