@@ -15,6 +15,11 @@ export async function POST(req: NextRequest) {
     if (!cartid) {
       return NextResponse.json({ msg: "Invalid payment" }, { status: 400 });
     }
+
+    if (payment.status !== "approved") {
+      return NextResponse.json({ msg: "Payment not approved" }, { status: 200 });
+    }
+
     await processPayment(cartid, body.data.id);
 
     return NextResponse.json({ msg: "Payment successfull" }, { status: 200 });
