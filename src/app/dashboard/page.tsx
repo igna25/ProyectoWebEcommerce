@@ -17,8 +17,9 @@ function DashboardContent() {
   const query = searchParams.get("query") || "";
   const rawPage = searchParams.get("page");
   const pageParam = Number(rawPage);
-  const isValidPage = rawPage === null || (Number.isInteger(pageParam) && pageParam > 0);
-  const currentPage = isValidPage ? (pageParam || 1) : 1;
+  const isValidPage =
+    rawPage === null || (Number.isInteger(pageParam) && pageParam > 0);
+  const currentPage = isValidPage ? pageParam || 1 : 1;
 
   useEffect(() => {
     if (!isValidPage) router.replace("/dashboard");
@@ -104,7 +105,10 @@ function DashboardContent() {
           <div className="h-screen flex items-center justify-center bg-gray-100">
             <div className="text-center text-gray-700 space-y-3">
               <p className="text-xl">Esta página no existe.</p>
-              <a href="/dashboard" className="text-sm text-[#004AAD] hover:underline">
+              <a
+                href="/dashboard"
+                className="text-sm text-[#004AAD] hover:underline"
+              >
                 Volver a la primera página
               </a>
             </div>
