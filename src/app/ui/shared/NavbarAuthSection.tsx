@@ -12,7 +12,9 @@ const NavbarAuthSection = () => {
   return session ? (
     <>
       <BuysRecordButton />
-      <UserMenu userName={session.user?.name ?? session.user?.email ?? undefined} />
+      <UserMenu
+        userName={session.user?.name ?? session.user?.email ?? undefined}
+      />
     </>
   ) : (
     <LoginButton />

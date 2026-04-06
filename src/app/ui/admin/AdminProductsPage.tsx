@@ -14,8 +14,9 @@ export default function AdminProductsPage({ active }: { active: boolean }) {
   const query = searchParams.get("query") || "";
   const rawPage = searchParams.get("page");
   const pageParam = Number(rawPage);
-  const isValidPage = rawPage === null || (Number.isInteger(pageParam) && pageParam > 0);
-  const currentPage = isValidPage ? (pageParam || 1) : 1;
+  const isValidPage =
+    rawPage === null || (Number.isInteger(pageParam) && pageParam > 0);
+  const currentPage = isValidPage ? pageParam || 1 : 1;
   const basePath = `/admin/${active ? "activos" : "inactivos"}`;
 
   useEffect(() => {

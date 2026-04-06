@@ -271,6 +271,7 @@ class ProductsRepository {
         SELECT p.*, SUM(so.quantity) as total_sold
         FROM products p
         JOIN sales_orders so ON p.id = so.productID
+        WHERE p.active = true
         GROUP BY p.id
         ORDER BY total_sold DESC
         LIMIT 12
