@@ -10,7 +10,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-export default function UserMenu() {
+export default function UserMenu({ userName }: { userName?: string }) {
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [deferredPrompt, setDeferredPrompt] =
@@ -94,6 +94,11 @@ export default function UserMenu() {
 
       {open && (
         <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-lg py-1 z-50">
+          {userName && (
+            <div className="px-4 py-2 text-sm font-semibold text-gray-900 border-b border-gray-100 truncate">
+              {userName}
+            </div>
+          )}
           {showInstall && (
             <button
               onClick={handleInstall}

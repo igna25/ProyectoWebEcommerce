@@ -45,6 +45,7 @@ export const authOptions: NextAuthOptions = {
           if (passwordsMatch)
             return {
               id: user.id,
+              name: user.name,
               email: user.email,
               role: user.role,
             };
@@ -67,6 +68,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
         token.role = user.role;
       }
       return token;
