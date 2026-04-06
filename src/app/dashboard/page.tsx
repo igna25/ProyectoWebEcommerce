@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Product } from "@/lib/Entities/Product";
 import ProductListDashboard from "../ui/dashboard/ProductListDashboard";
@@ -11,17 +11,24 @@ const ITEMS_PER_PAGE = 6;
 
 function DashboardContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { data: session } = useSession();
 
   const query = searchParams.get("query") || "";
-  const pageParam = Number(searchParams.get("page"));
-  const currentPage =
-    Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+  const rawPage = searchParams.get("page");
+  const pageParam = Number(rawPage);
+  const isValidPage = rawPage === null || (Number.isInteger(pageParam) && pageParam > 0);
+  const currentPage = isValidPage ? (pageParam || 1) : 1;
+
+  useEffect(() => {
+    if (!isValidPage) router.replace("/dashboard");
+  }, [isValidPage, router]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPageOutOfRange, setIsPageOutOfRange] = useState(false);
   const [sort, setSort] = useState("name_asc");
 
   const load = useCallback(async () => {
@@ -43,8 +50,11 @@ function DashboardContent() {
       if (!res.ok) throw new Error("fetch failed");
 
       const data = await res.json();
+      const total = Number(data.total);
+      const pages = Math.ceil(total / ITEMS_PER_PAGE);
       setProducts(data.products);
-      setTotalPages(Math.ceil(Number(data.total) / ITEMS_PER_PAGE));
+      setTotalPages(pages);
+      setIsPageOutOfRange(total > 0 && currentPage > pages);
     } catch {
       setError("No se pudieron cargar los productos. Intenta de nuevo.");
     } finally {
@@ -89,6 +99,15 @@ function DashboardContent() {
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+          </div>
+        ) : isPageOutOfRange ? (
+          <div className="h-screen flex items-center justify-center bg-gray-100">
+            <div className="text-center text-gray-700 space-y-3">
+              <p className="text-xl">Esta página no existe.</p>
+              <a href="/dashboard" className="text-sm text-[#004AAD] hover:underline">
+                Volver a la primera página
+              </a>
+            </div>
           </div>
         ) : products.length === 0 ? (
           <div className="h-screen flex items-center justify-center bg-gray-100">
