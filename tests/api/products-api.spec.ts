@@ -139,11 +139,11 @@ test.describe("API — /api/products", () => {
       expect(body).toHaveProperty("msg");
     });
 
-    test("retorna error (400/404/500) para ID con formato inválido", async ({
+    test("retorna error (500) para ID con formato inválido", async ({
       request,
     }) => {
       const res = await request.get(API.productById("id-invalido-abc-123"));
-      expect([400, 404, 500]).toContain(res.status());
+      expect(res.status()).toBe(500);
     });
   });
 
@@ -161,6 +161,7 @@ test.describe("API — /api/products", () => {
       request,
     }) => {
       const res = await request.get(API.productsRecent);
+      expect(res.status()).toBe(200);
       const body = await res.json();
       if (!body.products?.length) test.skip();
 
@@ -187,6 +188,7 @@ test.describe("API — /api/products", () => {
 
     test("los productos top tienen estructura válida", async ({ request }) => {
       const res = await request.get(API.productsTop);
+      expect(res.status()).toBe(200);
       const body = await res.json();
       if (!body.products?.length) test.skip();
 

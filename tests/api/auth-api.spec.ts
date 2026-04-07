@@ -139,11 +139,21 @@ test.describe("API — /api/auth (NextAuth)", () => {
     test("registro exitoso retorna message success", async ({ request }) => {
       const uniqueEmail = `test_${Date.now()}@playwright.com`;
       const res = await request.post("/api/auth/register", {
-        data: { email: uniqueEmail, password: "password123" },
+        data: { email: uniqueEmail, username: uniqueEmail.split("@")[0], password: "password123" },
       });
-      expect(res.status()).toBe(200);
+      expect(res.status()).toBe(201);
       const body = await res.json();
       expect(body).toHaveProperty("message", "success");
+    });
+
+    test("retorna 409 cuando el email ya está registrado", async ({ request }) => {
+      const existingEmail = ADMIN_USER.email;
+      const res = await request.post("/api/auth/register", {
+        data: { email: existingEmail, username: "testuser", password: "password123" },
+      });
+      expect(res.status()).toBe(409);
+      const body = await res.json();
+      expect(body).toHaveProperty("message");
     });
   });
 });

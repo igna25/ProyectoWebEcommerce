@@ -8,6 +8,9 @@ export async function GET(req: any) {
     const id = searchParams.get("id");
     if (id != null) {
       const sale = await salesRepository.getSaleById(id);
+      if (!sale) {
+        return NextResponse.json({ msg: "Sale not found" }, { status: 404 });
+      }
       return NextResponse.json({ sale }, { status: 200 });
     } else {
       const sales = await salesRepository.getAllSales();

@@ -117,7 +117,7 @@ test.describe("API — /api/admin (autenticado como admin)", () => {
       const body = await res.json();
 
       body.products.forEach((product: any) => {
-        expect(product.name.toLowerCase()).toContain(searchTerm.toLowerCase());
+        expect(product.productname.toLowerCase()).toContain(searchTerm.toLowerCase());
       });
     });
 
@@ -174,7 +174,7 @@ test.describe("API — /api/admin (autenticado como admin)", () => {
       await loginWithCredentials(request, ADMIN_USER.email, ADMIN_USER.password);
 
       const res = await request.get(
-        API.adminProductById("11111111-1111-11111"),
+        API.adminProductById("11111111-1111-1111-1111-111111111111"),
       );
       expect(res.status()).toBe(404);
     });
@@ -266,6 +266,20 @@ test.describe("API — /api/admin (autenticado como admin)", () => {
       });
       expect(res.status()).toBe(404);
     });
+
+    test("retorna 500 para productId inválido", async ({ request }) => {
+      await loginWithCredentials(request, ADMIN_USER.email, ADMIN_USER.password);
+
+      const res = await request.post(API.adminProductStatus, {
+        data: {
+          productId: "invalid-uuid-format",
+          active: true,
+        },
+      });
+      expect(res.status()).toBe(500);
+      const body = await res.json();
+      expect(body).toHaveProperty("msg");
+    });
   });
 
   test.describe("POST /api/admin/products/stock", () => {
@@ -330,11 +344,25 @@ test.describe("API — /api/admin (autenticado como admin)", () => {
 
       const res = await request.post(API.adminProductStock, {
         data: {
-          productId: "11111111-11111",
+          productId: "11111111-1111-1111-1111-111111111111",
           stock: 10,
         },
       });
       expect(res.status()).toBe(404);
+    });
+
+    test("retorna 500 para productId inválido", async ({ request }) => {
+      await loginWithCredentials(request, ADMIN_USER.email, ADMIN_USER.password);
+
+      const res = await request.post(API.adminProductStock, {
+        data: {
+          productId: "invalid-uuid-format",
+          stock: 10,
+        },
+      });
+      expect(res.status()).toBe(500);
+      const body = await res.json();
+      expect(body).toHaveProperty("msg");
     });
   });
 
@@ -435,9 +463,20 @@ test.describe("API — /api/admin (autenticado como admin)", () => {
       await loginWithCredentials(request, ADMIN_USER.email, ADMIN_USER.password);
 
       const res = await request.get(
-        API.adminSaleById("11111111-1111-1111-1111"),
+        API.adminSaleById("11111111-1111-1111-1111-111111111111"),
       );
       expect(res.status()).toBe(404);
+    });
+
+    test("retorna 500 para error del servidor (ID con formato inválido)", async ({ request }) => {
+      await loginWithCredentials(request, ADMIN_USER.email, ADMIN_USER.password);
+
+      const res = await request.get(
+        API.adminSaleById("invalid-id-format"),
+      );
+      expect(res.status()).toBe(500);
+      const body = await res.json();
+      expect(body).toHaveProperty("msg");
     });
   });
 });
