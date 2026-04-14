@@ -25,7 +25,7 @@ export default function SearchBar() {
   }
 
   return (
-    <div className="flex w-full sm:w-2/3 lg:w-1/2">
+    <div className="flex w-full sm:w-2/3 lg:w-1/2 min-w-0">
       <div className="relative flex-grow">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         <input
