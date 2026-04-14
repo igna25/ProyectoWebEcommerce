@@ -77,8 +77,8 @@ export default function DashboardContent() {
           Explora y encuentra los mejores productos de tu gusto
         </p>
       </div>
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-3 mb-6 px-2 sm:px-0">
-        <div className="w-full sm:w-auto sm:flex-1 sm:max-w-lg">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-6 px-2 sm:px-0 w-full">
+        <div className="w-full sm:flex-1">
           <SearchBar />
         </div>
         <select
