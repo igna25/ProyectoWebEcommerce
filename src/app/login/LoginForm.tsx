@@ -4,6 +4,8 @@ import { signIn, getSession } from "next-auth/react";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +16,9 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     if (!navigator.onLine) {
-      setError("Sin conexión. No podés iniciar sesión offline.");
+      toast.error("Sin conexión. No podés iniciar sesión offline.", {
+        position: "top-center",
+      });
       return;
     }
     setLoading(true);
@@ -39,6 +43,7 @@ export default function LoginForm() {
 
   return (
     <div className="w-full max-w-md">
+      <ToastContainer />
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8 space-y-5"
