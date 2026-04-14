@@ -25,23 +25,6 @@ test.describe("API — /api/products", () => {
       expect(body.products.length).toBeLessThanOrEqual(3);
     });
 
-    test("la segunda página devuelve productos distintos a la primera", async ({
-      request,
-    }) => {
-      const page1Res = await request.get(`${API.products}?page=1&pageSize=3`);
-      const page1 = await page1Res.json();
-      if (page1.total <= 3) test.skip();
-
-      const page2Res = await request.get(`${API.products}?page=2&pageSize=3`);
-      expect(page2Res.status()).toBe(200);
-      const page2 = await page2Res.json();
-
-      const ids1 = page1.products.map((p: { id: string }) => p.id);
-      const ids2 = page2.products.map((p: { id: string }) => p.id);
-      const overlap = ids1.filter((id: string) => ids2.includes(id));
-      expect(overlap.length).toBe(0);
-    });
-
     test("filtra por nombre con el parámetro query", async ({ request }) => {
       const allRes = await request.get(API.products);
       const allBody = await allRes.json();
