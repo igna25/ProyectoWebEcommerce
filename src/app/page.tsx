@@ -1,51 +1,38 @@
-import React, { Fragment } from 'react';
-import Link from 'next/link';
-import HomePage from './ui/HomePage';
-import NavBar from './ui/navBar';
-import { Button } from '@headlessui/react';
+import HomePage from "./ui/shared/HomePage";
+import NavBar from "./ui/shared/NavBar";
+import HeroCarousel from "./ui/shared/HeroCarousel";
+import Link from "next/link";
 
 const LandingPage = () => {
   return (
-    <Fragment>
-      
-      <NavBar></NavBar>
-      <div className="bg-gray-100 min-h-screen">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-gray-900 text-center">Bienvenido a Nuestra Tienda</h1>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-                  Encuentra los productos de la mejor calidad y a los mejores precios.
-            </p>
-            <div className="flex justify-center mt-4">
-              <Button className="bg-white text-gray-800 font-bold py-2 px-4 rounded">
-                <Link href="/dashboard">
-                  Ver todos los productos
-                </Link>
-              </Button>
-            </div>
-          </div>
+    <>
+      <NavBar />
+      <div className="bg-gray-50 min-h-screen">
+        <HeroCarousel />
 
         <main>
-          <section className="bg-white ">
-              <div className="mt-10">
-                <HomePage />
-              </div>
+          <section className="bg-white py-2">
+            <HomePage />
           </section>
 
-          <section className="bg-gray-800 py-4">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white text-center">
-              <h2 className="text-2xl font-bold">¿Listo para empezar?</h2>
-              <p className="mt-2">Explora nuestra colección y encuentra lo que necesitas.</p>
-              <Button className="mt-4 inline-block bg-white text-gray-800 font-bold py-2 px-4 rounded">
-                <Link href="/dashboard">
-                  Ver todos los productos
-                </Link>
-              </Button>
+          <section className="bg-gray-900 py-16 px-4">
+            <div className="max-w-2xl mx-auto text-white text-center">
+              <h2 className="text-3xl font-bold mb-3">¿Listo para empezar?</h2>
+              <p className="text-gray-400 mb-8">
+                Explora nuestra colección y encuentra lo que necesitas.
+              </p>
+              <Link
+                href="/dashboard"
+                className="inline-block bg-[#004AAD] hover:bg-[#003d8f] text-white font-bold py-3 px-8 rounded-xl transition-colors"
+              >
+                Ver todos los productos
+              </Link>
             </div>
           </section>
         </main>
       </div>
-    </Fragment>
+    </>
   );
-}
+};
 
 export default LandingPage;

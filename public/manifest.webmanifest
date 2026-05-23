@@ -1,0 +1,45 @@
+{
+  "name": "IAW-commerce",
+  "short_name": "IAW",
+  "description": "IAW Commerce es una aplicación web progresiva desarrollada en el marco de la materia Ingeniería de Aplicaciones Web. Permite gestionar un bazar online con funcionalidades de catálogo, carrito de compras y administración, ofreciendo una experiencia fluida tanto en modo online como offline.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F5F5F5",
+  "theme_color": "#004AAD",
+  "lang": "es",
+  "dir": "ltr",
+  "orientation": "portrait",
+  "categories": ["shopping", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/iaw-96.svg",
+      "sizes": "96x96",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/iaw-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/iaw-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/iaw-maskable.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/iaw-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
+
+

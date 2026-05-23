@@ -1,33 +1,60 @@
-import { getServerSession, Session } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/auth-config";
-import CartsRepository from "../lib/Repositories/CartsRepository";
+"use client";
+import { Fragment, useEffect, useState } from "react";
 import ProductList from "../ui/cart/ProductList";
-import { Product } from "../lib/Entities/Product";
-import OrderItemsRepository from "../lib/Repositories/OrdersRepository";
-import { OrderItem } from "../lib/Entities/Order";
-import { unstable_noStore as noStore } from 'next/cache';
-import { Fragment } from "react";
-export default async function CartPage() {
-  noStore();
-  const session: Session | null = await getServerSession(authOptions)
+import {
+  syncCartToServer,
+  loadCartFromServer,
+  getLocalCart,
+} from "@/lib/cache/cartCache";
 
-  const cartsRepository = new CartsRepository()
+export default function CartPage() {
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const ordersRepository = new OrderItemsRepository()
+  useEffect(() => {
+    const storedUserId =
+      typeof window !== "undefined"
+        ? localStorage.getItem("userId") || undefined
+        : undefined;
+    setUserId(storedUserId);
+  }, []);
 
-  let cartProducts: (OrderItem & Product)[] = []
-  if (session != null) {
-    let cart = await cartsRepository.getCartByUserId(session.user.id)
-    if (!!cart)
-      cartProducts = await ordersRepository.getOrdersByCartId(cart.id)
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        if (userId && navigator.onLine) {
+          const localItems = getLocalCart();
+          if (localItems.length > 0) {
+            await syncCartToServer(userId);
+          } else {
+            await loadCartFromServer(userId);
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadCart();
+  }, [userId]);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center text-gray-700">
+          <p className="text-xl">Cargando carrito...</p>
+        </div>
+      </div>
+    );
   }
-  
+
   return (
     <Fragment>
-      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">Tu carrito</h1>
+      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
+        Tu carrito
+      </h1>
       <section className="w-full mb-2">
-      <ProductList cartProducts={cartProducts} userId={session?.user.id}></ProductList>
+        <ProductList userId={userId}></ProductList>
       </section>
     </Fragment>
-  )
+  );
 }

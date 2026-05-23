@@ -1,231 +1,203 @@
-'use client'
+"use client";
 
-import React, { useState, Fragment, useEffect } from 'react';
-import Link from 'next/link';
-import CartWrapper from './CartCard';
-import { Product } from '@/app/lib/Entities/Product';
-import { OrderItem } from '@/app/lib/Entities/Order';
-import { removeProduct, increaseQuantity, decreaseQuantity, clearCart } from './../../lib/actions/cartActions';
-import { buyProducts } from '@/app/lib/actions/buyProducts';
-import { buyProductsLocal } from '@/app/lib/actions/buyProductsLocal';
-import { useRouter } from 'next/navigation';
-import { getCartProductsFromLocalStorage } from '@/app/lib/actions/getProductFromLocalStorage';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import CartWrapper from "./CartCard";
+import { Product } from "@/lib/Entities/Product";
+import { OrderItem } from "@/lib/Entities/Order";
+import { buyProducts } from "@/lib/actions/buyProducts";
+import { buyProductsLocal } from "@/lib/actions/buyProductsLocal";
 
-export default function ProductList({ cartProducts, userId }: { cartProducts: (OrderItem & Product)[], userId: string | undefined }) {
+import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import {
+  getLocalCart,
+  increaseItemQuantity,
+  decreaseItemQuantity,
+  removeItemFromLocalCart,
+  syncCartToServer,
+  CartItem,
+} from "@/lib/cache/cartCache";
+import { getProductFromLocalCache } from "@/lib/cache/productsCache";
 
-    const router = useRouter();
-    const isLogged = userId != undefined
+type EnrichedCartItem = CartItem &
+  Product & { id: string; cartid: string; dateadded: Date };
 
-    const [products, setProducts] = useState<(OrderItem & Product)[]>(cartProducts || []);
-    const [cartId, setCartId] = useState<string>('');
+export default function ProductList({
+  userId,
+}: {
+  userId: string | undefined;
+}) {
+  const [products, setProducts] = useState<EnrichedCartItem[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (isLogged) {
-            if (cartProducts.length > 0) {
-                setCartId(cartProducts[0].cartid);
-            }
-        } else {
-            cartProducts = getCartProductsFromLocalStorage();
-            setProducts(cartProducts);
+  const enrichCartItems = (): EnrichedCartItem[] => {
+    const cartItems = getLocalCart();
+    return cartItems
+      .map((item) => {
+        const product = getProductFromLocalCache(item.productid);
+        if (!product) return null;
+        return {
+          ...item,
+          ...product,
+          id: item.productid,
+          cartid: "",
+          dateadded: new Date(),
+        };
+      })
+      .filter((item): item is EnrichedCartItem => item !== null);
+  };
+
+  useEffect(() => {
+    setProducts(enrichCartItems());
+    const handleCartUpdate = () => setProducts(enrichCartItems());
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    return () => window.removeEventListener("cartUpdated", handleCartUpdate);
+  }, []);
+
+  const handleRemoveProduct = (productId: string) => {
+    removeItemFromLocalCart(productId);
+    setProducts(enrichCartItems());
+    if (userId && navigator.onLine) syncCartToServer(userId).catch(() => {});
+  };
+
+  const handleIncreaseQuantity = (productId: string) => {
+    increaseItemQuantity(productId);
+    setProducts(enrichCartItems());
+    if (userId && navigator.onLine) syncCartToServer(userId).catch(() => {});
+  };
+
+  const handleDecreaseQuantity = (productId: string) => {
+    decreaseItemQuantity(productId);
+    setProducts(enrichCartItems());
+    if (userId && navigator.onLine) syncCartToServer(userId).catch(() => {});
+  };
+
+  const outOfStockProducts = products.filter((p) => p.stock === 0);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setPurchaseError(null);
+    try {
+      let result;
+      if (userId) {
+        if (navigator.onLine) {
+          const synced = await syncCartToServer(userId);
+          if (!synced) {
+            setPurchaseError(
+              "No se pudo sincronizar el carrito. Intentá de nuevo.",
+            );
+            return;
+          }
         }
+        result = await buyProducts(userId);
+      } else {
+        result = await buyProductsLocal(products);
+      }
+      if (result.success && result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else if (result.outOfStock && result.outOfStock.length > 0) {
+        setPurchaseError(`Sin stock: ${result.outOfStock.join(", ")}`);
+      } else {
+        setPurchaseError("No se pudo completar la compra. Intenta de nuevo.");
+      }
+    } catch {
+      setPurchaseError("Ocurrió un error al procesar la compra.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    }, [cartProducts])
+  const total = products
+    .reduce((acc, p) => acc + p.productprice * p.quantity, 0)
+    .toFixed(2);
 
-    const handleRemoveProduct = async (orderitemid: string, productid:string) => {
-        if (isLogged) {
-            const handlerResult = await removeProduct(orderitemid, cartId);
-            if (handlerResult.success) {
-                const updatedProducts = products.filter(product => product.id !== orderitemid);
-                setProducts(updatedProducts);
-            }
-        }
-        else {
-            const cartString = localStorage.getItem('cart');
-            if (cartString) {
-                const cart: (OrderItem & Product)[] = JSON.parse(cartString);
-                const updatedCart = cart.filter(item => item.productid !== productid);
-                localStorage.setItem('cart', JSON.stringify(updatedCart));
-                setProducts(updatedCart);
-            }
-        }
-    };
-
-    const handleIncreaseQuantity = async (orderitemid: string, productid:string) => {
-        if (isLogged) {
-            const handlerResult = await increaseQuantity(orderitemid, cartId);
-            if (handlerResult.success) {
-                const updatedProducts = products.map(product =>
-                    product.id == orderitemid ? { ...product, quantity: product.quantity + 1 } : product
-                );
-                setProducts(updatedProducts);
-            }
-        }
-        else {
-            const cartString = localStorage.getItem('cart');
-            if (cartString) {
-                const cart: (OrderItem & Product)[] = JSON.parse(cartString);
-                const existingProductIndex = cart.findIndex((item: (OrderItem & Product)) => item.productid === productid);
-                if (existingProductIndex !== -1) {
-                    cart[existingProductIndex].quantity++;
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    setProducts(cart);
-                };
-
-            }
-        }
-    };
-
-    const handleDecreaseQuantity = async (orderitemid: string, productid:string) => {
-        if (isLogged) {
-            const handlerResult = await decreaseQuantity(orderitemid, cartId);
-            if (handlerResult.success) {
-                const updatedProducts = products.map(product =>
-                    product.id == orderitemid && product.quantity > 1 ? { ...product, quantity: product.quantity - 1 } : product
-                );
-                setProducts(updatedProducts);
-            }
-        }
-        else {
-            const cartString = localStorage.getItem('cart');
-            if (cartString) {
-                const cart: (OrderItem & Product)[] = JSON.parse(cartString);
-                const existingProductIndex = cart.findIndex((item: (OrderItem & Product)) => item.productid == productid && item.quantity > 1);
-                if (existingProductIndex !== -1) {
-                    cart[existingProductIndex].quantity--;
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    setProducts(cart);
-                };
-
-            }
-        }
-    };
-
-    const handleClearCart = async () => {
-        if (isLogged) {
-            const handlerResult = await clearCart(cartId);
-            if (handlerResult.success) {
-                setProducts([]);
-            }
-        }
-        else {
-            const cartString = localStorage.getItem('cart');
-            if (cartString) {
-                localStorage.removeItem('cart')
-                setProducts([]);
-            }
-        }
-    };
-
-    const handleSubmit = async () => {
-
-        try {
-            const formData: FormData = new FormData()
-
-            products.map((product: (OrderItem & Product)) => {
-                //Campos orderItem
-                formData.append('orderId', product.id)
-                formData.append('cartId', product.cartid)
-                formData.append('date', product.dateadded.toString())
-                formData.append('quantity', String(product.quantity))
-                formData.append('orderItemPrice', String(product.productprice))
-                //Campos Product
-                formData.append('productId', product.productid)
-                formData.append('productName', product.productname)
-                formData.append('description', product.description)
-                formData.append('image', product.imageurl)
-                formData.append('productPrice', String(product.price))
-                formData.append('publicationDate', product.publicationdate.toString())
-                formData.append('productStock', String(product.stock))
-                formData.append('productActive', String(product.active))
-
-            })
-
-            let result
-            if (isLogged) {
-                result = await buyProducts(userId)
-                if (result.success && result.redirectUrl) {
-                    router.push(result.redirectUrl);
-                } else {
-                    console.error('Error during purchase:');
-                }
-            }
-            else {
-               result = await buyProductsLocal(products);
-                if (result.success && result.redirectUrl) {
-                    router.push(result.redirectUrl); 
-                    console.log("compra exitosa")
-                } else {
-                    console.error('Error during purchase:');
-                }
-
-            }
-
-        } catch (error) {
-            console.error('Error al enviar datos:', error);
-        }
-    };
-
+  if (products.length === 0) {
     return (
-        <Fragment>
-            <div className="container grid md:grid-cols-2 lg:grid-cols-2 gap-4 px-4 md:px-6 mt-3">
-                <div className="grid gap-4">
-                    {
-                        products.length > 0
-                            ? (
-                                <Fragment>
-                                    {products.map((product: (OrderItem & Product)) => (
-                                        <CartWrapper
-                                            key={product.id}
-                                            product={product}
-                                            isLogged={isLogged}
-                                            onIncrease={() => handleIncreaseQuantity(product.id, product.productid)}
-                                            onDecrease={() => handleDecreaseQuantity(product.id, product.productid)}
-                                            onRemove={() => handleRemoveProduct(product.id, product.productid)}
-                                        />
-                                    ))}
-                                    <div className="flex-1 flex mt-4">
-                                        <button
-                                            onClick={handleClearCart}
-                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 focus:outline-none">
-                                            Limpiar carrito
-                                        </button>
-                                    </div>
-                                </Fragment>
-                            ) : (
-                                <div className="text-center border-2 border-dashed p-6 grid grid-rows-2 border-gray-200 rounded-lg">
-                                    <p className="text-2xl">Carrito vacío</p>
-                                    <Link href="/dashboard">
-                                        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400">
-                                            Volver al dashboard
-                                        </button>
-                                    </Link>
-                                </div>
-                            )
-                    }
-                </div>
-                <div className="w-full lg:w-3/4 bg-white rounded-lg p-6 flex flex-col justify-between shadow-xl shadow-slate-300">
-                    <h2 className="text-2xl font-bold">Resumen de compra</h2>
-                    <div className="flex flex-col gap-2">
-                        {products.map(product => (
-                            <div key={product.id} className="flex justify-between">
-                                <p>{product.productname}</p> X {product.quantity}
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex justify-between mt-4 border-t pt-6">
-                        <p className="text-xl font-bold">Total:</p>
-                        <p className="text-4xl">${products.reduce((acc, product) => acc + product.productprice * product.quantity, 0).toFixed(2)}</p>
-                    </div>
-                    {products.length > 0 && (
-                        <button
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 text-center"
-                            onClick={handleSubmit}
-                        >
-                            Comprar
-                        </button>
-                    )}
-                </div>
-            </div>
-        </Fragment>
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <ShoppingBagIcon className="w-16 h-16 text-gray-300 mb-4" />
+        <h2 className="text-xl font-bold text-gray-700 mb-1">
+          Tu carrito está vacío
+        </h2>
+        <p className="text-sm text-gray-400 mb-6">
+          Explorá el catálogo y agregá productos.
+        </p>
+        <Link
+          href="/dashboard"
+          className="px-6 py-2.5 bg-[#004AAD] hover:bg-[#003d8f] text-white text-sm font-semibold rounded-xl transition-colors"
+        >
+          Ver productos
+        </Link>
+      </div>
     );
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="lg:col-span-2 flex flex-col gap-3">
+        {products.map((product: OrderItem & Product) => (
+          <CartWrapper
+            key={product.productid}
+            product={product}
+            isLogged={!!userId}
+            onIncrease={() => handleIncreaseQuantity(product.productid)}
+            onDecrease={() => handleDecreaseQuantity(product.productid)}
+            onRemove={() => handleRemoveProduct(product.productid)}
+          />
+        ))}
+        <Link
+          href="/dashboard"
+          className="self-start text-sm font-medium text-[#004AAD] hover:text-[#003d8f] transition-colors mt-1"
+        >
+          ← Seguir comprando
+        </Link>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 flex flex-col gap-4 h-fit lg:sticky lg:top-20">
+        <h2 className="text-lg font-bold text-gray-900">Resumen</h2>
+
+        <div className="flex flex-col gap-2 text-sm text-gray-600">
+          {products.map((product) => (
+            <div key={product.id} className="flex justify-between">
+              <span className="truncate mr-2">{product.productname}</span>
+              <span className="shrink-0 text-gray-400">
+                x{product.quantity}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="border-t pt-4 flex justify-between items-center">
+          <p className="text-sm font-semibold text-gray-700">Total</p>
+          <p className="text-2xl font-extrabold text-[#004AAD]">${total}</p>
+        </div>
+
+        {outOfStockProducts.length > 0 && (
+          <div className="rounded-xl bg-red-50 border border-red-100 p-3 flex flex-col gap-1">
+            <p className="text-xs font-semibold text-red-700">
+              Los siguientes productos no tienen stock:
+            </p>
+            <ul className="list-disc list-inside">
+              {outOfStockProducts.map((p) => (
+                <li key={p.id} className="text-xs text-red-600">
+                  {p.productname}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {purchaseError && (
+          <p className="text-sm text-red-600 text-center">{purchaseError}</p>
+        )}
+        <button
+          onClick={handleSubmit}
+          disabled={submitting || outOfStockProducts.length > 0}
+          className="w-full py-3 bg-[#004AAD] hover:bg-[#003d8f] text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {submitting ? "Procesando..." : "Confirmar compra"}
+        </button>
+      </div>
+    </div>
+  );
 }

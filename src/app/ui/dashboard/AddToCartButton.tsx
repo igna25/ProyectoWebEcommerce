@@ -1,55 +1,114 @@
-"use client"
+"use client";
 
-import React, { Fragment, useState } from 'react';
-import { Button, Dialog, DialogPanel, DialogTitle, Transition } from '@headlessui/react';
-import { Product } from '@/app/lib/Entities/Product';
+import React, { Fragment, useState } from "react";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { Product } from "@/lib/Entities/Product";
+import Link from "next/link";
+import { addItemToLocalCart, syncCartToServer } from "@/lib/cache/cartCache";
 
-import Link from 'next/link';
-import { addProductToCart } from '@/app/lib/actions/addProductToCart';
-import { addProductToLocalStorage } from '@/app/lib/actions/addProductToLocalStorage';
+function AddCartButton({
+  product,
+  userID,
+}: {
+  product: Product;
+  userID: string | undefined;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
 
+  const handleClick = () => {
+    addItemToLocalCart(product);
+    if (userID && navigator.onLine) {
+      syncCartToServer(userID).catch(() => {});
+    }
+    setIsOpen(true);
+  };
 
-function AddCartButton({ product, userID }: { product: Product, userID: string | undefined }) {
-    let [isOpen, setIsOpen] = useState(false)
-    const handleClick = () => {
-        if (!userID) {
-            addProductToLocalStorage(product);
-        } else{
-            addProductToCart(product, userID);
-        }
-            setIsOpen(true)
-    };
-
+  if (product.stock === 0) {
     return (
-        <Fragment>
-            <Button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" onClick={handleClick}>
-                Agregar al carrito
-            </Button><Transition
-                show={isOpen}
-                enter="duration-200 ease-out"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="duration-300 ease-out"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-            >
-                <Dialog onClose={() => setIsOpen(false)} className="relative z-50 transition">
-                    <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-                        <DialogPanel className="max-w-lg space-y-2 bg-white p-6 rounded-xl">
-                            <DialogTitle className="font-bold">{product.productname} agregado al carrito</DialogTitle>
-                            <div className="flex gap-4">
-                                <button onClick={() => setIsOpen(false)} className="hover:bg-gray-200 rounded-md">
-                                    Entendido, gracias</button>
-                                <button onClick={() => setIsOpen(false)} className="hover:bg-gray-200 rounded-md">
-                                    <Link href="/cart">Ir al carrito</Link>
-                                </button>
-                            </div>
-                        </DialogPanel>
-                    </div>
-                </Dialog>
-            </Transition>
-        </Fragment>
+      <div className="flex flex-col gap-2">
+        <button
+          disabled
+          className="w-full py-2 px-4 rounded-xl text-sm font-semibold text-white bg-gray-300 cursor-not-allowed"
+        >
+          Sin stock
+        </button>
+        <p className="text-xs text-gray-500 text-center">
+          Próximamente obtendremos más unidades de este producto.
+        </p>
+      </div>
     );
-};
+  }
 
-export default AddCartButton 
+  return (
+    <Fragment>
+      <button
+        onClick={handleClick}
+        className="w-full py-2 px-4 rounded-xl text-sm font-semibold text-white bg-[#004AAD] hover:bg-[#003d8f] transition-colors"
+      >
+        Agregar al carrito
+      </button>
+
+      <Transition show={isOpen} as={Fragment}>
+        <Dialog onClose={() => setIsOpen(false)} className="relative z-50">
+          <TransitionChild
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/50" />
+          </TransitionChild>
+
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <TransitionChild
+              as={Fragment}
+              enter="ease-out duration-200"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-150"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <DialogPanel className="w-full max-w-sm bg-white rounded-2xl p-6 shadow-xl">
+                <div className="flex flex-col items-center text-center gap-3">
+                  <CheckCircleIcon className="w-12 h-12 text-green-500" />
+                  <DialogTitle className="text-lg font-bold text-gray-900">
+                    ¡Agregado al carrito!
+                  </DialogTitle>
+                  <p className="text-sm text-gray-500">{product.productname}</p>
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                  >
+                    Seguir comprando
+                  </button>
+                  <Link
+                    href="/cart"
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 py-2 text-sm font-semibold text-white bg-[#004AAD] hover:bg-[#003d8f] rounded-xl text-center transition-colors"
+                  >
+                    Ir al carrito
+                  </Link>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </Dialog>
+      </Transition>
+    </Fragment>
+  );
+}
+
+export default AddCartButton;

@@ -1,44 +1,60 @@
-import { authOptions } from '@/app/api/auth/[...nextauth]/auth-config';
-import ProductsRepository from '@/app/lib/Repositories/ProductsRepository';
-import ProductDetails from '@/app/ui/dashboard/ProductDetails';
-import { getServerSession, Session } from 'next-auth';
-import { notFound } from 'next/navigation';
+"use client";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { getProductFromLocalCache } from "@/lib/cache/productsCache";
+import ProductDetails from "@/app/ui/dashboard/ProductDetails";
 
+export default function ProductDetailsPage() {
+  const params = useParams();
+  const productIdParam = params?.productId;
+  const productId =
+    typeof productIdParam === "string"
+      ? productIdParam
+      : Array.isArray(productIdParam)
+        ? productIdParam[0]
+        : "";
+  const { data: session } = useSession();
+  const [product, setProduct] = useState<any | null>(null);
+  const [isNotFound, setIsNotFound] = useState(false);
 
-const ProductDetailsPage = async ({
-    params,
-  }: {
-    params: {
-      productId: string
-      userID: string
+  useEffect(() => {
+    const load = async () => {
+      if (!productId) return;
+      try {
+        const response = await fetch(`/api/products/${productId}`);
+        if (!response.ok) throw new Error("request-failed");
+        const json = await response.json();
+        if (json && json.product) {
+          setProduct(json.product);
+        } else {
+          setIsNotFound(true);
+        }
+      } catch {
+        const cachedProduct = getProductFromLocalCache(productId);
+        if (cachedProduct) {
+          setProduct(cachedProduct);
+        } else {
+          setIsNotFound(true);
+        }
+      }
     };
-  }) => {
-    
-    const session: Session | null = await getServerSession(authOptions);
-    const productsRepository = new ProductsRepository()
+    load();
+  }, [productId]);
 
-    const product = await productsRepository.getProductById(params.productId)
-    
-    if(!product) {
-      notFound();
-    }
-    
   return (
-    <div>
-
-      <div className="container mx-auto px-4">
-        {product? (
-            <ProductDetails product={product} userID={session?.user.id} />
-        ) : (
-            <div className="h-screen flex items-center justify-center bg-gray-100">
-                <div className="text-center text-gray-700">
-                    <p className="text-xl">Lo sentimos, parece que el producto no existe.</p>
-                </div>
-            </div>
-        )}
-    </div>
+    <div className="container mx-auto px-4">
+      {product ? (
+        <ProductDetails product={product} userID={session?.user?.id} />
+      ) : isNotFound ? (
+        <div className="h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center text-gray-700">
+            <p className="text-xl">
+              Lo sentimos, parece que el producto no existe.
+            </p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
-};
-
-export default ProductDetailsPage;
+}
