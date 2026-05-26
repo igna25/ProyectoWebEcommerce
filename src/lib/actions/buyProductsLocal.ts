@@ -84,8 +84,8 @@ export async function buyProductsLocal(
         body: {
           items,
           back_urls: {
-            success: "https://proyecto-web-vercel.vercel.app/",
-            failure: "https://proyecto-web-vercel.vercel.app/",
+            success: "https://proyecto-web-ecommerce.vercel.app/",
+            failure: "https://proyecto-web-ecommerce.vercel.app/",
           },
           metadata: {
             cartid: cartId,

@@ -62,8 +62,8 @@ export async function buyProducts(userID: string): Promise<{
         body: {
           items,
           back_urls: {
-            success: "https://proyecto-web-vercel.vercel.app/",
-            failure: "https://proyecto-web-vercel.vercel.app/",
+            success: "https://proyecto-web-ecommerce.vercel.app/",
+            failure: "https://proyecto-web-ecommerce.vercel.app/",
           },
           metadata: {
             cartid: cart.id,

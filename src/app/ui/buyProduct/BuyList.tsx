@@ -8,7 +8,6 @@ import clsx from "clsx";
 import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 //import { buyProductsLocal } from '@/lib/actions/buyProductsLocal';
 
 interface BuyListProps {
