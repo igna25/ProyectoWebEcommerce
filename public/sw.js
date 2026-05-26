@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v15";
+const CACHE_VERSION = "v16";
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_API_CACHE = `api-${CACHE_VERSION}`;
 const ADMIN_API_CACHE = `admin-api-${CACHE_VERSION}`;
