@@ -1,5 +1,5 @@
-const { db } = require("@vercel/postgres");
-const bcrypt = require("bcrypt");
+import { db } from "@vercel/postgres";
+import { hash } from "bcrypt";
 
 const users = [
   {
@@ -140,7 +140,7 @@ async function seedUsers(client) {
 
     const hashedPasswords = await Promise.all(
       users.map(async (user) => {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
+        const hashedPassword = await hash(user.password, 10);
         return hashedPassword;
       }),
     );
